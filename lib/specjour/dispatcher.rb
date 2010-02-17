@@ -8,6 +8,10 @@ module Specjour
       @worker_threads = []
     end
 
+    def all_specs
+      @all_specs ||= Dir[File.join(project_path, "/spec/**/*_spec.rb")]
+    end
+
     def alert_clients
 
     end
@@ -33,7 +37,8 @@ module Specjour
     end
 
     def dispatch_work
-      workers.each do |worker|
+      workers.each_with_index do |worker, index|
+        worker.specs_to_run = Array(specs_for_worker(index))
         worker_threads << Thread.new(worker, &work)
       end
     end
@@ -42,15 +47,37 @@ module Specjour
       browser.browse '_druby._tcp' do |reply|
         DNSSD.resolve(reply) do |resolved|
           uri = URI::Generic.build :scheme => reply.service_name, :host => resolved.target, :port => resolved.port
-          workers << DRbObject.new_with_uri(uri.to_s)
-          reply.service.stop
+          workers << fetch_worker(uri)
+          reply.service.stop unless reply.flags.more_coming?
         end
       end
-      workers
+      p workers
+    end
+
+    def fetch_worker(uri)
+      worker = DRbObject.new_with_uri(uri.to_s)
+      worker.project_path = project_path
+      worker.project_name = project_name
+      worker
     end
 
     def rsync_daemon
       @rsync_daemon ||= RsyncDaemon.new(project_path, project_name)
+    end
+
+    def specs_per_worker
+      per = all_specs.size / workers.size
+      per.zero? ? 1 : per
+    end
+
+    def specs_for_worker(index)
+      offset = (index * specs_per_worker)
+      boundry = specs_per_worker * (index + 1)
+      range = (offset...boundry)
+      if workers[index] == workers.last
+        range = (offset..-1)
+      end
+      all_specs[range]
     end
 
     def wait_on_workers
@@ -59,7 +86,7 @@ module Specjour
 
     def work
       lambda do |worker|
-        puts worker.run("spec/")
+        puts worker.run
       end
     end
   end

@@ -2,16 +2,10 @@ module Specjour
   class Worker
     include DRbUndumped
 
-    attr_reader :project_path, :project_name, :specs_to_run
+    attr_accessor :project_path, :project_name, :specs_to_run
 
-    def initialize(project_path, project_name)
-      @project_path = project_path
-      @project_name = project_name
-    end
-
-    def run(specs)
-      self.specs_to_run = specs
-      "Running command #{spec_command}"
+    def run
+      puts "Running command #{spec_command.inspect}"
       Open3.popen3(spec_command) do |stdin, stdout, stderr|
         stdout.read
       end
@@ -29,19 +23,23 @@ module Specjour
       DRb.thread.join
     end
 
-    protected
+    def hash
+      @hash ||= Time.now.to_f.to_s.sub(/\./,'')
+    end
+    alias object_id hash
 
-    attr_writer :specs_to_run
+    protected
 
     def drb_uri
       URI.parse(DRb.uri)
     end
 
     def spec_command
-      "cd #{project_path} && spec #{specs_to_run}"
+      "cd #{project_path} && spec #{specs_to_run.join(" ")}"
     end
 
     def announce_service
+      puts "registering specjour_worker_#{object_id}"
       DNSSD.register "specjour_worker_#{object_id}", "_#{drb_uri.scheme}._tcp", nil, drb_uri.port
     end
   end

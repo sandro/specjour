@@ -49,7 +49,9 @@ namespace(:example) do
   $:.unshift(File.dirname(__FILE__) + "/lib")
   require 'specjour'
   task :worker do
-    Specjour::Worker.new(Dir.pwd, 'specjour').start
+    w = Specjour::Worker.new
+    p w.object_id
+    w.start
   end
 
   task :dispatcher do
