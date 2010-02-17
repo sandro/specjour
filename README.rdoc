@@ -1,6 +1,6 @@
 = specjour
 
-Description goes here.
+Distribute your spec suite amongst your LAN via bonjour.
 
 == Note on Patches/Pull Requests
  

@@ -1,24 +1,27 @@
 #!/usr/bin/env ruby
 
-require 'drb/drb'
-require 'rinda/ring'
-require 'rinda/tuplespace'
+require 'drb'
+require 'uri'
+require 'rubygems'
+require 'dnssd'
 
-DRb.start_service
+workers = []
 
-ring_server = Rinda::RingFinger.primary
-#
-# service = ring_server.read([:name, nil, nil, nil])
-
-# worker = service[2]
-# worker.run("spec/1 spec/2 spec/3")
-
-services = ring_server.read_all([:name, nil, nil, nil])
-services.each do |service|
-  worker = service[2]
-  worker.run("spec/1 spec/2 spec/3")
+browser = DNSSD::Service.new
+browser.browse '_druby._tcp' do |reply|
+  DNSSD.resolve(reply) do |r|
+    uri = URI::Generic.build :scheme => reply.service_name, :host => r.target, :port => r.port
+    workers << DRbObject.new_with_uri(uri.to_s)
+    reply.service.stop
+  end
 end
-  # p service
-  # worker = service[2]
-  # worker.run("spec/1 spec/2 spec/3")
-# end
+p workers
+
+threads = []
+workers.each do |worker|
+  threads << Thread.new do
+    puts worker.run("spec/1 spec/2 spec/3")
+  end
+end
+
+threads.each {|t| t.join}
