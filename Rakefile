@@ -44,3 +44,15 @@ rescue LoadError
     abort "YARD is not available. In order to run yardoc, you must: sudo gem install yard"
   end
 end
+
+namespace(:example) do
+  $:.unshift(File.dirname(__FILE__) + "/lib")
+  require 'specjour'
+  task :worker do
+    Specjour::Worker.new(Dir.pwd, 'specjour').start
+  end
+
+  task :dispatcher do
+    Specjour::Dispatcher.new(Dir.pwd).start
+  end
+end
