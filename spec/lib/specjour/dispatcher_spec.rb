@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Specjour::Dispatcher do
   let(:dispatcher) { Specjour::Dispatcher.new('.') }
   def new_worker
-    Specjour::Worker.new '.', ''
+    Specjour::Worker.new
   end
 
   context "when splitting specs amongst workers" do
