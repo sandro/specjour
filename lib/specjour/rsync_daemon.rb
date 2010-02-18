@@ -25,10 +25,8 @@ module Specjour
     protected
 
     def write_config
-      unless File.exists?(config_file)
-        File.open(config_file, 'w') do |f|
-          f.write config
-        end
+      File.open(config_file, 'w') do |f|
+        f.write config
       end
     end
 
