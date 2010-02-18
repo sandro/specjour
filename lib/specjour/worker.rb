@@ -2,7 +2,7 @@ module Specjour
   class Worker
     include DRbUndumped
 
-    attr_accessor :project_name, :specs_to_run, :host
+    attr_accessor :project_name, :specs_to_run, :host, :number
     attr_reader :project_path
 
     def initialize(project_path = nil)
@@ -51,7 +51,8 @@ module Specjour
     end
 
     def spec_command
-      "cd #{project_path} && spec #{specs_to_run.join(" ")}"
+      test_env_number = (number == 1 ? nil : "TEST_ENV_NUMBER=#{number}") # parallel_spec compat
+      "cd #{project_path} && #{test_env_number} spec #{specs_to_run.join(" ")}"
     end
 
     def announce_service

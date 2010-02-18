@@ -1,11 +1,12 @@
 module Specjour
   class Dispatcher
-    attr_reader :project_path, :workers, :worker_threads
+    attr_reader :project_path, :workers, :worker_threads, :hosts
 
     def initialize(project_path)
       @project_path = project_path
       @workers = []
       @worker_threads = []
+      @hosts = {}
     end
 
     def all_specs
@@ -29,6 +30,14 @@ module Specjour
     end
 
     protected
+
+    def add_worker_to_hosts(worker, host)
+      if hosts[host]
+        hosts[host] << worker
+      else
+        hosts[host] = [worker]
+      end
+    end
 
     def browser
       @browser ||= DNSSD::Service.new
@@ -61,8 +70,10 @@ module Specjour
 
     def fetch_worker(uri)
       worker = DRbObject.new_with_uri(uri.to_s)
+      add_worker_to_hosts(worker, uri.host)
       worker.project_name = project_name
       worker.host = %x(hostname).strip
+      worker.number = hosts[uri.host].index(worker) + 1
       worker
     end
 
