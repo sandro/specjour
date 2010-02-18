@@ -9,7 +9,7 @@ module Specjour
     end
 
     def config_file
-      File.join(project_path, "tmp", "rsyncd.conf")
+      File.join("/tmp", "rsyncd.conf")
     end
 
     def start
