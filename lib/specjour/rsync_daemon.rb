@@ -18,8 +18,10 @@ module Specjour
     end
 
     def stop
-      Process.kill("TERM", pid)
-      FileUtils.rm(pid_file)
+      if pid
+        Process.kill("TERM", pid)
+        FileUtils.rm(pid_file)
+      end
     end
 
     protected
@@ -31,7 +33,9 @@ module Specjour
     end
 
     def pid
-      File.read(pid_file).strip.to_i
+      if File.exists?(pid_file)
+        File.read(pid_file).strip.to_i
+      end
     end
 
     def pid_file
