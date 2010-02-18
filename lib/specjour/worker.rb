@@ -2,17 +2,27 @@ module Specjour
   class Worker
     include DRbUndumped
 
-    attr_accessor :project_path, :project_name, :specs_to_run
+    attr_accessor :project_name, :specs_to_run, :host
+    attr_reader :project_path
+
+    def initialize(project_path = nil)
+      @project_path = project_path
+    end
+
+    def hash
+      @hash ||= Time.now.to_f.to_s.sub(/\./,'')
+    end
+    alias object_id hash
+
+    def project_path=(name)
+      @project_path ||= name
+    end
 
     def run
       puts "Running command #{spec_command.inspect}"
       Open3.popen3(spec_command) do |stdin, stdout, stderr|
         stdout.read
       end
-    end
-
-    def sync
-      "rsync -a --delete --port=8989 santurimob.local::#{project_name} /tmp/#{project_name}"
     end
 
     def start
@@ -23,12 +33,18 @@ module Specjour
       DRb.thread.join
     end
 
-    def hash
-      @hash ||= Time.now.to_f.to_s.sub(/\./,'')
+    def sync
+      p "syncing"
+      self.project_path = File.join("/tmp", project_name)
+      cmd "rsync -a --port=8989 #{host}::#{project_name} #{project_path}"
     end
-    alias object_id hash
 
     protected
+
+    def cmd(command)
+      puts command
+      system command
+    end
 
     def drb_uri
       URI.parse(DRb.uri)

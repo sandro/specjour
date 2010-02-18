@@ -18,14 +18,14 @@ module Specjour
       File.basename(project_path)
     end
 
-    def serve
-      rsync_daemon.start
-    end
-
     def start
+      rsync_daemon.start
       gather_workers
+      sync_workers
       dispatch_work
       wait_on_workers
+      sleep 2
+      rsync_daemon.stop
     end
 
     protected
@@ -41,6 +41,13 @@ module Specjour
       end
     end
 
+    def sync_workers
+      workers.each do |worker|
+        worker.sync
+      end
+      puts "done syncing"
+    end
+
     def gather_workers
       browser.browse '_druby._tcp' do |reply|
         DNSSD.resolve(reply) do |resolved|
@@ -54,8 +61,8 @@ module Specjour
 
     def fetch_worker(uri)
       worker = DRbObject.new_with_uri(uri.to_s)
-      worker.project_path = project_path
       worker.project_name = project_name
+      worker.host = %x(hostname).strip
       worker
     end
 
