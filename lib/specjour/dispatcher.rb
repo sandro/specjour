@@ -9,11 +9,9 @@ module Specjour
     end
 
     def all_specs
-      @all_specs ||= Dir[File.join(project_path, "/spec/**/*_spec.rb")]
-    end
-
-    def alert_clients
-
+      @all_specs ||= Dir.chdir(project_path) do
+        Dir["spec/**/*_spec.rb"].sort_by { rand }
+      end
     end
 
     def project_name
