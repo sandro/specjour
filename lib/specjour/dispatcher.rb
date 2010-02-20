@@ -51,10 +51,10 @@ module Specjour
     end
 
     def sync_workers
-      workers.each do |worker|
-        worker.sync
+      hosts.each do |hostname, workers|
+        workers.first.sync
       end
-      puts "done syncing"
+      puts "Workers are syncing..."
     end
 
     def gather_workers
