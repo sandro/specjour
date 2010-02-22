@@ -28,7 +28,7 @@ module Specjour
     def run
       Kernel.puts "Running #{specs_to_run.size} spec files..."
       pid = Process.fork do
-        set_test_env_number
+        set_env_variables
         Dir.chdir(project_path) do
           ::Spec::Runner::CommandLine.run(
             ::Spec::Runner::OptionParser.parse(
@@ -115,7 +115,8 @@ module Specjour
       DNSSD.register "specjour_worker_#{object_id}", "_#{drb_uri.scheme}._tcp", nil, drb_uri.port
     end
 
-    def set_test_env_number
+    def set_env_variables
+      ENV['PREPARE_DB'] = 'true'
       if number > 1
         ENV['TEST_ENV_NUMBER'] = number.to_s
       end
