@@ -50,7 +50,6 @@ namespace(:example) do
   require 'specjour'
   task :worker do
     w = Specjour::Worker.new
-    p w.object_id
     w.start
   end
 

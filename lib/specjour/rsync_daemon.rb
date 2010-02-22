@@ -15,6 +15,7 @@ module Specjour
     def start
       write_config
       system("rsync", "--daemon", "--config=#{config_file}", "--port=8989")
+      at_exit { puts 'shutting down rsync'; stop }
     end
 
     def stop
