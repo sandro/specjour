@@ -12,6 +12,10 @@ module Specjour
       @dispatcher_stdout ||= dispatcher.stdout
     end
 
+    def dispatcher_stderr
+      @dispatcher_stderr ||= dispatcher.stderr
+    end
+
     def hash
       @hash ||= Time.now.to_f.to_s.sub(/\./,'')
     end
@@ -33,7 +37,7 @@ module Specjour
           ::Spec::Runner::CommandLine.run(
             ::Spec::Runner::OptionParser.parse(
               rspec_options,
-              dispatcher.stderr,
+              dispatcher_stderr,
               spec_reporter
             )
           )
