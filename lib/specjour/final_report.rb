@@ -28,7 +28,7 @@ module Specjour
 
     def formatter
       @formatter ||= begin
-        f = Spec::Runner::Formatter::BaseTextFormatter.new(formatter_options, $stdout)
+        f = MarshalableFailureFormatter.new(formatter_options, $stdout)
         f.instance_variable_set(:@pending_examples, pending_examples)
         f
       end

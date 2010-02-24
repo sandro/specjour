@@ -1,7 +1,14 @@
 require 'spec_helper'
 
+class CustomException < RuntimeError
+end
+
+def boo
+  raise CustomException, 'fails'
+end
+
 describe Specjour::Worker do
   it "fails" do
-    fail 'i failed'
+    boo
   end
 end

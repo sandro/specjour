@@ -6,12 +6,15 @@ require 'forwardable'
 require 'spec'
 require 'spec/runner/formatter/progress_bar_formatter'
 
-require 'specjour/dispatcher'
-require 'specjour/rsync_daemon'
-require 'specjour/distributed_formatter'
-require 'specjour/spec_reporter'
-require 'specjour/final_report'
-require 'specjour/worker'
+require 'specjour/marshalable_rspec_failure'
 
 module Specjour
+  autoload :Dispatcher, 'specjour/dispatcher'
+  autoload :FinalReport, 'specjour/final_report'
+  autoload :RsyncDaemon, 'specjour/rsync_daemon'
+  autoload :MarshalableFailureFormatter, 'specjour/marshalable_failure_formatter'
+
+  autoload :Worker, 'specjour/worker'
+  autoload :SpecReporter, 'specjour/spec_reporter'
+  autoload :DistributedFormatter, 'specjour/distributed_formatter'
 end
