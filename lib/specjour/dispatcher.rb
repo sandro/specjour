@@ -70,12 +70,18 @@ module Specjour
 
     def fetch_worker(uri)
       worker = DRbObject.new_with_uri(uri.to_s)
-      add_worker_to_hosts(worker, uri.host)
+      unless workers.include?(worker)
+        workers << worker
+        add_worker_to_hosts(worker, uri.host)
+        set_up_worker(worker, uri)
+      end
+    end
+
+    def set_up_worker(worker, uri)
       worker.project_name = project_name
       worker.host = hostname
       worker.number = hosts[uri.host].index(worker) + 1
       worker.dispatcher_uri = DRb.uri
-      worker
     end
 
     def gather_workers
@@ -85,8 +91,8 @@ module Specjour
         if reply.flags.add?
           DNSSD.resolve!(reply) do |resolved|
             uri = URI::Generic.build :scheme => reply.service_name, :host => resolved.target, :port => resolved.port
-            workers << fetch_worker(uri)
-            resolved.service.stop
+            fetch_worker(uri)
+            resolved.service.stop if resolved.service.started?
           end
         end
         browser.stop unless reply.flags.more_coming?
