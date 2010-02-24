@@ -4,7 +4,7 @@ require 'drb'
 require 'dnssd'
 require 'forwardable'
 require 'spec'
-require 'spec/runner/formatter/progress_bar_formatter'
+require 'spec/runner/formatter/base_text_formatter'
 
 require 'specjour/marshalable_rspec_failure'
 
