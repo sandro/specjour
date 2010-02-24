@@ -86,7 +86,6 @@ module Specjour
 
     def gather_workers
       browser = DNSSD::Service.new
-      puts 'browsing'
       browser.browse '_druby._tcp' do |reply|
         if reply.flags.add?
           DNSSD.resolve!(reply) do |resolved|
