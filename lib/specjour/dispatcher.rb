@@ -88,11 +88,7 @@ module Specjour
       browser = DNSSD::Service.new
       browser.browse '_druby._tcp' do |reply|
         if reply.flags.add?
-          DNSSD.resolve!(reply) do |resolved|
-            uri = URI::Generic.build :scheme => reply.service_name, :host => resolved.target, :port => resolved.port
-            fetch_worker(uri)
-            resolved.service.stop if resolved.service.started?
-          end
+          resolve_reply(reply)
         end
         browser.stop unless reply.flags.more_coming?
       end
@@ -105,6 +101,14 @@ module Specjour
 
     def reset_worker_threads
       @worker_threads = []
+    end
+
+    def resolve_reply(reply)
+      DNSSD.resolve!(reply) do |resolved|
+        uri = URI::Generic.build :scheme => reply.service_name, :host => resolved.target, :port => resolved.port
+        fetch_worker(uri)
+        resolved.service.stop if resolved.service.started?
+      end
     end
 
     def rsync_daemon
