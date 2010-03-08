@@ -3,12 +3,11 @@ module Specjour
     include DRbUndumped
     extend Forwardable
 
-    attr_reader :worker_stdout, :duration, :example_count, :failure_count, :pending_count, :pending_examples, :failing_examples
-    def_delegators :worker_stdout, :puts, :print, :flush, :tty?
+    attr_reader :dispatcher_stdout, :duration, :example_count, :failure_count, :pending_count, :pending_examples, :failing_examples
+    def_delegators :dispatcher_stdout, :puts, :print, :flush, :tty?
 
-
-    def initialize(worker_stdout)
-      @worker_stdout = worker_stdout
+    def initialize(dispatcher_stdout)
+      @dispatcher_stdout = dispatcher_stdout
       @duration = 0.0
       @example_count = 0
       @failure_count = 0

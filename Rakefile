@@ -48,12 +48,12 @@ end
 namespace(:example) do
   $:.unshift(File.dirname(__FILE__) + "/lib")
   require 'specjour'
-  task :worker do
-    w = Specjour::Worker.new
-    w.start
+  task :manager do
+    Specjour::Manager.new.start
   end
 
   task :dispatcher do
-    Specjour::Dispatcher.new(Dir.pwd).start
+    # Specjour::Dispatcher.new(Dir.pwd).start
+    Specjour::Dispatcher.new('/Users/santuri/hashrocket/workbeast').start
   end
 end

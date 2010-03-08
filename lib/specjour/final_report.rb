@@ -13,10 +13,19 @@ module Specjour
 
     def add(stats)
       stats.each do |key, value|
-        current = send(key)
-        instance_variable_set("@#{key}", current + value)
+        if key == :duration
+          @duration = value.to_f if duration < value.to_f
+        else
+          increment(key, value)
+        end
       end
     end
+
+    def increment(key, value)
+      current = instance_variable_get("@#{key}")
+      instance_variable_set("@#{key}", current + value)
+    end
+
 
     def formatter_options
       @formatter_options ||= OpenStruct.new(
