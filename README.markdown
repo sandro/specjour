@@ -16,14 +16,13 @@ _Distribute your spec suite amongst your LAN via Bonjour._
     gem install specjour
 
 ## Start a manager
-Running `specjour` on the command-line will start a manager which dispatches the tests to 1 worker by default
+Running `specjour` on the command-line will start a manager which advertises that it's ready to run tests. By default, the manager will only use one worker to run the tests. If you had 4 cores however, you could use `specjour --workers 4` to run 4 sets of tests at once.
 
     $ specjour
 
 ## Setup the dispatcher
-Edit the `Rakefile` in your project's directory
+Add the rake task to the `Rakefile` in your project's directory.
 
-    require 'specjour' # unless it's already in your load path, i.e. config.gem 'specjour'
     require 'specjour/tasks/specjour'
 
 ## Distribute the tests
