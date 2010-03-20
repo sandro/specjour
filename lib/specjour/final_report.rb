@@ -1,5 +1,6 @@
 module Specjour
   class FinalReport
+    require 'specjour/marshalable_rspec_failure'
     attr_reader :duration, :example_count, :failure_count, :pending_count, :pending_examples, :failing_examples
 
     def initialize
@@ -25,7 +26,6 @@ module Specjour
       current = instance_variable_get("@#{key}")
       instance_variable_set("@#{key}", current + value)
     end
-
 
     def formatter_options
       @formatter_options ||= OpenStruct.new(

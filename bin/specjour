@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+require 'optparse'
+require 'specjour'
+
+options = {:number => 1, :batch_size => 25}
+
+optparse = OptionParser.new do |opts|
+  opts.banner = "Usage: specjour [options]"
+
+  opts.on('-n', '--number [WORKERS]', Numeric, "Number of WORKERS to spin up, defaults to #{options[:number]}") do |n|
+    options[:number] = n
+    options[:manager] = true
+  end
+
+  opts.on('-b', '--batch-size [SIZE]', Integer, "Number of specs to run before reporting back to the dispatcher, defaults to #{options[:batch_size]}") do |n|
+    options[:batch_size] = n
+  end
+
+  opts.on('--worker OPTIONS', Array, 'Starts a worker; for internal use only') do |args|
+    specs_to_run = args[3..-1]
+    options[:worker_args] = args[0], args[1], args[2], specs_to_run
+  end
+
+  opts.on_tail('-v', '--version', 'Show the version of bench_press') do
+    abort Specjour::VERSION
+  end
+end
+
+optparse.parse!
+
+if options[:manager]
+  Specjour::Manager.new(options[:number], options[:batch_size]).start
+elsif options[:worker_args]
+  options[:worker_args] << options[:batch_size]
+  Specjour::Worker.new(*options[:worker_args]).run
+end

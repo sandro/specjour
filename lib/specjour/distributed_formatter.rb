@@ -1,23 +1,7 @@
 module Specjour
-  class MarshaledOut
-    extend Forwardable
-    attr_reader :output
-    def_delegators :output, :flush, :tty?
-
-    def initialize(output)
-      @output = output
-    end
-
-    def puts(arg)
-      output.print(Marshal.dump(arg << "\n") << Specjour::TERMINATOR)
-    end
-
-    def print(arg)
-      output.print(Marshal.dump(arg) << Specjour::TERMINATOR)
-    end
-  end
-
   class DistributedFormatter < Spec::Runner::Formatter::BaseTextFormatter
+    require 'specjour/marshalable_rspec_failure'
+
     class << self
       attr_accessor :batch_size
     end
@@ -28,7 +12,7 @@ module Specjour
 
     def initialize(options, output)
       @options = options
-      @output = MarshaledOut.new output
+      @output = output.extend Specjour::Protocol
       @failing_messages = []
       @passing_messages = []
       @pending_messages = []
@@ -62,6 +46,7 @@ module Specjour
     end
 
     def dump_pending
+      #noop
     end
 
     def dump_failure(counter, failure)

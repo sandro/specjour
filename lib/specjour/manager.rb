@@ -3,10 +3,11 @@ module Specjour
     require 'dnssd'
     include DRbUndumped
 
-    attr_accessor :project_name, :specs_to_run, :host, :dispatcher_uri, :worker_size
+    attr_accessor :project_name, :specs_to_run, :dispatcher_uri, :worker_size, :bonjour_service, :batch_size
 
-    def initialize
-      @worker_size = 2
+    def initialize(worker_size = 1, batch_size = 25)
+      @worker_size = worker_size
+      @batch_size = 25
     end
 
     def project_path=(name)
@@ -18,36 +19,34 @@ module Specjour
     end
 
     def dispatch
-      @bjs.stop
-      DRb.stop_service
-      puts "Running #{specs_to_run.flatten.size} spec files..."
-      rubylib = File.expand_path(File.join(File.dirname(__FILE__), "/.."))
-      bin = File.expand_path(File.join(File.dirname(__FILE__), "/../../bin/worker.rb"))
+      bonjour_service.stop
       pids = []
       (1..worker_size).each do |index|
         pids << fork do
-          exec("RUBYLIB='#{rubylib}' #{bin} #{project_path} #{dispatcher_uri} #{index} #{specs_to_run[index - 1].join(' ')}")
+          exec("specjour --batch-size #{batch_size} --worker #{project_path},#{dispatcher_uri},#{index},#{specs_to_run[index - 1].join(' ')}")
+          Kernel.exit!
         end
       end
-      pids.each {|p| Process.detach p}
-      puts "Dispatched to workers."
+      at_exit { Process.kill('KILL', *pids) rescue nil }
+      Process.waitall
+      bonjour_announce
     end
 
     def start
       drb_start
-      announce_service
-      Signal.trap('INT') { puts; puts "Shutting down worker..."; exit }
+      bonjour_announce
+      Signal.trap('INT') { puts; puts "Shutting down manager..."; exit }
       DRb.thread.join
     end
 
     def drb_start
       DRb.start_service nil, self
       Kernel.puts "Server started at #{drb_uri}"
-      at_exit { Kernel.puts 'shutting down DRb client'; DRb.stop_service }
+      at_exit { DRb.stop_service }
     end
 
     def sync
-      cmd "rsync -a --port=8989 #{host}::#{project_name} #{project_path}"
+      cmd "rsync -a --port=8989 #{dispatcher_uri.host}::#{project_name} #{project_path}"
     end
 
     protected
@@ -61,8 +60,8 @@ module Specjour
       @drb_uri ||= URI.parse(DRb.uri)
     end
 
-    def announce_service
-      @bjs = DNSSD.register! "specjour_worker_#{object_id}", "_#{drb_uri.scheme}._tcp", nil, drb_uri.port
+    def bonjour_announce
+      @bonjour_service = DNSSD.register! "specjour_manager_#{object_id}", "_#{drb_uri.scheme}._tcp", nil, drb_uri.port
     end
   end
 end

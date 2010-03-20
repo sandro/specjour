@@ -1,22 +1,22 @@
 require 'spec'
 require 'spec/runner/formatter/base_text_formatter'
+require 'specjour/protocol'
+require 'specjour/core_ext/array'
+
 autoload :URI, 'uri'
 autoload :DRb, 'drb'
 autoload :Forwardable, 'forwardable'
-
-require 'benchmark'
-
-# require 'specjour/spec_reporter'
-require 'specjour/distributed_formatter'
-require 'specjour/marshalable_rspec_failure'
-require 'specjour/marshalable_failure_formatter'
+autoload :GServer, 'gserver'
 
 module Specjour
   autoload :Dispatcher, 'specjour/dispatcher'
+  autoload :DistributedFormatter, 'specjour/distributed_formatter'
   autoload :FinalReport, 'specjour/final_report'
-  autoload :RsyncDaemon, 'specjour/rsync_daemon'
   autoload :Manager, 'specjour/manager'
+  autoload :MarshalableFailureFormatter, 'specjour/marshalable_failure_formatter'
+  autoload :Printer, 'specjour/printer'
+  autoload :RsyncDaemon, 'specjour/rsync_daemon'
   autoload :Worker, 'specjour/worker'
 
-  TERMINATOR = "|ruojceps|"
+  VERSION = "0.1.0".freeze
 end

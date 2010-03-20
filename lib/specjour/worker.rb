@@ -3,8 +3,7 @@ module Specjour
     attr_accessor :dispatcher_uri
     attr_reader :project_path, :specs_to_run, :number, :batch_size
 
-    def initialize(project_path, dispatcher_uri, number, specs_to_run, batch_size = 100)
-      puts "INIT WORKER!"
+    def initialize(project_path, dispatcher_uri, number, specs_to_run, batch_size)
       @project_path = project_path
       @specs_to_run = specs_to_run
       @number = number.to_i
@@ -18,7 +17,6 @@ module Specjour
 
     def run
       puts "Running #{specs_to_run.size} spec files..."
-      puts rspec_options.join(" ").inspect
       GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
       DistributedFormatter.batch_size = batch_size
       Dir.chdir(project_path) do
@@ -29,15 +27,9 @@ module Specjour
           dispatcher
         )
         Spec::Runner.use options
-        time = Benchmark.realtime do
-          options.run_examples
-        end
-        puts time
+        options.run_examples
         Spec::Runner.options.instance_variable_set(:@examples_run, true)
       end
-      dispatcher.flush
-      dispatcher.close
-      puts "Done!"
     end
 
     protected
@@ -58,7 +50,6 @@ module Specjour
       else
         ENV['TEST_ENV_NUMBER'] = nil
       end
-      puts "TEST NUMBER #{ENV['TEST_ENV_NUMBER']}"
     end
   end
 end
