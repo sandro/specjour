@@ -18,5 +18,5 @@ module Specjour
   autoload :RsyncDaemon, 'specjour/rsync_daemon'
   autoload :Worker, 'specjour/worker'
 
-  VERSION = "0.1.1".freeze
+  VERSION = "0.1.2".freeze
 end
