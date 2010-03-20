@@ -1,3 +1,5 @@
+require 'specjour'
+
 namespace :specjour do
   task :dispatch, [:project_path] do |task, args|
     args.with_defaults :project_path => Rake.original_dir
