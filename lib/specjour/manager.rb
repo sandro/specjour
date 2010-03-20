@@ -10,12 +10,8 @@ module Specjour
       @batch_size = 25
     end
 
-    def project_path=(name)
-      @project_path = name
-    end
-
     def project_path
-      @project_path ||= File.join("/tmp", project_name)
+      File.join("/tmp", project_name)
     end
 
     def dispatch
