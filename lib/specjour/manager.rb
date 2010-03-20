@@ -23,7 +23,7 @@ module Specjour
       pids = []
       (1..worker_size).each do |index|
         pids << fork do
-          exec("specjour --batch-size #{batch_size} --do-work #{project_path},#{dispatcher_uri},#{index},#{specs_to_run[index - 1].join(' ')}")
+          exec("specjour --batch-size #{batch_size} --do-work #{project_path},#{dispatcher_uri},#{index},#{specs_to_run[index - 1].join(',')}")
           Kernel.exit!
         end
       end
