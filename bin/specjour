@@ -9,7 +9,6 @@ optparse = OptionParser.new do |opts|
 
   opts.on('-n', '--number [WORKERS]', Numeric, "Number of WORKERS to spin up, defaults to #{options[:number]}") do |n|
     options[:number] = n
-    options[:manager] = true
   end
 
   opts.on('-b', '--batch-size [SIZE]', Integer, "Number of specs to run before reporting back to the dispatcher, defaults to #{options[:batch_size]}") do |n|
@@ -28,9 +27,9 @@ end
 
 optparse.parse!
 
-if options[:manager]
-  Specjour::Manager.new(options[:number], options[:batch_size]).start
-elsif options[:worker_args]
+if options[:worker_args]
   options[:worker_args] << options[:batch_size]
   Specjour::Worker.new(*options[:worker_args]).run
+else
+  Specjour::Manager.new(options[:number], options[:batch_size]).start
 end
