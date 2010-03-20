@@ -47,5 +47,4 @@ rescue LoadError
 end
 
 $:.unshift(File.dirname(__FILE__) + "/lib")
-require 'specjour'
 require 'specjour/tasks/specjour'
