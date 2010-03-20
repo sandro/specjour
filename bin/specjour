@@ -23,6 +23,12 @@ optparse = OptionParser.new do |opts|
   opts.on_tail('-v', '--version', 'Show the version of specjour') do
     abort Specjour::VERSION
   end
+
+  opts.on_tail("-h", "--help", "Show this message") do
+    summary = opts.to_a
+    summary.first << "\n"
+    abort summary.reject {|s| s =~ /INTERNAL/}.join
+  end
 end
 
 optparse.parse!
