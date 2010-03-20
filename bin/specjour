@@ -15,7 +15,7 @@ optparse = OptionParser.new do |opts|
     options[:batch_size] = n
   end
 
-  opts.on('--worker OPTIONS', Array, 'Starts a worker; for internal use only') do |args|
+  opts.on('--do-work OPTIONS', Array, 'INTERNAL USE ONLY') do |args|
     specs_to_run = args[3..-1]
     options[:worker_args] = args[0], args[1], args[2], specs_to_run
   end
