@@ -9,7 +9,7 @@ module Specjour
     def initialize
       super(
         port = RANDOM_PORT,
-        host = hostname,
+        host = "0.0.0.0",
         max_connections = 100,
         stdlog = $stderr,
         audit = true,
@@ -28,6 +28,10 @@ module Specjour
       report.add(summary)
     end
 
+    def hostname
+      @hostname ||= Socket.gethostname
+    end
+
     protected
 
     def disconnecting(client_port)
@@ -35,10 +39,6 @@ module Specjour
       if completed_workers == worker_size
         stop
       end
-    end
-
-    def hostname
-      @hostname ||= Socket.gethostname
     end
 
     def log(msg)

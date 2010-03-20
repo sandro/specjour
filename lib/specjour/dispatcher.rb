@@ -95,7 +95,7 @@ module Specjour
 
     def set_up_manager(manager, uri)
       manager.project_name = project_name
-      manager.dispatcher_uri = URI::Generic.build :scheme => "specjour", :host => printer.host, :port => printer.port
+      manager.dispatcher_uri = URI::Generic.build :scheme => "specjour", :host => printer.hostname, :port => printer.port
     end
 
     def sync_managers
