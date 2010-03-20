@@ -11,6 +11,7 @@ begin
     gem.homepage = "http://github.com/sandro/specjour"
     gem.authors = ["Sandro Turriate"]
     gem.add_dependency "dnssd", "1.3.1"
+    gem.add_dependency "rspec"
     gem.add_development_dependency "rspec", "1.3.0"
     gem.add_development_dependency "yard", "0.5.3"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
