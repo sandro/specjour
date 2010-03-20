@@ -41,7 +41,7 @@ module Specjour
 
     def drb_start
       DRb.start_service nil, self
-      Kernel.puts "Server started at #{drb_uri}"
+      Kernel.puts "Manager started at #{drb_uri}"
       at_exit { DRb.stop_service }
     end
 
