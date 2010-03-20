@@ -7,7 +7,8 @@ module Specjour
       begin
         ActiveRecord::Base.connection
       rescue # assume the database doesn't exist
-        Rake::Task['db:test:load'].invoke
+        Rake::Task['db:create'].invoke
+        Rake::Task['db:schema:load'].invoke
       else
         if pending_migrations?
           Rake::Task['db:migrate'].invoke
