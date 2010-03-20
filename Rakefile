@@ -5,8 +5,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "specjour"
-    gem.summary = %Q{Distribute your spec suite amongst your LAN via bonjour.}
-    gem.description = %Q{Distribute your spec suite amongst your LAN via bonjour.}
+    gem.summary = %Q{Distribute your spec suite amongst your LAN via Bonjour.}
+    gem.description = %Q{Distribute your spec suite amongst your LAN via Bonjour.}
     gem.email = "sandro.turriate@gmail.com"
     gem.homepage = "http://github.com/sandro/specjour"
     gem.authors = ["Sandro Turriate"]
