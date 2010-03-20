@@ -2,13 +2,13 @@
 require 'optparse'
 require 'specjour'
 
-options = {:number => 1, :batch_size => 25}
+options = {:worker_size => 1, :batch_size => 25}
 
 optparse = OptionParser.new do |opts|
   opts.banner = "Usage: specjour [options]"
 
-  opts.on('-n', '--number [WORKERS]', Numeric, "Number of WORKERS to spin up, defaults to #{options[:number]}") do |n|
-    options[:number] = n
+  opts.on('-w', '--workers [WORKERS]', Numeric, "Number of WORKERS to spin up, defaults to #{options[:worker_size]}") do |n|
+    options[:worker_size] = n
   end
 
   opts.on('-b', '--batch-size [SIZE]', Integer, "Number of specs to run before reporting back to the dispatcher, defaults to #{options[:batch_size]}") do |n|
@@ -31,5 +31,5 @@ if options[:worker_args]
   options[:worker_args] << options[:batch_size]
   Specjour::Worker.new(*options[:worker_args]).run
 else
-  Specjour::Manager.new(options[:number], options[:batch_size]).start
+  Specjour::Manager.new(options[:worker_size], options[:batch_size]).start
 end
