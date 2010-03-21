@@ -7,7 +7,5 @@ namespace :specjour do
   end
 end
 
-desc "Dispatch the [project_path] to listening managers"
-task :specjour, [:project_path] do |task, args|
-  Rake::Task['specjour:dispatch'].invoke(args[:project_path])
-end
+desc "Dispatch the project to listening managers"
+task :specjour => "specjour:dispatch"
