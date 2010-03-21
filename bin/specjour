@@ -2,7 +2,7 @@
 require 'optparse'
 require 'specjour'
 
-options = {:worker_size => 1, :batch_size => 25}
+options = {:worker_size => 1, :batch_size => 1}
 
 optparse = OptionParser.new do |opts|
   opts.banner = "Usage: specjour [options]"

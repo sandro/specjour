@@ -30,8 +30,6 @@ Run the rake task in your project directory to start the test suite.
 
     $ rake specjour
 
-The worker reports passes/failures in batches of 25 so you won't get immediate feedback, override the batch size via `specjour --batch-size 1`
-
 ## Note on Patches/Pull Requests
 
 * Fork the project.

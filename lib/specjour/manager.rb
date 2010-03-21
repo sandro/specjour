@@ -5,9 +5,9 @@ module Specjour
 
     attr_accessor :project_name, :specs_to_run, :dispatcher_uri, :worker_size, :bonjour_service, :batch_size
 
-    def initialize(worker_size = 1, batch_size = 25)
+    def initialize(worker_size = 1, batch_size = 1)
       @worker_size = worker_size
-      @batch_size = 25
+      @batch_size = batch_size
     end
 
     def project_path
