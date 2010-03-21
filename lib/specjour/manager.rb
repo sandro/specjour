@@ -10,6 +10,14 @@ module Specjour
       @batch_size = batch_size
     end
 
+    def bundle_install
+      Dir.chdir(project_path) do
+        unless system('bundle check > /dev/null')
+          system("bundle install --relock > /dev/null")
+        end
+      end
+    end
+
     def project_path
       File.join("/tmp", project_name)
     end
