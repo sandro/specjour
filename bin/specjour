@@ -15,6 +15,10 @@ optparse = OptionParser.new do |opts|
     options[:batch_size] = n
   end
 
+  opts.on('-d', '--dispatcher HOSTNAME', "Only run specs from the dispatcher running on this host, i.e. farnsworth.local") do |name|
+    options[:registered_dispatcher] = name
+  end
+
   opts.on('--do-work OPTIONS', Array, 'INTERNAL USE ONLY') do |args|
     specs_to_run = args[3..-1]
     options[:worker_args] = args[0], args[1], args[2], specs_to_run
@@ -37,5 +41,5 @@ if options[:worker_args]
   options[:worker_args] << options[:batch_size]
   Specjour::Worker.new(*options[:worker_args]).run
 else
-  Specjour::Manager.new(options[:worker_size], options[:batch_size]).start
+  Specjour::Manager.new(options).start
 end

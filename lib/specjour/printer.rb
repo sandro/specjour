@@ -28,10 +28,6 @@ module Specjour
       report.add(summary)
     end
 
-    def hostname
-      @hostname ||= Socket.gethostname
-    end
-
     protected
 
     def disconnecting(client_port)

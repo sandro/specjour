@@ -60,7 +60,7 @@ module Specjour
 
     def fetch_manager(uri)
       manager = DRbObject.new_with_uri(uri.to_s)
-      unless managers.include?(manager)
+      if !managers.include?(manager) && manager.available_for?(hostname)
         set_up_manager(manager, uri)
         managers << manager
         self.worker_size += manager.worker_size
@@ -78,7 +78,12 @@ module Specjour
         browser.stop unless reply.flags.more_coming?
       end
       puts "Managers found: #{managers.size}"
+      abort unless managers.size > 0
       printer.worker_size = worker_size
+    end
+
+    def hostname
+      @hostname ||= Socket.gethostname
     end
 
     def printer
@@ -107,7 +112,7 @@ module Specjour
 
     def set_up_manager(manager, uri)
       manager.project_name = project_name
-      manager.dispatcher_uri = URI::Generic.build :scheme => "specjour", :host => printer.hostname, :port => printer.port
+      manager.dispatcher_uri = URI::Generic.build :scheme => "specjour", :host => hostname, :port => printer.port
     end
 
     def sync_managers

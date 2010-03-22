@@ -3,12 +3,18 @@ module Specjour
     require 'dnssd'
     include DRbUndumped
 
-    attr_accessor :project_name, :specs_to_run, :dispatcher_uri, :worker_size, :bonjour_service, :batch_size
+    attr_accessor :project_name, :specs_to_run, :dispatcher_uri
+    attr_reader :worker_size, :batch_size, :registered_dispatcher, :bonjour_service
 
-    def initialize(worker_size = 1, batch_size = 1)
-      @worker_size = worker_size
-      @batch_size = batch_size
+    def initialize(options = {})
+      @worker_size = options[:worker_size]
+      @batch_size = options[:batch_size]
+      @registered_dispatcher = options[:registered_dispatcher]
     end
+
+    def available_for?(hostname)
+      registered_dispatcher ? registered_dispatcher == hostname : true
+   end
 
     def bundle_install
       Dir.chdir(project_path) do
