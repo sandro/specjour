@@ -113,6 +113,7 @@ module Specjour
     def set_up_manager(manager, uri)
       manager.project_name = project_name
       manager.dispatcher_uri = URI::Generic.build :scheme => "specjour", :host => hostname, :port => printer.port
+      at_exit { manager.kill_worker_processes }
     end
 
     def sync_managers

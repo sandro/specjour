@@ -4,12 +4,13 @@ module Specjour
     include DRbUndumped
 
     attr_accessor :project_name, :specs_to_run, :dispatcher_uri
-    attr_reader :worker_size, :batch_size, :registered_dispatcher, :bonjour_service
+    attr_reader :worker_size, :batch_size, :registered_dispatcher, :bonjour_service, :worker_pids
 
     def initialize(options = {})
       @worker_size = options[:worker_size]
       @batch_size = options[:batch_size]
       @registered_dispatcher = options[:registered_dispatcher]
+      @worker_pids = []
     end
 
     def available_for?(hostname)
@@ -24,20 +25,23 @@ module Specjour
       end
     end
 
+    def kill_worker_processes
+      Process.kill('TERM', *worker_pids) rescue nil
+    end
+
     def project_path
       File.join("/tmp", project_name)
     end
 
     def dispatch
       bonjour_service.stop
-      pids = []
       (1..worker_size).each do |index|
-        pids << fork do
+        worker_pids << fork do
           exec("specjour --batch-size #{batch_size} --do-work #{project_path},#{dispatcher_uri},#{index},#{specs_to_run[index - 1].join(',')}")
           Kernel.exit!
         end
       end
-      at_exit { Process.kill('KILL', *pids) rescue nil }
+      at_exit { kill_worker_processes }
       Process.waitall
       bonjour_announce
     end
