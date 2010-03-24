@@ -60,7 +60,7 @@ module Specjour
     end
 
     def sync
-      cmd "rsync -a --port=8989 #{dispatcher_uri.host}::#{project_name} #{project_path}"
+      cmd "rsync -a --delete --port=8989 #{dispatcher_uri.host}::#{project_name} #{project_path}"
     end
 
     protected
