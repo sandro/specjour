@@ -3,22 +3,22 @@ module Specjour
     extend self
 
     def scrub
-      load 'Rakefile'
-      begin
-        ActiveRecord::Base.connection
-      rescue # assume the database doesn't exist
-        Rake::Task['db:create'].invoke
+      connect_to_database
+      if pending_migrations?
         Rake::Task['db:schema:load'].invoke
       else
-        if pending_migrations?
-          Rake::Task['db:migrate'].invoke
-        end
-
         purge_tables
       end
     end
 
     protected
+
+    def connect_to_database
+      load 'Rakefile'
+      connection
+    rescue # assume the database doesn't exist
+      Rake::Task['db:create'].invoke
+    end
 
     def connection
       ActiveRecord::Base.connection
