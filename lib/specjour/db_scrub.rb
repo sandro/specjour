@@ -1,5 +1,6 @@
 module Specjour
   module DbScrub
+    load 'Rakefile'
     extend self
 
     def scrub
@@ -14,7 +15,6 @@ module Specjour
     protected
 
     def connect_to_database
-      load 'Rakefile'
       connection
     rescue # assume the database doesn't exist
       Rake::Task['db:create'].invoke
