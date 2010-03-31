@@ -46,7 +46,7 @@ module Specjour
         $stdout.print message
         $stdout.flush
       elsif message.is_a?(Array)
-        send(message.first, message[1])
+        send(message.first, *message[1..-1])
       end
     end
 
