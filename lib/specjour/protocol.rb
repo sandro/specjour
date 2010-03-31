@@ -1,6 +1,7 @@
 module Specjour
   module Protocol
     TERMINATOR = "|ruojceps|"
+    TERMINATOR_REGEXP = /#{TERMINATOR}$/
 
     def puts(arg)
       print(arg << "\n")
@@ -15,7 +16,7 @@ module Specjour
     end
 
     def load_object(data)
-      Marshal.load(data.sub(/#{TERMINATOR}$/, ''))
+      Marshal.load(data.sub(TERMINATOR_REGEXP, ''))
     end
   end
 end
