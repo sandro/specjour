@@ -1,4 +1,4 @@
-module Specjour
+module Specjour::Rspec
   class Spec::Runner::Reporter::Failure
     attr_reader :backtrace, :message, :header, :exception_class_name
 

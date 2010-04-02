@@ -1,6 +1,6 @@
-module Specjour
+module Specjour::Rspec
   class FinalReport
-    require 'specjour/marshalable_rspec_failure'
+    require 'specjour/rspec/marshalable_rspec_failure'
     attr_reader :duration, :example_count, :failure_count, :pending_count, :pending_examples, :failing_examples
 
     def initialize

@@ -1,4 +1,4 @@
-module Specjour
+module Specjour::Rspec
   class MarshalableFailureFormatter < Spec::Runner::Formatter::BaseTextFormatter
     def dump_failure(counter, failure)
       @output.puts

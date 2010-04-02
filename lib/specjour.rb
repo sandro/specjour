@@ -1,8 +1,3 @@
-require 'spec'
-require 'spec/runner/formatter/base_text_formatter'
-require 'specjour/protocol'
-require 'specjour/core_ext/array'
-
 autoload :URI, 'uri'
 autoload :DRb, 'drb'
 autoload :Forwardable, 'forwardable'
@@ -15,14 +10,26 @@ autoload :Socket, 'socket'
 module Specjour
   autoload :Connection, 'specjour/connection'
   autoload :Dispatcher, 'specjour/dispatcher'
-  autoload :DistributedFormatter, 'specjour/distributed_formatter'
-  autoload :FinalReport, 'specjour/final_report'
   autoload :Manager, 'specjour/manager'
-  autoload :MarshalableFailureFormatter, 'specjour/marshalable_failure_formatter'
-  autoload :Printer, 'specjour/printer'
   autoload :RsyncDaemon, 'specjour/rsync_daemon'
   autoload :SocketHelpers, 'specjour/socket_helpers'
   autoload :Worker, 'specjour/worker'
+  autoload :Printer, 'specjour/printer'
+  autoload :Protocol, 'specjour/protocol'
+
+  module Rspec
+    require 'spec'
+    require 'spec/runner/formatter/base_text_formatter'
+
+    autoload :DistributedFormatter, 'specjour/rspec/distributed_formatter'
+    autoload :FinalReport, 'specjour/rspec/final_report'
+    autoload :MarshalableFailureFormatter, 'specjour/rspec/marshalable_failure_formatter'
+  end
+
+  module Cucumber
+    require 'cucumber'
+    autoload :DistributedFormatter, 'specjour/cucumber/distributed_formatter'
+  end
 
   VERSION = "0.1.18".freeze
 

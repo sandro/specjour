@@ -1,6 +1,6 @@
-module Specjour
+module Specjour::Rspec
   class DistributedFormatter < Spec::Runner::Formatter::BaseTextFormatter
-    require 'specjour/marshalable_rspec_failure'
+    require 'specjour/rspec/marshalable_rspec_failure'
 
     class << self
       attr_accessor :batch_size
