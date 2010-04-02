@@ -12,7 +12,7 @@ module Specjour
 
     def initialize(options, output)
       @options = options
-      @output = output.extend Specjour::Protocol
+      @output = output
       @failing_messages = []
       @passing_messages = []
       @pending_messages = []
@@ -41,8 +41,7 @@ module Specjour
       @example_count = example_count
       @failure_count = failure_count
       @pending_count = pending_count
-      output.puts [:worker_summary=, to_hash]
-      output.flush
+      output.send_message(:worker_summary=, to_hash)
     end
 
     def dump_pending

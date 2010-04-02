@@ -3,8 +3,7 @@ module Specjour
     include Protocol
     RANDOM_PORT = 0
 
-    attr_reader :completed_workers
-    attr_accessor :worker_size
+    attr_accessor :worker_size, :specs_to_run, :completed_workers
 
     def initialize
       super(
@@ -19,34 +18,43 @@ module Specjour
     end
 
     def serve(client)
+      client.extend Protocol
       client.each(TERMINATOR) do |data|
-        process load_object(data)
+        process load_object(data), client
       end
     end
 
-    def worker_summary=(summary)
+    def ready(client)
+      client.print specs_to_run.shift
+      client.flush
+    end
+
+    def done(client)
+      self.completed_workers += 1
+    end
+
+    def worker_summary=(client, summary)
       report.add(summary)
     end
 
     protected
 
     def disconnecting(client_port)
-      @completed_workers += 1
       if completed_workers == worker_size
         stop
       end
     end
 
     def log(msg)
-      #noop
+      # noop
     end
 
-    def process(message)
+    def process(message, client)
       if message.is_a?(String)
         $stdout.print message
         $stdout.flush
       elsif message.is_a?(Array)
-        send(message.first, *message[1..-1])
+        send(message.first, client, *message[1..-1])
       end
     end
 

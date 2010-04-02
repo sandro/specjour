@@ -37,7 +37,7 @@ module Specjour
       bonjour_service.stop
       (1..worker_size).each do |index|
         worker_pids << fork do
-          exec("specjour --batch-size #{batch_size} --do-work #{project_path},#{dispatcher_uri},#{index},#{specs_to_run[index - 1].join(',')}")
+          exec("specjour --batch-size #{batch_size} --do-work #{project_path},#{dispatcher_uri},#{index}")
           Kernel.exit!
         end
       end
@@ -55,7 +55,7 @@ module Specjour
 
     def drb_start
       DRb.start_service nil, self
-      Kernel.puts "Manager started at #{drb_uri}"
+      puts "Manager started at #{drb_uri}"
       at_exit { DRb.stop_service }
     end
 
@@ -66,7 +66,7 @@ module Specjour
     protected
 
     def cmd(command)
-      Kernel.puts command
+      puts command
       system command
     end
 

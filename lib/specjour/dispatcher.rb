@@ -42,15 +42,7 @@ module Specjour
     end
 
     def dispatch_work
-      distributable_specs = all_specs.among(worker_size)
-      last_index = 0
-      managers.each_with_index do |manager, index|
-        manager.specs_to_run = Array.new(manager.worker_size) do |i|
-          distributable_specs[last_index + i]
-        end
-        last_index += manager.worker_size
-        manager_threads << Thread.new(manager) {|m| m.dispatch}
-      end
+      command_managers(true) { |m| m.dispatch }
     end
 
     def drb_start
@@ -87,7 +79,11 @@ module Specjour
     end
 
     def printer
-      @printer ||= Printer.new.start
+      @printer ||= begin
+        p = Printer.new
+        p.specs_to_run = all_specs
+        p.start
+      end
     end
 
     def project_name
