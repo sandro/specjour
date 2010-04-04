@@ -75,11 +75,7 @@ module Specjour
     end
 
     def printer
-      @printer ||= begin
-        p = Printer.new
-        p.specs_to_run = all_specs
-        p.start
-      end
+      @printer ||= Printer.new.start
     end
 
     def project_name
