@@ -16,6 +16,8 @@ module Specjour::Cucumber
     end
 
     def print_summary(features)
+      require 'ruby-debug'; Debugger.start; Debugger.settings[:autoeval] = 1; Debugger.settings[:autolist] = 1; debugger
+      @io.send_message(:worker_summary=, features)
     end
   end
 end

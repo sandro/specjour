@@ -1,8 +1,13 @@
 module Specjour
   module Cucumber
     class FinalReport
-      def add(stats)
-        p stats
+      def initialize
+        @features = []
+      end
+
+      def add(features)
+        p features
+        @features << features
       end
 
       def summarize

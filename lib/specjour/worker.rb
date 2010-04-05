@@ -15,6 +15,7 @@ module Specjour
       DRb
       Rspec::DistributedFormatter.batch_size = batch_size
       Cucumber::DistributedFormatter.batch_size = batch_size
+      ::Cucumber::Cli::Options.class_eval { def print_profile_information; end }
       set_env_variables
     end
 
@@ -43,10 +44,6 @@ module Specjour
 
     protected
 
-    def cucumber_loaded?
-      !@cucumber_loaded.nil?
-    end
-
     def printer
       @printer ||= printer_connection
     end
@@ -57,7 +54,6 @@ module Specjour
 
     def run_test(test)
       if test =~ /.feature/
-        set_up_cucumber unless cucumber_loaded?
         run_feature test
       else
         run_spec test
@@ -66,8 +62,8 @@ module Specjour
 
     def run_feature(feature)
       Kernel.puts "Running #{feature}"
-      features = @step_mother.load_plain_text_features(feature)
-      @cucumber_runner.visit_features(features)
+      cli = ::Cucumber::Cli::Main.new(['--format', 'Specjour::Cucumber::DistributedFormatter', feature], printer_connection)
+      cli.execute!(::Cucumber::Cli::Main.step_mother)
     end
 
     def run_spec(spec)
@@ -85,24 +81,6 @@ module Specjour
       ENV['PREPARE_DB'] = 'true'
       ENV['RSPEC_COLOR'] = 'true'
       ENV['TEST_ENV_NUMBER'] = number.to_s
-    end
-
-    def set_up_cucumber
-      ::Cucumber::Cli::Options.class_eval { def print_profile_information; end }
-      # configuration.options.instance_variable_set(:@skip_profile_information, true)
-      @step_mother = ::Cucumber::Cli::Main.step_mother
-      configuration = ::Cucumber::Cli::Configuration.new
-      configuration.parse! []
-      @step_mother.options = configuration.options
-      @step_mother.load_code_files(configuration.support_to_load)
-      @step_mother.after_configuration(configuration)
-      @step_mother.load_code_files(configuration.step_defs_to_load)
-
-      formatter = Specjour::Cucumber::DistributedFormatter.new @step_mother, printer_connection, configuration.options
-      @cucumber_runner = ::Cucumber::Ast::TreeWalker.new(@step_mother, [formatter])
-      @step_mother.visitor = @cucumber_runner
-
-      @cucumber_loaded = true
     end
   end
 end
