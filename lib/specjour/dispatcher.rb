@@ -63,11 +63,16 @@ module Specjour
       puts "Waiting for managers"
       Signal.trap('INT') { exit }
       browser = DNSSD::Service.new
-      browser.browse '_druby._tcp' do |reply|
-        if reply.flags.add?
-          resolve_reply(reply)
+      begin
+        Timeout.timeout(5) do
+          browser.browse '_druby._tcp' do |reply|
+            if reply.flags.add?
+              resolve_reply(reply)
+            end
+            browser.stop unless reply.flags.more_coming?
+          end
         end
-        browser.stop unless reply.flags.more_coming?
+      rescue Timeout::Error
       end
       puts "Managers found: #{managers.size}"
       abort unless managers.size > 0
