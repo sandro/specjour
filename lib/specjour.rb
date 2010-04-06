@@ -11,6 +11,7 @@ autoload :Timeout, 'timeout'
 autoload :Benchmark, 'benchmark'
 
 module Specjour
+  autoload :Connection, 'specjour/connection'
   autoload :Dispatcher, 'specjour/dispatcher'
   autoload :DistributedFormatter, 'specjour/distributed_formatter'
   autoload :FinalReport, 'specjour/final_report'

@@ -10,6 +10,7 @@ module Specjour
       @number = number.to_i
       @batch_size = batch_size.to_i
       self.printer_uri = printer_uri
+      printer
       GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
       DistributedFormatter.batch_size = batch_size
       Dir.chdir(project_path)
@@ -45,7 +46,7 @@ module Specjour
     end
 
     def printer_connection
-      TCPSocket.open(printer_uri.host, printer_uri.port).extend Protocol
+      Connection.new printer_uri
     end
 
     def run_spec(spec)
