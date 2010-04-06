@@ -16,8 +16,6 @@ module Specjour
     def start
       rsync_daemon.start
       gather_managers
-      sync_managers
-      bundle_install_managers
       dispatch_work
       printer.join
     end
@@ -28,10 +26,6 @@ module Specjour
       @all_specs ||= Dir.chdir(project_path) do
         Dir["spec/**/**/*_spec.rb"].partition {|f| f =~ /integration/}.flatten
       end
-    end
-
-    def bundle_install_managers
-      command_managers {|manager| manager.bundle_install }
     end
 
     def command_managers(async = false, &block)
@@ -115,10 +109,6 @@ module Specjour
       manager.project_name = project_name
       manager.dispatcher_uri = URI::Generic.build :scheme => "specjour", :host => hostname, :port => printer.port
       at_exit { manager.kill_worker_processes }
-    end
-
-    def sync_managers
-      command_managers { |manager| manager.sync }
     end
 
     def wait_on_managers

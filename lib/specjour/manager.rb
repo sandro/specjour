@@ -34,7 +34,14 @@ module Specjour
     end
 
     def dispatch
-      bonjour_service.stop
+      suspend_bonjour do
+        sync
+        bundle_install
+        dispatch_workers
+      end
+    end
+
+    def dispatch_workers
       (1..worker_size).each do |index|
         worker_pids << fork do
           exec("specjour --batch-size #{batch_size} --do-work #{project_path},#{dispatcher_uri},#{index}")
@@ -43,7 +50,6 @@ module Specjour
       end
       at_exit { kill_worker_processes }
       Process.waitall
-      bonjour_announce
     end
 
     def start
@@ -65,6 +71,10 @@ module Specjour
 
     protected
 
+    def bonjour_announce
+      @bonjour_service = DNSSD.register! "specjour_manager_#{object_id}", "_#{drb_uri.scheme}._tcp", nil, drb_uri.port
+    end
+
     def cmd(command)
       puts command
       system command
@@ -74,8 +84,10 @@ module Specjour
       @drb_uri ||= URI.parse(DRb.uri)
     end
 
-    def bonjour_announce
-      @bonjour_service = DNSSD.register! "specjour_manager_#{object_id}", "_#{drb_uri.scheme}._tcp", nil, drb_uri.port
+    def suspend_bonjour(&block)
+      bonjour_service.stop
+      block.call
+      bonjour_announce
     end
   end
 end
