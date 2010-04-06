@@ -22,13 +22,17 @@ module Specjour
 
     def run
       printer.send_message(:ready)
+      run_time = 0
       while !printer.closed? && data = printer.gets(TERMINATOR)
         spec = load_object(data)
         if spec
-          run_spec spec
+          run_time += Benchmark.realtime do
+            run_spec spec
+          end
           printer.send_message(:ready)
         else
           printer.send_message(:done)
+          printer.send_message(:worker_summary=, {:duration => sprintf("%6f", run_time)})
           printer.close
         end
       end

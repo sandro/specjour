@@ -8,6 +8,7 @@ autoload :DRb, 'drb'
 autoload :Forwardable, 'forwardable'
 autoload :GServer, 'gserver'
 autoload :Timeout, 'timeout'
+autoload :Benchmark, 'benchmark'
 
 module Specjour
   autoload :Dispatcher, 'specjour/dispatcher'
