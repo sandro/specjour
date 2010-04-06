@@ -21,4 +21,5 @@ module Specjour
   autoload :Worker, 'specjour/worker'
 
   VERSION = "0.1.10".freeze
+  class Error < StandardError; end
 end
