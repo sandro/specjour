@@ -39,11 +39,6 @@ module Specjour
       command_managers(true) { |m| m.dispatch }
     end
 
-    def drb_start
-      DRb.start_service nil, self
-      at_exit { puts 'shutting down DRb client'; DRb.stop_service }
-    end
-
     def fetch_manager(uri)
       manager = DRbObject.new_with_uri(uri.to_s)
       if !managers.include?(manager) && manager.available_for?(hostname)
