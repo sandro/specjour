@@ -57,7 +57,6 @@ module Specjour
       )
       Spec::Runner.use options
       options.run_examples
-      Spec::Runner.options.instance_variable_set(:@examples_run, true)
     end
 
     def set_env_variables
