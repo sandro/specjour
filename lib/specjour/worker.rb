@@ -49,7 +49,7 @@ module Specjour
     end
 
     def run_spec(spec)
-      Kernel.puts "Running #{spec}"
+      puts "Running #{spec}"
       options = Spec::Runner::OptionParser.parse(
         ['--format=Specjour::DistributedFormatter', spec],
         $stderr,
