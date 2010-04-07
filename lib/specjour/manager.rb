@@ -4,17 +4,17 @@ module Specjour
     include DRbUndumped
 
     attr_accessor :project_name, :specs_to_run, :dispatcher_uri
-    attr_reader :worker_size, :batch_size, :registered_dispatcher, :bonjour_service, :worker_pids
+    attr_reader :worker_size, :batch_size, :registered_projects, :bonjour_service, :worker_pids
 
     def initialize(options = {})
       @worker_size = options[:worker_size]
       @batch_size = options[:batch_size]
-      @registered_dispatcher = options[:registered_dispatcher]
+      @registered_projects = options[:registered_projects]
       @worker_pids = []
     end
 
-    def available_for?(hostname)
-      registered_dispatcher ? registered_dispatcher == hostname : true
+    def available_for?(project_name)
+      registered_projects ? registered_projects.include?(project_name) : true
    end
 
     def bundle_install

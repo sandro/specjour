@@ -15,8 +15,8 @@ optparse = OptionParser.new do |opts|
     options[:batch_size] = n
   end
 
-  opts.on('-d', '--dispatcher HOSTNAME', "Only run specs from the dispatcher running on this host, i.e. farnsworth.local") do |name|
-    options[:registered_dispatcher] = name
+  opts.on('-p', '--projects PROJECTS', Array, "Only run specs for these comma delimited project names, i.e. workbeast,taigan") do |project_names|
+    options[:registered_projects] = project_names
   end
 
   opts.on('--do-work OPTIONS', Array, 'INTERNAL USE ONLY') do |args|

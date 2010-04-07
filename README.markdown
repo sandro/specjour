@@ -40,6 +40,15 @@ Each worker should run their specs in an isolated database. Modify the test data
 
 Each worker will attempt to clear its database tables before running any specs via `DELETE FROM <table_name>;`. Additionally, test databases will be created if they don't exist (i.e. `CREATE DATABASE blog_test8` for the 8th worker) and will load your schema when it has fallen behind.
 
+## Only listen to supported projects
+By default, a manager will listen to all projects trying to distribute specs over the network. Sometimes you'll only want a manager to respond to one specific spec suite. You can accomplish this with the `--projects` flags.
+
+    $ specjour --projects bizconf # only run specs for the bizconf project
+
+You could also listen to multiple projects:
+
+    $ specjour --projects bizconf,workbeast # only run specs for the bizconf and workbeast projects
+
 ## Note on Patches/Pull Requests
 
 * Fork the project.

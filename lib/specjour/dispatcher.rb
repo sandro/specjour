@@ -41,7 +41,7 @@ module Specjour
 
     def fetch_manager(uri)
       manager = DRbObject.new_with_uri(uri.to_s)
-      if !managers.include?(manager) && manager.available_for?(hostname)
+      if !managers.include?(manager) && manager.available_for?(project_name)
         set_up_manager(manager, uri)
         managers << manager
         self.worker_size += manager.worker_size
