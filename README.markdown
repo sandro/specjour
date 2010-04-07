@@ -1,8 +1,8 @@
 # Specjour
 _Distribute your spec suite amongst your LAN via Bonjour._
 
-1. Start a dispatcher in your project directory.
-2. Spin up a manager on each remote machine.
+1. Spin up a manager on each machine that can run your specs.
+2. Start a dispatcher in your project directory.
 3. Say farewell to your long coffee breaks.
 
 ## Requirements
@@ -14,7 +14,7 @@ _Distribute your spec suite amongst your LAN via Bonjour._
     gem install specjour
 
 ## Start a manager
-Running `specjour` on the command-line will start a manager which advertises that it's ready to run tests. By default, the manager will only use one worker to run the tests. If you had 4 cores however, you could use `specjour --workers 4` to run 4 sets of tests at once.
+Running `specjour` on the command-line will start a manager which advertises that it's ready to run specs. By default, the manager will only use one worker to run yours specs. If you had 4 cores however, you could use `specjour --workers 4` to run 4 sets of specs at once.
 
     $ specjour
 
@@ -23,8 +23,8 @@ Require specjour's rake tasks in your project's `Rakefile`.
 
     require 'specjour/tasks/specjour'
 
-## Distribute the tests
-Run the rake task to distribute the tests among the managers you started.
+## Distribute the specs
+Run the rake task to distribute the specs among the managers you started.
 
     $ rake specjour
 
@@ -38,7 +38,7 @@ Each worker should run their specs in an isolated database. Modify the test data
     test:
       database: blog_test<%=ENV['TEST_ENV_NUMBER']%>
 
-Each worker will attempt to clear its database tables before running any specs via `DELETE FROM <table_name>;`. Additionally, test databases will be created if they don't exist (i.e. blog_test8 for the 8th worker) and will be migrated when necessary.
+Each worker will attempt to clear its database tables before running any specs via `DELETE FROM <table_name>;`. Additionally, test databases will be created if they don't exist (i.e. `CREATE DATABASE blog_test8` for the 8th worker) and will load your schema when it has fallen behind.
 
 ## Note on Patches/Pull Requests
 
