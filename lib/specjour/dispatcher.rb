@@ -65,6 +65,7 @@ module Specjour
       end
       puts "Managers found: #{managers.size}"
       abort unless managers.size > 0
+      puts "Workers found: #{worker_size}"
       printer.worker_size = worker_size
     end
 
