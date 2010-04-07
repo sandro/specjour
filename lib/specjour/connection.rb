@@ -5,25 +5,30 @@ module Specjour
     include Protocol
     extend Forwardable
 
-    attr_reader :uri, :connection
+    attr_reader :uri
+    attr_writer :socket
     attr_accessor :reconnection_attempts
 
-    def_delegators :connection, :flush, :closed?, :close, :gets, :each
+    def_delegators :socket, :flush, :closed?, :close, :gets, :each
+
 
     def initialize(uri)
       @uri = uri
       @reconnection_attempts = 0
-      connect
     end
 
     def connect
-      @connection = TCPSocket.open(uri.host, uri.port)
+      @socket = TCPSocket.open(uri.host, uri.port)
     rescue SystemCallError => error
       Kernel.puts "Could not connect to #{uri.to_s}\n#{error.inspect}"
     end
 
+    def socket
+      @socket ||= connect
+    end
+
     def print(arg)
-      connection.print dump_object(arg)
+      socket.print dump_object(arg)
     rescue SystemCallError => error
       Kernel.p error
       reconnect
@@ -35,7 +40,7 @@ module Specjour
     end
 
     def reconnect
-      connection.close
+      socket.close
       if reconnection_attempts < MAX_RECONNECTS
         connect
         self.reconnection_attempts += 1
