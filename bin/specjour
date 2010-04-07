@@ -7,7 +7,7 @@ options = {:worker_size => 1, :batch_size => 1}
 optparse = OptionParser.new do |opts|
   opts.banner = "Usage: specjour [options]"
 
-  opts.on('-w', '--workers [WORKERS]', Numeric, "Number of WORKERS to spin up, defaults to #{options[:worker_size]}") do |n|
+  opts.on('-w', '--workers WORKERS', Numeric, "Number of WORKERS to spin up, defaults to #{options[:worker_size]}") do |n|
     options[:worker_size] = n
   end
 
