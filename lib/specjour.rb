@@ -21,6 +21,6 @@ module Specjour
   autoload :RsyncDaemon, 'specjour/rsync_daemon'
   autoload :Worker, 'specjour/worker'
 
-  VERSION = "0.1.11".freeze
+  VERSION = "0.1.12".freeze
   class Error < StandardError; end
 end
