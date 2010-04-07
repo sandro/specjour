@@ -45,6 +45,13 @@ module Specjour
       print(arg << "\n")
     end
 
+    def send_message(method_name, *args)
+      print([method_name, *args])
+      flush
+    end
+
+    protected
+
     def reconnect
       socket.close
       if reconnection_attempts < MAX_RECONNECTS
@@ -53,11 +60,6 @@ module Specjour
       else
         raise Error, "Lost connection #{MAX_RECONNECTS} times"
       end
-    end
-
-    def send_message(method_name, *args)
-      print([method_name, *args])
-      flush
     end
   end
 end
