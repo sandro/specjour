@@ -36,6 +36,8 @@ end
 
 optparse.parse!
 
+abort(%(ERROR: I don't understand the following flags: "#{ARGV.join(', ')}")) if ARGV.any?
+
 if options[:worker_args]
   options[:worker_args] << options[:batch_size]
   Specjour::Worker.new(*options[:worker_args]).run
