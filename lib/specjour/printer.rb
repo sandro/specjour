@@ -18,7 +18,7 @@ module Specjour
     end
 
     def serve(client)
-      client.extend Protocol
+      client = Connection.wrap client
       client.each(TERMINATOR) do |data|
         process load_object(data), client
       end
