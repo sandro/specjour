@@ -24,7 +24,7 @@ module Specjour
 
     def all_specs
       @all_specs ||= Dir.chdir(project_path) do
-        Dir["spec/**/**/*_spec.rb"].partition {|f| f =~ /integration/}.flatten
+        Dir["spec/**/**/*_spec.rb"].sort
       end
     end
 
