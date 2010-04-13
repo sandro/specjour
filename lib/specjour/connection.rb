@@ -1,13 +1,10 @@
 module Specjour
   class Connection
-    MAX_RECONNECTS = 5
-
     include Protocol
     extend Forwardable
 
     attr_reader :uri
     attr_writer :socket
-    attr_accessor :reconnection_attempts
 
     def_delegators :socket, :flush, :closed?, :close, :gets, :each
 
@@ -20,23 +17,25 @@ module Specjour
 
     def initialize(uri)
       @uri = uri
-      @reconnection_attempts = 0
     end
 
     def connect
-      @socket = TCPSocket.open(uri.host, uri.port)
-    rescue SystemCallError => error
-      Kernel.puts "Could not connect to #{uri.to_s}\n#{error.inspect}"
+      timeout { connect_socket }
     end
 
     def socket
       @socket ||= connect
     end
 
+    def timeout(&block)
+      Timeout.timeout(5, &block)
+    rescue Timeout::Error
+      raise Error, "Connection to dispatcher timed out"
+    end
+
     def print(arg)
       socket.print dump_object(arg)
     rescue SystemCallError => error
-      Kernel.p error
       reconnect
       retry
     end
@@ -52,14 +51,16 @@ module Specjour
 
     protected
 
+    def connect_socket
+      @socket = TCPSocket.open(uri.host, uri.port)
+    rescue Errno::ECONNREFUSED => error
+      Specjour.logger.debug "Could not connect to #{uri.to_s}\n#{error.inspect}"
+      retry
+    end
+
     def reconnect
-      socket.close
-      if reconnection_attempts < MAX_RECONNECTS
-        connect
-        self.reconnection_attempts += 1
-      else
-        raise Error, "Lost connection #{MAX_RECONNECTS} times"
-      end
+      socket.close unless socket.closed?
+      connect
     end
   end
 end
