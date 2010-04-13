@@ -57,7 +57,7 @@ module Specjour
       Signal.trap('INT') { exit }
       browser = DNSSD::Service.new
       begin
-        Timeout.timeout(5) do
+        Timeout.timeout(10) do
           browser.browse '_druby._tcp' do |reply|
             if reply.flags.add?
               resolve_reply(reply)
