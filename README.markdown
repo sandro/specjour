@@ -1,7 +1,6 @@
 # Specjour
 
-## FUCK SETI
-### Run specs with your spare CPU cycles.
+## FUCK SETI. Run specs with your spare CPU cycles.
 
 _Distribute your spec suite amongst your LAN via Bonjour._
 
