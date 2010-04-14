@@ -23,6 +23,10 @@ optparse = OptionParser.new do |opts|
     options[:worker_args] = args[0], args[1], args[2]
   end
 
+  opts.on('--log', TrueClass, 'print debug messages to stdout') do |val|
+    Specjour.new_logger Logger::DEBUG
+  end
+
   opts.on_tail('-v', '--version', 'Show the version of specjour') do
     abort Specjour::VERSION
   end

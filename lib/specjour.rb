@@ -9,6 +9,7 @@ autoload :Forwardable, 'forwardable'
 autoload :GServer, 'gserver'
 autoload :Timeout, 'timeout'
 autoload :Benchmark, 'benchmark'
+autoload :Logger, 'logger'
 
 module Specjour
   autoload :Connection, 'specjour/connection'
@@ -22,5 +23,21 @@ module Specjour
   autoload :Worker, 'specjour/worker'
 
   VERSION = "0.1.12".freeze
+
   class Error < StandardError; end
+
+  def self.logger
+    @logger ||= new_logger
+  end
+
+  def self.new_logger(level = Logger::UNKNOWN)
+    @logger = Logger.new $stdout
+    @logger.level = level
+    @logger
+  end
+
+  def self.log?
+    logger.level != Logger::UNKNOWN
+  end
+
 end

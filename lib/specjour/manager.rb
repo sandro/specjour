@@ -44,7 +44,7 @@ module Specjour
     def dispatch_workers
       (1..worker_size).each do |index|
         worker_pids << fork do
-          exec("specjour --batch-size #{batch_size} --do-work #{project_path},#{dispatcher_uri},#{index}")
+          exec("specjour --batch-size #{batch_size} #{'--log' if Specjour.log?} --do-work #{project_path},#{dispatcher_uri},#{index}")
           Kernel.exit!
         end
       end
