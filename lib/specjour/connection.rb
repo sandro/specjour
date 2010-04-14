@@ -9,7 +9,7 @@ module Specjour
     def_delegators :socket, :flush, :closed?, :close, :gets, :each
 
     def self.wrap(established_connection)
-      host, port = established_connection.peeraddr.values_at(2,1)
+      host, port = established_connection.peeraddr.values_at(3,1)
       connection = new URI::Generic.build(:host => host, :port => port)
       connection.socket = established_connection
       connection

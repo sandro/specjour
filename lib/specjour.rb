@@ -10,6 +10,7 @@ autoload :GServer, 'gserver'
 autoload :Timeout, 'timeout'
 autoload :Benchmark, 'benchmark'
 autoload :Logger, 'logger'
+autoload :Socket, 'socket'
 
 module Specjour
   autoload :Connection, 'specjour/connection'
@@ -40,4 +41,7 @@ module Specjour
     logger.level != Logger::UNKNOWN
   end
 
+  def self.ip_from_hostname(hostname)
+    Socket.getaddrinfo(hostname, nil).last.fetch(3)
+  end
 end

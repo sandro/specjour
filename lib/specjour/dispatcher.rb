@@ -77,6 +77,10 @@ module Specjour
       @hostname ||= Socket.gethostname
     end
 
+    def host_ip
+      @host_ip ||= Specjour.ip_from_hostname hostname
+    end
+
     def printer
       @printer ||= begin
         p = Printer.new
@@ -95,7 +99,8 @@ module Specjour
 
     def resolve_reply(reply)
       DNSSD.resolve!(reply) do |resolved|
-        uri = URI::Generic.build :scheme => reply.service_name, :host => resolved.target, :port => resolved.port
+        resolved_ip = Specjour.ip_from_hostname(resolved.target)
+        uri = URI::Generic.build :scheme => reply.service_name, :host => resolved_ip, :port => resolved.port
         fetch_manager(uri)
         resolved.service.stop if resolved.service.started?
       end
@@ -107,7 +112,7 @@ module Specjour
 
     def set_up_manager(manager, uri)
       manager.project_name = project_name
-      manager.dispatcher_uri = URI::Generic.build :scheme => "specjour", :host => hostname, :port => printer.port
+      manager.dispatcher_uri = URI::Generic.build :scheme => "specjour", :host => host_ip, :port => printer.port
       at_exit { manager.kill_worker_processes }
     end
 
