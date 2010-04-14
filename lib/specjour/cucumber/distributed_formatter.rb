@@ -16,8 +16,21 @@ module Specjour::Cucumber
     end
 
     def print_summary(features)
-      require 'ruby-debug'; Debugger.start; Debugger.settings[:autoeval] = 1; Debugger.settings[:autolist] = 1; debugger
-      @io.send_message(:worker_summary=, features)
+      @io.send_message(:worker_summary=, to_hash)
     end
+
+    OUTCOMES = [:failed, :skipped, :undefined, :pending, :passed]
+
+    def to_hash
+      hash = {}
+      [:scenarios, :steps].each do |type|
+        hash[type] = {}
+        OUTCOMES.each do |outcome|
+          hash[type][outcome] = step_mother.send(type, outcome).size
+        end
+      end
+      hash
+    end
+
   end
 end
