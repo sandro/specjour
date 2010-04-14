@@ -42,6 +42,6 @@ module Specjour
   end
 
   def self.ip_from_hostname(hostname)
-    Socket.getaddrinfo(hostname, nil).last.fetch(3)
+    Socket.getaddrinfo(hostname, nil, Socket::AF_INET, Socket::SOCK_STREAM).first.fetch(3)
   end
 end
