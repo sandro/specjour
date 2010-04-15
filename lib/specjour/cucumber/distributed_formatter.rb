@@ -13,6 +13,8 @@ module Specjour::Cucumber
 
     def after_features(features)
       print_summary(features)
+      step_mother.scenarios.clear
+      step_mother.steps.clear
     end
 
     def print_summary(features)

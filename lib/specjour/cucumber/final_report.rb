@@ -6,27 +6,36 @@ module Specjour
         @steps = Hash.new(0)
       end
 
-      def increment(category, type, value)
+      def increment(category, type, count)
         current = instance_variable_get("@#{category}")
-        current[type] += value
+        current[type] += count
       end
 
       def add(stats)
         stats.each do |category, hash|
           hash.each do |type, count|
-            increment(category, type, value)
+            increment(category, type, count)
           end
         end
       end
 
       def scenarios(status=nil)
         require 'ostruct'
-        OpenStruct.new(:length => status ? @scenarios[status] : @scenarios.inject(0) {|h,(k,v)| h += v})
+        length = status ? @scenarios[status] : @scenarios.inject(0) {|h,(k,v)| h += v}
+        any = @scenarios[status] > 0 if status
+        OpenStruct.new(:length => length , :any? => any)
+      end
+
+      def steps(status=nil)
+        require 'ostruct'
+        length = status ? @steps[status] : @steps.inject(0) {|h,(k,v)| h += v}
+        any = @steps[status] > 0 if status
+        OpenStruct.new(:length => length , :any? => any)
       end
     end
 
     class FinalReport
-      include ::Cucumber::Formatter::Summary
+      include ::Cucumber::Formatter::Console
       def initialize
         @features = []
         @summarizer = Summarizer.new
@@ -37,11 +46,11 @@ module Specjour
       end
 
       def summarize
-        puts "\n\nTIM SAYS HI\n\n"
-        puts "sum: #{@summarizer.scenarios}"
-        puts scenario_summary(@summarizer) {|status_count, status| "#{status_count} #{status}"}
-        puts step_summary(@summarizer)
-        puts "\n\nTIM SAYS BYE\n\n"
+        default_format = lambda {|status_count, status| format_string(status_count, status)}
+        puts
+        puts
+        puts scenario_summary(@summarizer, &default_format)
+        puts step_summary(@summarizer, &default_format)
       end
     end
   end
