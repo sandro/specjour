@@ -1,51 +1,52 @@
 #!/usr/bin/env ruby
-require 'optparse'
 require 'specjour'
 
-options = {:batch_size => 1}
+Specjour::CLI.start
 
-optparse = OptionParser.new do |opts|
-  opts.banner = "Usage: specjour [options]"
+# options = {:batch_size => 1}
 
-  opts.on('-w', '--workers WORKERS', Numeric, "Number of WORKERS to spin up, defaults to available cores") do |n|
-    options[:worker_size] = n
-  end
+# optparse = OptionParser.new do |opts|
+  # opts.banner = "Usage: specjour [options]"
 
-  opts.on('-b', '--batch-size [SIZE]', Integer, "Number of specs to run before reporting back to the dispatcher, defaults to #{options[:batch_size]}") do |n|
-    options[:batch_size] = n
-  end
+  # opts.on('-w', '--workers WORKERS', Numeric, "Number of WORKERS to spin up, defaults to available cores") do |n|
+    # options[:worker_size] = n
+  # end
 
-  opts.on('-p', '--projects PROJECTS', Array, "Only run specs for these comma delimited project names, i.e. workbeast,taigan") do |project_names|
-    options[:registered_projects] = project_names
-  end
+  # opts.on('-b', '--batch-size [SIZE]', Integer, "Number of specs to run before reporting back to the dispatcher, defaults to #{options[:batch_size]}") do |n|
+    # options[:batch_size] = n
+  # end
 
-  opts.on('--do-work OPTIONS', Array, 'INTERNAL USE ONLY') do |args|
-    options[:worker_args] = args[0], args[1], args[2]
-  end
+  # opts.on('-p', '--projects PROJECTS', Array, "Only run specs for these comma delimited project names, i.e. workbeast,taigan") do |project_names|
+    # options[:registered_projects] = project_names
+  # end
 
-  opts.on('--log', TrueClass, 'print debug messages to stdout') do |val|
-    Specjour.new_logger Logger::DEBUG
-  end
+  # opts.on('--do-work OPTIONS', Array, 'INTERNAL USE ONLY') do |args|
+    # options[:worker_args] = args[0], args[1], args[2]
+  # end
 
-  opts.on_tail('-v', '--version', 'Show the version of specjour') do
-    abort Specjour::VERSION
-  end
+  # opts.on('--log', TrueClass, 'print debug messages to stdout') do |val|
+    # Specjour.new_logger Logger::DEBUG
+  # end
 
-  opts.on_tail("-h", "--help", "Show this message") do
-    summary = opts.to_a
-    summary.first << "\n"
-    abort summary.reject {|s| s =~ /INTERNAL/}.join
-  end
-end
+  # opts.on_tail('-v', '--version', 'Show the version of specjour') do
+    # abort Specjour::VERSION
+  # end
 
-optparse.parse!
+  # opts.on_tail("-h", "--help", "Show this message") do
+    # summary = opts.to_a
+    # summary.first << "\n"
+    # abort summary.reject {|s| s =~ /INTERNAL/}.join
+  # end
+# end
 
-abort(%(ERROR: I don't understand the following flags: "#{ARGV.join(', ')}")) if ARGV.any?
+# optparse.parse!
 
-if options[:worker_args]
-  options[:worker_args] << options[:batch_size]
-  Specjour::Worker.new(*options[:worker_args]).run
-else
-  options[:worker_size] ||= Specjour::CPU.cores
-  Specjour::Manager.new(options).start
-end
+# abort(%(ERROR: I don't understand the following flags: "#{ARGV.join(', ')}")) if ARGV.any?
+
+# if options[:worker_args]
+  # options[:worker_args] << options[:batch_size]
+  # Specjour::Worker.new(*options[:worker_args]).run
+# else
+  # options[:worker_size] ||= Specjour::CPU.cores
+  # Specjour::Manager.new(options).start
+# end

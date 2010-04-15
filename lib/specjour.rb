@@ -9,6 +9,7 @@ autoload :Logger, 'logger'
 autoload :Socket, 'socket'
 
 module Specjour
+  autoload :CLI, 'specjour/cli'
   autoload :CPU, 'specjour/cpu'
   autoload :Connection, 'specjour/connection'
   autoload :Dispatcher, 'specjour/dispatcher'
