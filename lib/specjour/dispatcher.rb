@@ -77,10 +77,6 @@ module Specjour
       @hostname ||= Socket.gethostname
     end
 
-    def host_ip
-      @host_ip ||= Specjour.ip_from_hostname hostname
-    end
-
     def printer
       @printer ||= begin
         p = Printer.new
@@ -112,7 +108,7 @@ module Specjour
 
     def set_up_manager(manager, uri)
       manager.project_name = project_name
-      manager.dispatcher_uri = URI::Generic.build :scheme => "specjour", :host => host_ip, :port => printer.port
+      manager.dispatcher_uri = URI::Generic.build :scheme => "specjour", :host => hostname, :port => printer.port
       at_exit { manager.kill_worker_processes }
     end
 

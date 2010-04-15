@@ -3,8 +3,8 @@ module Specjour
     require 'dnssd'
     include DRbUndumped
 
-    attr_accessor :project_name, :specs_to_run, :dispatcher_uri
-    attr_reader :worker_size, :batch_size, :registered_projects, :bonjour_service, :worker_pids
+    attr_accessor :project_name, :specs_to_run
+    attr_reader :worker_size, :batch_size, :dispatcher_uri, :registered_projects, :bonjour_service, :worker_pids
 
     def initialize(options = {})
       @worker_size = options[:worker_size]
@@ -23,6 +23,11 @@ module Specjour
           system("bundle install --relock > /dev/null")
         end
       end
+    end
+
+    def dispatcher_uri=(uri)
+      uri.host = Specjour.ip_from_hostname(uri.host)
+      @dispatcher_uri = uri
     end
 
     def kill_worker_processes
