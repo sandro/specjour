@@ -1,9 +1,11 @@
 module Specjour
   module Cucumber
     class Summarizer
+      attr_accessor :failing_scenarios
       def initialize
         @scenarios = Hash.new(0)
         @steps = Hash.new(0)
+        @failing_scenarios = []
       end
 
       def increment(category, type, count)
@@ -13,8 +15,12 @@ module Specjour
 
       def add(stats)
         stats.each do |category, hash|
-          hash.each do |type, count|
-            increment(category, type, count)
+          if category == :failing_scenarios
+            @failing_scenarios += hash
+          else
+            hash.each do |type, count|
+              increment(category, type, count)
+            end
           end
         end
       end
@@ -46,8 +52,14 @@ module Specjour
       end
 
       def summarize
+        if @summarizer.failing_scenarios.any?
+          puts
+          puts
+          puts format_string("Failing Scenarios:", :failed)
+          @summarizer.failing_scenarios.each {|f| puts f }
+        end
+
         default_format = lambda {|status_count, status| format_string(status_count, status)}
-        puts
         puts
         puts scenario_summary(@summarizer, &default_format)
         puts step_summary(@summarizer, &default_format)
