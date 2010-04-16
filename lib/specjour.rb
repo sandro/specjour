@@ -24,7 +24,7 @@ module Specjour
   autoload :SocketHelpers, 'specjour/socket_helpers'
   autoload :Worker, 'specjour/worker'
 
-  VERSION = "0.1.17".freeze
+  VERSION = "0.1.18".freeze
 
   class Error < StandardError; end
 
