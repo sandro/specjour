@@ -6,8 +6,8 @@ module Specjour
     def scrub
       connect_to_database
       if pending_migrations?
-        Rake::Task['db:test:purge'].invoke
-        Rake::Task['db:schema:load'].invoke
+        puts "Migrating schema for database #{ENV['TEST_ENV_NUMBER'] || 1}..."
+        Rake::Task['db:test:load'].invoke
       else
         purge_tables
       end
