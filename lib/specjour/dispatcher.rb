@@ -2,6 +2,7 @@ module Specjour
   class Dispatcher
     require 'dnssd'
     Thread.abort_on_exception = true
+    include SocketHelpers
 
     attr_reader :project_path, :managers, :manager_threads, :hosts
     attr_accessor :worker_size
@@ -73,10 +74,6 @@ module Specjour
       printer.worker_size = worker_size
     end
 
-    def hostname
-      @hostname ||= Socket.gethostname
-    end
-
     def printer
       @printer ||= begin
         p = Printer.new
@@ -95,7 +92,7 @@ module Specjour
 
     def resolve_reply(reply)
       DNSSD.resolve!(reply) do |resolved|
-        resolved_ip = Specjour.ip_from_hostname(resolved.target)
+        resolved_ip = ip_from_hostname(resolved.target)
         uri = URI::Generic.build :scheme => reply.service_name, :host => resolved_ip, :port => resolved.port
         fetch_manager(uri)
         resolved.service.stop if resolved.service.started?

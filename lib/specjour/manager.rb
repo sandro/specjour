@@ -2,6 +2,7 @@ module Specjour
   class Manager
     require 'dnssd'
     include DRbUndumped
+    include SocketHelpers
 
     attr_accessor :project_name, :specs_to_run
     attr_reader :worker_size, :batch_size, :dispatcher_uri, :registered_projects, :bonjour_service, :worker_pids
@@ -26,7 +27,7 @@ module Specjour
     end
 
     def dispatcher_uri=(uri)
-      uri.host = Specjour.ip_from_hostname(uri.host)
+      uri.host = ip_from_hostname(uri.host)
       @dispatcher_uri = uri
     end
 

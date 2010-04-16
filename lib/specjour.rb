@@ -21,6 +21,7 @@ module Specjour
   autoload :MarshalableFailureFormatter, 'specjour/marshalable_failure_formatter'
   autoload :Printer, 'specjour/printer'
   autoload :RsyncDaemon, 'specjour/rsync_daemon'
+  autoload :SocketHelpers, 'specjour/socket_helpers'
   autoload :Worker, 'specjour/worker'
 
   VERSION = "0.1.15".freeze
@@ -39,9 +40,5 @@ module Specjour
 
   def self.log?
     logger.level != Logger::UNKNOWN
-  end
-
-  def self.ip_from_hostname(hostname)
-    Socket.getaddrinfo(hostname, nil, Socket::AF_INET, Socket::SOCK_STREAM).first.fetch(3)
   end
 end
