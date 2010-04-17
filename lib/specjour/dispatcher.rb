@@ -41,7 +41,7 @@ module Specjour
     end
 
     def fetch_manager(uri)
-      Timeout.timeout(1) do
+      Timeout.timeout(8) do
         manager = DRbObject.new_with_uri(uri.to_s)
         if !managers.include?(manager) && manager.available_for?(project_name)
           set_up_manager(manager, uri)
