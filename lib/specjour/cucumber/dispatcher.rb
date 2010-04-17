@@ -11,7 +11,7 @@ module Specjour
       end
 
       def printer
-        @printer ||= Printer.new.start
+        @printer ||= Printer.start(all_specs)
       end
     end
   end

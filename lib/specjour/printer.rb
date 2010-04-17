@@ -3,9 +3,13 @@ module Specjour
     include Protocol
     RANDOM_PORT = 0
 
+    def self.start(specs_to_run)
+      new(specs_to_run).start
+    end
+
     attr_accessor :worker_size, :specs_to_run, :completed_workers
 
-    def initialize
+    def initialize(specs_to_run)
       super(
         port = RANDOM_PORT,
         host = "0.0.0.0",
@@ -15,6 +19,7 @@ module Specjour
         debug = true
       )
       @completed_workers = 0
+      self.specs_to_run = specs_to_run
     end
 
     def serve(client)
