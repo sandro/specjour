@@ -64,7 +64,7 @@ module Specjour
     end
 
     def report
-      @report ||= FinalReport.new
+      @report ||= Rspec::FinalReport.new
     end
 
     def stopping

@@ -19,6 +19,8 @@ module Specjour
       @uri = uri
     end
 
+    alias to_str to_s
+
     def connect
       timeout { connect_socket }
     end

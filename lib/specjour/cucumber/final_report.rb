@@ -1,11 +1,12 @@
 module Specjour
   module Cucumber
     class Summarizer
-      attr_accessor :failing_scenarios
+      attr_reader :duration, :failing_scenarios
       def initialize
+        @duration = 0.0
+        @failing_scenarios = []
         @scenarios = Hash.new(0)
         @steps = Hash.new(0)
-        @failing_scenarios = []
       end
 
       def increment(category, type, count)
@@ -17,6 +18,8 @@ module Specjour
         stats.each do |category, hash|
           if category == :failing_scenarios
             @failing_scenarios += hash
+          elsif category == :duration
+            @duration = hash.to_f if duration < hash.to_f
           else
             hash.each do |type, count|
               increment(category, type, count)
@@ -63,6 +66,7 @@ module Specjour
         puts
         puts scenario_summary(@summarizer, &default_format)
         puts step_summary(@summarizer, &default_format)
+        puts format_duration(@summarizer.duration) if @summarizer.duration
       end
     end
   end
