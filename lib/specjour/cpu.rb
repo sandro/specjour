@@ -6,7 +6,7 @@ module Specjour
       when /darwin/
         `hwprefs cpu_count`.to_i
       when /linux/
-        `cat /proc/cpuinfo | grep processor | wc -l`.to_i
+        `cat /proc/cpuinfo | grep --count processor`.to_i
       end
     end
   end
