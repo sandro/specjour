@@ -11,7 +11,6 @@ module Specjour
       @number = number.to_i
       @batch_size = batch_size.to_i
       self.printer_uri = printer_uri
-      GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
       Rspec::DistributedFormatter.batch_size = batch_size
       set_env_variables
     end

@@ -48,6 +48,7 @@ module Specjour
     end
 
     def dispatch_workers
+      GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
       (1..worker_size).each do |index|
         worker_pids << fork do
           exec("specjour --batch-size #{batch_size} #{'--log' if Specjour.log?} --do-work #{project_path},#{dispatcher_uri},#{index}")
