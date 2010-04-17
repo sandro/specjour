@@ -1,6 +1,5 @@
 module Specjour
   module Cucumber
-    DRb
     require 'cucumber'
     require 'cucumber/formatter/progress'
     autoload :Dispatcher, 'specjour/cucumber/dispatcher'

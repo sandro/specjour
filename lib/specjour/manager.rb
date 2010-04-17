@@ -1,4 +1,3 @@
-DRb
 module Specjour
   class Manager
     require 'dnssd'

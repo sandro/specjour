@@ -12,7 +12,6 @@ module Specjour
       @batch_size = batch_size.to_i
       self.printer_uri = printer_uri
       GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
-      DRb
       Rspec::DistributedFormatter.batch_size = batch_size
       Cucumber::DistributedFormatter.batch_size = batch_size
       ::Cucumber::Cli::Options.class_eval { def print_profile_information; end }

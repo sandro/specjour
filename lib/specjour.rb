@@ -1,5 +1,6 @@
+require 'drb'
+
 autoload :URI, 'uri'
-autoload :DRb, 'drb'
 autoload :Forwardable, 'forwardable'
 autoload :GServer, 'gserver'
 autoload :Timeout, 'timeout'
