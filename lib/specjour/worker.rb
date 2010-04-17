@@ -13,8 +13,6 @@ module Specjour
       self.printer_uri = printer_uri
       GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
       Rspec::DistributedFormatter.batch_size = batch_size
-      Cucumber::DistributedFormatter.batch_size = batch_size
-      ::Cucumber::Cli::Options.class_eval { def print_profile_information; end }
       set_env_variables
     end
 
@@ -52,6 +50,7 @@ module Specjour
     end
 
     def run_test(test)
+      puts "Running #{test}"
       if test =~ /.feature/
         run_feature test
       else
@@ -60,13 +59,12 @@ module Specjour
     end
 
     def run_feature(feature)
-      Kernel.puts "Running #{feature}"
+      set_up_cucumber
       cli = ::Cucumber::Cli::Main.new(['--format', 'Specjour::Cucumber::DistributedFormatter', feature], printer)
       cli.execute!(::Cucumber::Cli::Main.step_mother)
     end
 
     def run_spec(spec)
-      puts "Running #{spec}"
       options = Spec::Runner::OptionParser.parse(
         ['--format=Specjour::Rspec::DistributedFormatter', spec],
         $stderr,
@@ -80,6 +78,14 @@ module Specjour
       ENV['PREPARE_DB'] = 'true'
       ENV['RSPEC_COLOR'] = 'true'
       ENV['TEST_ENV_NUMBER'] = number.to_s
+    end
+
+    def set_up_cucumber
+      unless @cucumber_loaded
+        Cucumber::DistributedFormatter.batch_size = batch_size
+        ::Cucumber::Cli::Options.class_eval { def print_profile_information; end }
+        @cucumber_loaded = true
+      end
     end
   end
 end
