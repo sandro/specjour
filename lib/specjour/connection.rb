@@ -34,7 +34,7 @@ module Specjour
     end
 
     def timeout(&block)
-      Timeout.timeout(5, &block)
+      Timeout.timeout(2, &block)
     rescue Timeout::Error
       raise Error, "Connection to dispatcher timed out"
     end
