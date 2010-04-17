@@ -50,7 +50,7 @@ module Specjour
 
     def run_test(test)
       puts "Running #{test}"
-      if test =~ /.feature/
+      if test =~ /\.feature$/
         run_feature test
       else
         run_spec test
