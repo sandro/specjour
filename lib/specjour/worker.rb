@@ -35,9 +35,9 @@ module Specjour
           end
           printer.send_message(:ready)
         else
-          printer.send_message(:done)
           printer.send_message(:worker_summary=, {:duration => sprintf("%6f", run_time)})
-          printer.close
+          printer.send_message(:done)
+          printer.disconnect
         end
       end
     end
@@ -62,7 +62,7 @@ module Specjour
 
     def run_feature(feature)
       Kernel.puts "Running #{feature}"
-      cli = ::Cucumber::Cli::Main.new(['--format', 'Specjour::Cucumber::DistributedFormatter', feature], printer_connection)
+      cli = ::Cucumber::Cli::Main.new(['--format', 'Specjour::Cucumber::DistributedFormatter', feature], printer)
       cli.execute!(::Cucumber::Cli::Main.step_mother)
     end
 
@@ -71,7 +71,7 @@ module Specjour
       options = Spec::Runner::OptionParser.parse(
         ['--format=Specjour::Rspec::DistributedFormatter', spec],
         $stderr,
-        printer_connection
+        printer
       )
       Spec::Runner.use options
       options.run_examples
