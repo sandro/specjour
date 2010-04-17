@@ -7,7 +7,7 @@ module Specjour
       new(specs_to_run).start
     end
 
-    attr_accessor :worker_size, :specs_to_run, :completed_workers
+    attr_accessor :worker_size, :specs_to_run, :completed_workers, :disconnections
 
     def initialize(specs_to_run)
       super(
@@ -19,6 +19,7 @@ module Specjour
         debug = true
       )
       @completed_workers = 0
+      @disconnections = 0
       self.specs_to_run = specs_to_run
     end
 
@@ -45,7 +46,8 @@ module Specjour
     protected
 
     def disconnecting(client_port)
-      if completed_workers == worker_size
+      self.disconnections += 1
+      if disconnections == worker_size
         stop
       end
     end
@@ -69,6 +71,11 @@ module Specjour
 
     def stopping
       report.summarize
+      if disconnections != completed_workers
+        puts "*" * 63
+        puts "* ERROR: NOT ALL WORKERS COMPLETED PROPERLY, RE-RUN THE SUITE *"
+        puts "*" * 63
+      end
     end
   end
 end
