@@ -12,6 +12,7 @@ module Specjour
       @number = options[:number].to_i
       self.printer_uri = options[:printer_uri]
       set_env_variables
+      Rspec::DistributedFormatter
     end
 
     def printer_uri=(val)
