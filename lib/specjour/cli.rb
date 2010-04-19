@@ -15,7 +15,7 @@ module Specjour
 
     desc "listen", "Advertise availability to run specs"
     worker_option
-    method_option :projects, :aliases => "-p", :type => :array, :desc => "Projects supported by this listener"
+    method_option :projects, :aliases => "-p", :type => :array, :desc => "Projects supported by this listener", :required => true
     def listen
       handle_logging
       handle_workers
