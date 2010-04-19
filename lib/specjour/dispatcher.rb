@@ -10,13 +10,14 @@ module Specjour
     end
 
     attr_reader :project_path, :project_alias, :managers, :manager_threads, :hosts
-    attr_accessor :worker_size
+    attr_accessor :worker_size, :discovery_attempts
 
     def initialize(options = {})
       @project_path = options[:project_path]
       @project_alias = options[:project_alias] || project_name
       @worker_size = 0
       @managers = []
+      @discovery_attempts = 0
       clear_manager_threads
     end
 
@@ -44,6 +45,9 @@ module Specjour
     end
 
     def dispatch_work
+      puts "Managers found: #{managers.size}"
+      puts "Workers found: #{worker_size}"
+      printer.worker_size = worker_size
       command_managers(true) { |m| m.dispatch }
     end
 
@@ -61,7 +65,7 @@ module Specjour
     end
 
     def gather_managers
-      puts "Waiting for managers"
+      puts "Looking for managers..."
       Signal.trap('INT') { self.class.interrupted = true; exit }
       browser = DNSSD::Service.new
       begin
@@ -75,10 +79,13 @@ module Specjour
         end
       rescue Timeout::Error
       end
-      puts "Managers found: #{managers.size}"
-      abort unless managers.size > 0
-      puts "Workers found: #{worker_size}"
-      printer.worker_size = worker_size
+      if managers.size < 1 && discovery_attempts < 10
+        sleep 1
+        self.discovery_attempts += 1
+        gather_managers
+      elsif managers.size == 0 && discovery_attempts == 10
+        abort "No managers found"
+      end
     end
 
     def printer

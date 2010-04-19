@@ -10,6 +10,7 @@ module Specjour
       method_option :workers, :aliases => "-w", :type => :numeric, :desc => "Number of concurent processes to run. Defaults to your system's available cores."
     end
 
+    default_task :dispatch
 
     class_option :log, :aliases => "-l", :type => :boolean, :desc => "Print debug messages to $stdout"
 
@@ -32,7 +33,6 @@ module Specjour
       start_manager if args[:worker_size] > 0
       Specjour::Dispatcher.new(args).start
     end
-    default_task :dispatch
 
     desc "version", "Show the version of specjour"
     def version
