@@ -14,7 +14,7 @@ module Specjour
     end
 
     def available_for?(project_name)
-      registered_projects ? registered_projects.include?(project_name) : true
+      registered_projects ? registered_projects.include?(project_name) : false
    end
 
     def bundle_install
