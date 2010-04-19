@@ -5,11 +5,10 @@ module Specjour
     include SocketHelpers
 
     attr_accessor :project_name, :specs_to_run
-    attr_reader :worker_size, :batch_size, :dispatcher_uri, :registered_projects, :bonjour_service, :worker_pids
+    attr_reader :worker_size, :dispatcher_uri, :registered_projects, :bonjour_service, :worker_pids
 
     def initialize(options = {})
       @worker_size = options[:worker_size]
-      @batch_size = options[:batch_size]
       @registered_projects = options[:registered_projects]
       @worker_pids = []
     end

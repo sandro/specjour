@@ -5,7 +5,7 @@ module Specjour
     include Protocol
     include SocketHelpers
     attr_accessor :printer_uri
-    attr_reader :project_path, :specs_to_run, :number, :batch_size
+    attr_reader :project_path, :specs_to_run, :number
 
     def initialize(project_path, printer_uri, number, batch_size)
       @project_path = project_path
@@ -77,7 +77,6 @@ module Specjour
 
     def set_up_cucumber
       unless @cucumber_loaded
-        Cucumber::DistributedFormatter.batch_size = batch_size
         ::Cucumber::Cli::Options.class_eval { def print_profile_information; end }
         @cucumber_loaded = true
       end
