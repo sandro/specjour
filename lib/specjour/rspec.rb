@@ -5,5 +5,6 @@ module Specjour
 
     require 'specjour/rspec/distributed_formatter'
     require 'specjour/rspec/final_report'
+
   end
 end
