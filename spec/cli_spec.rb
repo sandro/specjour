@@ -26,7 +26,7 @@ describe Specjour::CLI do
     end
 
     it "accepts an array of projects to listen to" do
-      manager_receives_options("projects" => %w(one two three))
+      manager_receives_options("registered_projects" => %w(one two three))
       Specjour::CLI.start %w(listen --projects one two three)
     end
   end

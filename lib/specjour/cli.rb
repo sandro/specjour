@@ -20,6 +20,7 @@ module Specjour
     def listen
       handle_logging
       handle_workers
+      args[:registered_projects] = args.delete(:projects)
       Specjour::Manager.new(args).start
     end
 
