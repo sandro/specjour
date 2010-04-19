@@ -15,7 +15,7 @@ module Specjour
     def initialize(options = {})
       @project_path = options[:project_path]
       @project_alias = options[:project_alias] || project_name
-      @worker_size = options[:worker_size]
+      @worker_size = 0
       @managers = []
       clear_manager_threads
     end

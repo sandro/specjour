@@ -1,7 +1,6 @@
 module Specjour
   require 'thor'
   class CLI < Thor
-    default_task :dispatch
 
     def self.printable_tasks
       super.reject{|t| t.last =~ /INTERNAL USE/ }
@@ -10,6 +9,7 @@ module Specjour
     def self.worker_option
       method_option :workers, :aliases => "-w", :type => :numeric, :desc => "Number of concurent processes to run. Defaults to your system's available cores."
     end
+
 
     class_option :log, :aliases => "-l", :type => :boolean, :desc => "Print debug messages to $stdout"
 
@@ -29,8 +29,10 @@ module Specjour
       handle_logging
       handle_workers
       args[:project_path] = path
+      start_manager if args[:worker_size] > 0
       Specjour::Dispatcher.new(args).start
     end
+    default_task :dispatch
 
     desc "version", "Show the version of specjour"
     def version
@@ -56,7 +58,13 @@ module Specjour
     end
 
     def handle_workers
-      args["worker_size"] = options["workers"] || CPU.cores
+      args[:worker_size] = options["workers"] || CPU.cores
+    end
+
+    def start_manager
+      process = IO.popen %(specjour listen --projects #{args[:project_path]} --workers #{args[:worker_size]})
+      Process.detach process.pid
+      Kernel.at_exit { Process.kill('TERM', process.pid) }
     end
   end
 end

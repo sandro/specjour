@@ -1,8 +1,15 @@
 require 'spec_helper'
 
 describe Specjour::CLI do
+  let(:fake_pid) { 100_000_000 }
   before do
     Specjour::CPU.stub(:cores => 27)
+    Specjour::Dispatcher.stub(:new => stub.as_null_object)
+    Specjour::Manager.stub(:new => stub.as_null_object)
+    Specjour::Worker.stub(:new => stub.as_null_object)
+    IO.stub(:popen => stub(:pid => fake_pid))
+    Kernel.stub(:at_exit)
+    Process.stub(:detach)
   end
 
   describe "#listen" do
@@ -47,6 +54,26 @@ describe Specjour::CLI do
       dispatcher_receives_options("alias" => "eh")
       Specjour::CLI.start %w(dispatch --alias eh)
     end
+
+    context "starting a manager" do
+      let(:task) { task = Specjour::CLI.all_tasks['dispatch'] }
+
+      before do
+        Specjour::Dispatcher.stub(:new).and_return(stub.as_null_object)
+      end
+
+      it "attempts to start a manager" do
+        cli = Specjour::CLI.new [], %w(--workers 2), {:task_options => task.options}
+        cli.should_receive(:start_manager)
+        cli.invoke(:dispatch)
+      end
+
+      it "doesn't start a manager when the worker size is less than one" do
+        cli = Specjour::CLI.new [], %w(--workers 0), {:task_options => task.options}
+        cli.should_not_receive(:start_manager)
+        cli.invoke(:dispatch)
+      end
+    end
   end
 
   describe "#work" do
@@ -72,6 +99,25 @@ describe Specjour::CLI do
     it "doesn't enable logging" do
       Specjour.should_not_receive(:new_logger)
       subject.send(:handle_logging)
+    end
+  end
+
+  describe "#start_manager" do
+    it "starts a listener in a subprocess" do
+      subject.stub(:args => {:project_path => 'eh', :worker_size => 1})
+      command = %(specjour listen --projects eh --workers 1)
+      IO.should_receive(:popen).with(command).and_return(stub(:pid => fake_pid))
+      subject.send(:start_manager)
+    end
+
+    it "detaches the subprocess' pid" do
+      Process.should_receive(:detach).with(fake_pid)
+      subject.send :start_manager
+    end
+
+    it "does something at exit" do
+      Kernel.should_receive(:at_exit)
+      subject.send :start_manager
     end
   end
 end
