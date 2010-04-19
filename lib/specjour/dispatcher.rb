@@ -9,14 +9,15 @@ module Specjour
       alias interrupted? interrupted
     end
 
-    attr_reader :project_path, :managers, :manager_threads, :hosts
+    attr_reader :project_path, :project_alias, :managers, :manager_threads, :hosts
     attr_accessor :worker_size
 
-    def initialize(project_path)
-      @project_path = project_path
+    def initialize(options = {})
+      @project_path = options[:project_path]
+      @project_alias = options[:project_alias] || project_name
+      @worker_size = options[:worker_size]
       @managers = []
-      @worker_size = 0
-      reset_manager_threads
+      clear_manager_threads
     end
 
     def start
@@ -88,7 +89,7 @@ module Specjour
       @project_name ||= File.basename(project_path)
     end
 
-    def reset_manager_threads
+    def clear_manager_threads
       @manager_threads = []
     end
 
@@ -113,7 +114,7 @@ module Specjour
 
     def wait_on_managers
       manager_threads.each {|t| t.join; t.exit}
-      reset_manager_threads
+      clear_manager_threads
     end
   end
 end

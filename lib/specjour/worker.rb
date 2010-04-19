@@ -7,13 +7,10 @@ module Specjour
     attr_accessor :printer_uri
     attr_reader :project_path, :specs_to_run, :number
 
-    def initialize(project_path, printer_uri, number, batch_size)
-      @project_path = project_path
-      @specs_to_run = specs_to_run
-      @number = number.to_i
-      @batch_size = batch_size.to_i
-      self.printer_uri = printer_uri
-      Rspec::DistributedFormatter.batch_size = batch_size
+    def initialize(options = {})
+      @project_path = options[:project_path]
+      @number = options[:number].to_i
+      self.printer_uri = options[:printer_uri]
       set_env_variables
     end
 
@@ -21,7 +18,8 @@ module Specjour
       @printer_uri = URI.parse(val)
     end
 
-    def run
+    def start
+      connection.send_message(:ready)
       run_time = 0
       Dir.chdir(project_path)
       while test = connection.next_test

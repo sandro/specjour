@@ -50,7 +50,7 @@ module Specjour
       GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
       (1..worker_size).each do |index|
         worker_pids << fork do
-          exec("specjour --batch-size #{batch_size} #{'--log' if Specjour.log?} --do-work #{project_path},#{dispatcher_uri},#{index}")
+          exec("specjour work --project-path #{project_path} --printer-uri #{dispatcher_uri} --number #{index} #{'--log' if Specjour.log?}")
           Kernel.exit!
         end
       end

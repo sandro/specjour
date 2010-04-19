@@ -12,6 +12,7 @@ begin
     gem.authors = ["Sandro Turriate"]
     gem.add_dependency "dnssd", "1.3.1"
     gem.add_dependency "rspec"
+    gem.add_dependency "thor", "0.13.4"
     gem.add_development_dependency "rspec", "1.3.0"
     gem.add_development_dependency "rr", "0.10.11"
     gem.add_development_dependency "yard", "0.5.3"
@@ -46,6 +47,3 @@ rescue LoadError
     abort "YARD is not available. In order to run yardoc, you must: sudo gem install yard"
   end
 end
-
-$:.unshift(File.dirname(__FILE__) + "/lib")
-require 'specjour/tasks/specjour'
