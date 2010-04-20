@@ -1,5 +1,6 @@
 module Specjour
   class RsyncDaemon
+    require 'fileutils'
     require 'pathname'
 
     attr_reader :project_path, :project_name
