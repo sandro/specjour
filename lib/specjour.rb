@@ -22,7 +22,7 @@ module Specjour
   autoload :Cucumber, 'specjour/cucumber'
   autoload :Rspec, 'specjour/rspec'
 
-  VERSION = "0.1.18".freeze
+  VERSION = "0.2.0".freeze
 
   class Error < StandardError; end
 
