@@ -31,6 +31,11 @@ Run the rake task to distribute the specs among the managers you started.
 
     $ rake specjour
 
+## Distribute the features
+Run the rake task to distribute the features among the managers you started.
+
+    $ rake specjour:cucumber
+
 ## Rails
 Edit your config/environment.rb
 
