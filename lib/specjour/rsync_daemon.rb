@@ -61,7 +61,7 @@ pid file = #{pid_file}
 
 [#{project_name}]
   path = #{project_path}
-  exclude = .git* doc tmp/* log script
+  exclude = .git* .specjour doc tmp/* log script
       CONFIG
     end
   end
