@@ -1,4 +1,6 @@
 module Specjour
+  require 'specjour/cucumber'
+
   class Worker
     include Protocol
     include SocketHelpers

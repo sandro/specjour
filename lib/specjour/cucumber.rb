@@ -1,11 +1,14 @@
 module Specjour
   module Cucumber
-    require 'cucumber'
-    require 'cucumber/formatter/progress'
+    begin
+      require 'cucumber'
+      require 'cucumber/formatter/progress'
 
-    autoload :Dispatcher, 'specjour/cucumber/dispatcher'
-    autoload :DistributedFormatter, 'specjour/cucumber/distributed_formatter'
-    autoload :FinalReport, 'specjour/cucumber/final_report'
-    autoload :Printer, 'specjour/cucumber/printer'
+      require 'specjour/cucumber/dispatcher'
+      require 'specjour/cucumber/distributed_formatter'
+      require 'specjour/cucumber/final_report'
+      require 'specjour/cucumber/printer'
+    rescue LoadError
+    end
   end
 end
