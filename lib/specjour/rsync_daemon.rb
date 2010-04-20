@@ -1,7 +1,6 @@
 module Specjour
   class RsyncDaemon
     require 'fileutils'
-    require 'pathname'
 
     attr_reader :project_path, :project_name
     def initialize(project_path, project_name)
@@ -10,13 +9,11 @@ module Specjour
     end
 
     def config_directory
-      dir = Pathname.new('.specjour')
-      dir.mkpath unless dir.exist?
-      dir
+      @config_directory ||= File.join(project_path, ".specjour")
     end
 
     def config_file
-      @config_file ||= config_directory + 'rsyncd.conf'
+      @config_file ||= File.join(config_directory, "rsyncd.conf")
     end
 
     def start
@@ -35,7 +32,9 @@ module Specjour
     protected
 
     def write_config
-      unless config_file.exist?
+      unless File.exists? config_file
+        FileUtils.mkdir_p config_directory
+
         File.open(config_file, 'w') do |f|
           f.write config
         end
