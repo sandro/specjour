@@ -1,4 +1,5 @@
 module Specjour::Cucumber
+  ::Term::ANSIColor.coloring = true
   class DistributedFormatter < ::Cucumber::Formatter::Progress
 
     def initialize(step_mother, io, options)
@@ -59,7 +60,7 @@ module Specjour::Cucumber
       prepare_steps(:failed)
       prepare_steps(:undefined)
 
-      @io.send_message(:worker_summary=, to_hash)
+      @io.send_message(:cucumber_summary=, to_hash)
     end
 
     OUTCOMES = [:failed, :skipped, :undefined, :pending, :passed]

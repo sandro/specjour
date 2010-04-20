@@ -31,7 +31,6 @@ module Specjour
       handle_logging
       handle_workers
       args[:project_path] = path
-      start_manager if args[:worker_size] > 0
       Specjour::Dispatcher.new(args).start
     end
 
@@ -60,12 +59,6 @@ module Specjour
 
     def handle_workers
       args[:worker_size] = options["workers"] || CPU.cores
-    end
-
-    def start_manager
-      process = IO.popen %(specjour listen --projects #{args[:project_path]} --workers #{args[:worker_size]})
-      Process.detach process.pid
-      Kernel.at_exit { Process.kill('TERM', process.pid) }
     end
   end
 end

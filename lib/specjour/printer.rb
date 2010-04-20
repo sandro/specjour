@@ -47,8 +47,12 @@ module Specjour
       report.exit_status
     end
 
-    def worker_summary=(client, summary)
-      report.add(summary)
+    def rspec_summary=(client, summary)
+      rspec_report.add(summary)
+    end
+
+    def cucumber_summary=(client, summary)
+      cucumber_report.add(summary)
     end
 
     protected
@@ -78,13 +82,19 @@ module Specjour
       end
     end
 
-    def report
-      @report ||= Rspec::FinalReport.new
+    def rspec_report
+      @rspec_report ||= Rspec::FinalReport.new
+    end
+
+    def cucumber_report
+      @cucumber_report ||= Cucumber::FinalReport.new
     end
 
     def stopping
-      report.summarize
+      rspec_report.summarize
+      cucumber_report.summarize
       if disconnections != completed_workers && !Specjour::Dispatcher.interrupted?
+        puts
         puts abandoned_worker_message
       end
     end

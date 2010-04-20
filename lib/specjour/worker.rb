@@ -1,18 +1,18 @@
 module Specjour
+  require 'specjour/rspec'
   require 'specjour/cucumber'
 
   class Worker
     include Protocol
     include SocketHelpers
     attr_accessor :printer_uri
-    attr_reader :project_path, :specs_to_run, :number
+    attr_reader :project_path, :number
 
     def initialize(options = {})
       @project_path = options[:project_path]
       @number = options[:number].to_i
       self.printer_uri = options[:printer_uri]
       set_env_variables
-      Rspec::DistributedFormatter
     end
 
     def printer_uri=(val)
@@ -24,11 +24,12 @@ module Specjour
       run_time = 0
       Dir.chdir(project_path)
       while test = connection.next_test
-        run_time += Benchmark.realtime do
+        time = Benchmark.realtime do
           run_test test
         end
+        run_time += time if test =~ /_spec\.rb$/
       end
-      connection.send_message(:worker_summary=, {:duration => sprintf("%6f", run_time)})
+      connection.send_message(:rspec_summary=, {:duration => sprintf("%6f", run_time)})
       connection.send_message(:done)
       connection.disconnect
     end

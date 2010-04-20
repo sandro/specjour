@@ -54,7 +54,7 @@ module Specjour
           Kernel.exit!
         end
       end
-      at_exit { kill_worker_processes }
+      at_exit { puts "manager kills"; kill_worker_processes }
       Process.waitall
     end
 
@@ -69,7 +69,7 @@ module Specjour
     def drb_start
       DRb.start_service nil, self
       puts "Manager started at #{drb_uri}"
-      at_exit { DRb.stop_service }
+      at_exit { puts "stopping service"; DRb.stop_service }
     end
 
     def sync

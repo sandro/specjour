@@ -36,7 +36,7 @@ module Specjour::Rspec
       @example_count = example_count
       @failure_count = failure_count
       @pending_count = pending_count
-      output.send_message(:worker_summary=, to_hash)
+      output.send_message(:rspec_summary=, to_hash)
     end
 
     def dump_pending

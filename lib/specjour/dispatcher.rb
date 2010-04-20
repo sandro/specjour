@@ -9,19 +9,21 @@ module Specjour
       alias interrupted? interrupted
     end
 
-    attr_reader :project_path, :project_alias, :managers, :manager_threads, :hosts
-    attr_accessor :worker_size, :discovery_attempts
+    attr_reader :project_alias, :managers, :manager_threads, :hosts, :options, :all_tests
+    attr_accessor :worker_size, :discovery_attempts, :project_path
 
     def initialize(options = {})
-      @project_path = options[:project_path]
-      @project_alias = options[:project_alias] || project_name
+      @options = options
+      @project_path = File.expand_path options[:project_path]
       @worker_size = 0
       @managers = []
       @discovery_attempts = 0
+      find_tests
       clear_manager_threads
     end
 
     def start
+      start_manager if options[:worker_size] > 0
       rsync_daemon.start
       gather_managers
       dispatch_work
@@ -31,10 +33,25 @@ module Specjour
 
     protected
 
-    def all_specs
-      @all_specs ||= Dir.chdir(project_path) do
-        Dir["spec/**/**/*_spec.rb"].sort
+    def find_tests
+      if project_path.match(/(.+)\/((spec|features)(?:\/\w+)*)$/)
+        self.project_path = $1
+        @all_tests = $3 == 'spec' ? all_specs($2) : all_features($2)
+      else
+        @all_tests = Array(all_specs) | Array(all_features)
       end
+    end
+
+    def all_specs(tests_path = 'spec')
+      Dir.chdir(project_path) do
+        Dir[File.join(tests_path, "**/*_spec.rb")].sort
+      end if File.exists? File.join(project_path, tests_path)
+    end
+
+    def all_features(tests_path = 'features')
+      Dir.chdir(project_path) do
+        Dir[File.join(tests_path, "**/*.feature")].sort
+      end if File.exists? File.join(project_path, tests_path)
     end
 
     def command_managers(async = false, &block)
@@ -89,7 +106,11 @@ module Specjour
     end
 
     def printer
-      @printer ||= Printer.start(all_specs)
+      @printer ||= Printer.start(all_tests)
+    end
+
+    def project_alias
+      @project_alias ||= options[:project_alias] || project_name
     end
 
     def project_name
@@ -116,11 +137,24 @@ module Specjour
     def set_up_manager(manager, uri)
       manager.project_name = project_name
       manager.dispatcher_uri = URI::Generic.build :scheme => "specjour", :host => hostname, :port => printer.port
-      at_exit { manager.kill_worker_processes }
+      at_exit { manager.kill_worker_processes rescue DRb::DRbConnError }
+    end
+
+    def start_manager
+      puts "STARTING MANAGER"
+      process = IO.popen %(specjour listen --projects #{project_name} --workers #{options[:worker_size]})
+      Process.detach process.pid
+      at_exit { Process.kill('TERM', process.pid) rescue nil }
     end
 
     def wait_on_managers
       manager_threads.each {|t| t.join; t.exit}
+      clear_manager_threads
+    end
+
+    def exit_manager_threads
+      puts "EXITING MANAGER TREA"
+      manager_threads.each {|t| t.run; sleep 1; t.exit}
       clear_manager_threads
     end
   end
