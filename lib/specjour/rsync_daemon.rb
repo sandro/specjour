@@ -48,7 +48,7 @@ module Specjour
     end
 
     def pid_file
-      File.join("/tmp", "#{project_name}_rsync_daemon.pid")
+      File.join(config_directory, "rsync_daemon.pid")
     end
 
     def config
