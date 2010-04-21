@@ -50,12 +50,17 @@ module Specjour
     def disconnecting(client_port)
       self.disconnections += 1
       if disconnections == worker_size
-        stop
+        shutdown
+        stop unless stopped?
       end
     end
 
     def log(msg)
       # noop
+    end
+
+    def error(exception)
+      Specjour.logger.debug exception
     end
 
     def process(message, client)
