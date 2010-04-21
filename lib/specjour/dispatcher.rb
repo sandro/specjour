@@ -4,6 +4,11 @@ module Specjour
     Thread.abort_on_exception = true
     include SocketHelpers
 
+    class << self
+      attr_accessor :interrupted
+      alias interrupted? interrupted
+    end
+
     attr_reader :project_path, :managers, :manager_threads, :hosts
     attr_accessor :worker_size
 
@@ -55,7 +60,7 @@ module Specjour
 
     def gather_managers
       puts "Waiting for managers"
-      Signal.trap('INT') { exit }
+      Signal.trap('INT') { self.class.interrupted = true; exit }
       browser = DNSSD::Service.new
       begin
         Timeout.timeout(10) do
