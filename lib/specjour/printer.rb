@@ -1,4 +1,6 @@
 module Specjour
+  require 'specjour/rspec'
+
   class Printer < GServer
     include Protocol
     RANDOM_PORT = 0
