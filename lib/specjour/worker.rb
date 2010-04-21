@@ -51,7 +51,7 @@ module Specjour
     end
 
     def run_test(test)
-      puts "Running #{test}"
+      puts "[#{ENV['TEST_ENV_NUMBER']}] Running #{test}"
       if test =~ /\.feature$/
         run_feature test
       else
