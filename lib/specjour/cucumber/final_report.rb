@@ -1,10 +1,11 @@
 module Specjour
   module Cucumber
     class Summarizer
-      attr_reader :duration, :failing_scenarios
+      attr_reader :duration, :failing_scenarios, :step_summary
       def initialize
         @duration = 0.0
         @failing_scenarios = []
+        @step_summary = []
         @scenarios = Hash.new(0)
         @steps = Hash.new(0)
       end
@@ -18,6 +19,8 @@ module Specjour
         stats.each do |category, hash|
           if category == :failing_scenarios
             @failing_scenarios += hash
+          elsif category == :step_summary
+            @step_summary += hash
           elsif category == :duration
             @duration = hash.to_f if duration < hash.to_f
           else
@@ -54,8 +57,9 @@ module Specjour
 
       def summarize
         if @summarizer.failing_scenarios.any?
-          puts
-          puts
+          puts "\n\n"
+          @summarizer.step_summary.each {|f| puts f }
+          puts "\n\n"
           puts format_string("Failing Scenarios:", :failed)
           @summarizer.failing_scenarios.each {|f| puts f }
         end
