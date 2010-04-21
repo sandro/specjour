@@ -5,6 +5,5 @@ module Specjour
 
     require 'specjour/rspec/distributed_formatter'
     require 'specjour/rspec/final_report'
-    require 'specjour/rspec/marshalable_failure_formatter'
   end
 end

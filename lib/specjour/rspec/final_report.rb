@@ -1,7 +1,6 @@
 module Specjour
   module Rspec
     class FinalReport
-      require 'specjour/rspec/marshalable_rspec_failure'
       attr_reader :duration, :example_count, :failure_count, :pending_count, :pending_examples, :failing_examples
 
       def initialize
@@ -38,7 +37,7 @@ module Specjour
 
       def formatter
         @formatter ||= begin
-          f = MarshalableFailureFormatter.new(formatter_options, $stdout)
+          f = Spec::Runner::Formatter::BaseTextFormatter.new(formatter_options, $stdout)
           f.instance_variable_set(:@pending_examples, pending_examples)
           f
         end
