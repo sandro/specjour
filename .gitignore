@@ -20,5 +20,4 @@ pkg
 
 ## PROJECT::SPECIFIC
 .specjour
-specjour.gemspec
 spec/spec.opts
