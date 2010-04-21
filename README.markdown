@@ -17,7 +17,7 @@ _Distribute your spec suite amongst your LAN via Bonjour._
     gem install specjour
 
 ## Start a manager
-Running `specjour` on the command-line will start a manager which advertises that it's ready to run specs. By default, the manager will only use one worker to run yours specs. If you had 4 cores however, you could use `specjour --workers 4` to run 4 sets of specs at once.
+Running `specjour` on the command-line will start a manager which advertises that it's ready to run specs. By default, the manager will use your system cores to determine the number of workers to use. Two cores equals two workers. If you only want to dedicate 1 core to running specs, use `$ specjour --workers 1`.
 
     $ specjour
 
@@ -64,11 +64,14 @@ directory, add an exclusion to your projects rsyncd.conf file.
 
     $ vi workbeast/.specjour/rsyncd.conf
 
+## Use one machine
+Distributed testing doesn't have to happen over multiple machines, just multiple processes. Specjour is an excellent candidiate for running 4 tests at once on one machine with 4 cores. Just run `$ specjour` in one window and `$ rake specjour` in another.
+
 ## Thanks
 
 * shayarnett - Cucumber support, pairing and other various patches
 * voxdolo - Endless support, alpha testing, various patches
-* leshill - Making rsync daemon configurable
+* leshill - Made rsync daemon configurable
 
 ## Note on Patches/Pull Requests
 
