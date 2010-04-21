@@ -59,6 +59,7 @@ module Specjour
 
     def config
       <<-CONFIG
+# #{Specjour::VERSION}
 # Anonymous rsync daemon config for #{project_name}
 #
 # Serve this project with the following command:
