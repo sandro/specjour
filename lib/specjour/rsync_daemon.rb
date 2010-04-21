@@ -68,7 +68,7 @@ module Specjour
 # $ rsync -a --port=8989 #{hostname}::#{project_name} ~/#{project_name}
 #
 use chroot = no
-timeout = 60
+timeout = 20
 read only = yes
 pid file = #{pid_file}
 
