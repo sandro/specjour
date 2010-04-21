@@ -60,7 +60,7 @@ module Specjour
     end
 
     def error(exception)
-      Specjour.logger.debug exception
+      Specjour.logger.debug exception.inspect
     end
 
     def process(message, client)
