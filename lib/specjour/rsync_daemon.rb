@@ -4,6 +4,7 @@ module Specjour
     include SocketHelpers
 
     attr_reader :project_path, :project_name
+
     def initialize(project_path, project_name)
       @project_path = project_path
       @project_name = project_name
@@ -15,6 +16,16 @@ module Specjour
 
     def config_file
       @config_file ||= File.join(config_directory, "rsyncd.conf")
+    end
+
+    def pid
+      if File.exists?(pid_file)
+        File.read(pid_file).strip.to_i
+      end
+    end
+
+    def pid_file
+      File.join(config_directory, "rsync_daemon.pid")
     end
 
     def start
@@ -44,16 +55,6 @@ module Specjour
 
     def command
       ["rsync", "--daemon", "--config=#{config_file}", "--port=8989"]
-    end
-
-    def pid
-      if File.exists?(pid_file)
-        File.read(pid_file).strip.to_i
-      end
-    end
-
-    def pid_file
-      File.join(config_directory, "rsync_daemon.pid")
     end
 
     def config
