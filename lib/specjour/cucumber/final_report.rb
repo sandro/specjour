@@ -29,14 +29,12 @@ module Specjour
       end
 
       def scenarios(status=nil)
-        require 'ostruct'
         length = status ? @scenarios[status] : @scenarios.inject(0) {|h,(k,v)| h += v}
         any = @scenarios[status] > 0 if status
         OpenStruct.new(:length => length , :any? => any)
       end
 
       def steps(status=nil)
-        require 'ostruct'
         length = status ? @steps[status] : @steps.inject(0) {|h,(k,v)| h += v}
         any = @steps[status] > 0 if status
         OpenStruct.new(:length => length , :any? => any)

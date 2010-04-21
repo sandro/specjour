@@ -13,6 +13,7 @@ module Specjour
   autoload :Connection, 'specjour/connection'
   autoload :Dispatcher, 'specjour/dispatcher'
   autoload :Manager, 'specjour/manager'
+  autoload :OpenStruct, 'ostruct'
   autoload :Printer, 'specjour/printer'
   autoload :Protocol, 'specjour/protocol'
   autoload :RsyncDaemon, 'specjour/rsync_daemon'
