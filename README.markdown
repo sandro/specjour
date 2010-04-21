@@ -57,6 +57,19 @@ You could also listen to multiple projects:
 
     $ specjour --projects bizconf,workbeast # only run specs for the bizconf and workbeast projects
 
+## Customize what gets rsync'd
+The standard rsync configuration file may be too broad for your
+project. If you find you're rsyncing gigs of extraneous data from your public
+directory, add an exclusion to your projects rsyncd.conf file.
+
+    $ vi workbeast/.specjour/rsyncd.conf
+
+## Thanks
+
+* shayarnett - Cucumber support, pairing and other various patches
+* voxdolo - Endless support, alpha testing, various patches
+* leshill - Making rsync daemon configurable
+
 ## Note on Patches/Pull Requests
 
 * Fork the project.
