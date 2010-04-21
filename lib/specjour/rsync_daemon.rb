@@ -59,7 +59,7 @@ module Specjour
 
     def config
       <<-CONFIG
-# Anonymous Rsync Daemon config for #{project_name}
+# Anonymous rsync daemon config for #{project_name}
 #
 # Serve this project with the following command:
 # $ #{command.join(' ')}
