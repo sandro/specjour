@@ -71,11 +71,15 @@ module Specjour
 
     def stopping
       report.summarize
-      if disconnections != completed_workers
-        puts "*" * 63
-        puts "* ERROR: NOT ALL WORKERS COMPLETED PROPERLY, RE-RUN THE SUITE *"
-        puts "*" * 63
+      if disconnections != completed_workers && !Specjour::Dispatcher.interrupted?
+        puts abandoned_worker_message
       end
+    end
+
+    def abandoned_worker_message
+      data = "* ERROR: NOT ALL WORKERS COMPLETED PROPERLY *"
+      filler = "*" * data.size
+      [filler, data, filler].join "\n"
     end
   end
 end
