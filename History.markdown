@@ -1,6 +1,12 @@
 History
 =======
 
+0.2.2
+-----
+*2010-04-22*
+
+* [added] Backtrace for cucumber failures
+
 0.2.1
 -----
 *2010-04-21*
