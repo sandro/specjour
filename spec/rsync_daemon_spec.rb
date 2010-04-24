@@ -9,7 +9,8 @@ describe Specjour::RsyncDaemon do
     stub(Kernel).system
     stub(Kernel).at_exit
     stub(Dir).chdir
-    stub(subject).write_config
+    stub(File).open
+    stub(File).read
   end
 
   specify { subject.config_directory.should == '/tmp/seasonal/.specjour' }
@@ -57,6 +58,30 @@ describe Specjour::RsyncDaemon do
       it "does nothing" do
         stub(subject).pid
         subject.stop.should be_nil
+      end
+    end
+  end
+
+  describe "#check_config_version" do
+    it "warns when the version is out of date" do
+      stub(File).read { "# 0.0.0\n" }
+      mock(Kernel).warn(/made changes/)
+      subject.send(:check_config_version)
+    end
+
+    it "doesn't warn when the version isn't out of date" do
+      stub(File).read { "# #{Specjour::RsyncDaemon::CONFIG_VERSION}\n" }
+      dont_allow(Kernel).warn
+      subject.send(:check_config_version)
+    end
+  end
+
+  describe "#write_config" do
+    context "config exists" do
+      it "checks if the config is out of date" do
+        stub(File).exists?(anything) { true }
+        mock(subject).check_config_version
+        subject.send(:write_config)
       end
     end
   end

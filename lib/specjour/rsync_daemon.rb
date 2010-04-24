@@ -3,6 +3,11 @@ module Specjour
     require 'fileutils'
     include SocketHelpers
 
+    # Corresponds to the version of specjour that changed the configuration
+    # file.
+    CONFIG_VERSION = "0.2.3".freeze
+    PID_FILE_NAME = "rsyncd.pid"
+
     attr_reader :project_path, :project_name
 
     def initialize(project_path, project_name)
@@ -25,7 +30,7 @@ module Specjour
     end
 
     def pid_file
-      File.join(config_directory, "rsync_daemon.pid")
+      File.join(config_directory, PID_FILE_NAME)
     end
 
     def start
@@ -45,24 +50,41 @@ module Specjour
 
     protected
 
-    def write_config
-      unless File.exists? config_file
-        FileUtils.mkdir_p config_directory
+    def command
+      ["rsync", "--daemon", "--config=#{config_file}", "--port=8989"]
+    end
 
+    def check_config_version
+      File.read(config_file) =~ /\A# (\d+.\d+.\d+)/
+      if out_of_date? Regexp.last_match(1)
+        Kernel.warn <<-WARN
+
+Specjour has made changes to the way rsync.d is generated.
+Back up '#{config_file}'
+and re-run the dispatcher to generate the new config file.
+        WARN
+      end
+    end
+
+    def out_of_date?(version)
+      CONFIG_VERSION != version
+    end
+
+    def write_config
+      if File.exists? config_file
+        check_config_version
+      else
+        FileUtils.mkdir_p config_directory
         File.open(config_file, 'w') do |f|
           f.write config
         end
       end
     end
 
-    def command
-      ["rsync", "--daemon", "--config=#{config_file}", "--port=8989"]
-    end
-
     def config
       <<-CONFIG
-# #{Specjour::VERSION}
-# Anonymous rsync daemon config for #{project_name}
+# #{CONFIG_VERSION}
+# Rsync daemon config for #{project_name}
 #
 # Serve this project with the following command:
 # $ #{(command | ['--no-detach']).join(' ')}
@@ -73,7 +95,7 @@ module Specjour
 use chroot = no
 timeout = 20
 read only = yes
-pid file = ./.specjour/#{pid_file}
+pid file = ./.specjour/#{PID_FILE_NAME}
 
 [#{project_name}]
   path = .
