@@ -8,6 +8,7 @@ describe Specjour::RsyncDaemon do
   before do
     stub(Kernel).system
     stub(Kernel).at_exit
+    stub(Dir).chdir
     stub(subject).write_config
   end
 
@@ -20,8 +21,9 @@ describe Specjour::RsyncDaemon do
       subject.start
     end
 
-    it "executes the system command" do
+    it "executes the system command in the project directory" do
       mock(Kernel).system(*subject.send(:command))
+      mock(Dir).chdir(subject.project_path).yields
       subject.start
     end
 

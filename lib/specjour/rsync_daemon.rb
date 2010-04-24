@@ -30,7 +30,9 @@ module Specjour
 
     def start
       write_config
-      Kernel.system *command
+      Dir.chdir(project_path) do
+        Kernel.system *command
+      end
       Kernel.at_exit { stop }
     end
 
@@ -63,18 +65,18 @@ module Specjour
 # Anonymous rsync daemon config for #{project_name}
 #
 # Serve this project with the following command:
-# $ #{command.join(' ')}
+# $ #{(command | ['--no-detach']).join(' ')}
 #
 # Rsync with the following command:
-# $ rsync -a --port=8989 #{hostname}::#{project_name} ~/#{project_name}
+# $ rsync -a --port=8989 #{hostname}::#{project_name} /tmp/#{project_name}
 #
 use chroot = no
 timeout = 20
 read only = yes
-pid file = #{pid_file}
+pid file = ./.specjour/#{pid_file}
 
 [#{project_name}]
-  path = #{project_path}
+  path = .
   exclude = .git* .specjour doc tmp/* log script
       CONFIG
     end
