@@ -37,16 +37,28 @@ Run the rake task to distribute the features among the managers you started.
     $ rake specjour:cucumber
 
 ## Rails
-Edit your config/environment.rb
-
-    config.gem 'specjour'
-
 Each worker should run their specs in an isolated database. Modify the test database name in your `config/database.yml` to include the following environment variable (Influenced by [parallel_tests](http://github.com/grosser/parallel_tests)):
 
     test:
       database: blog_test<%=ENV['TEST_ENV_NUMBER']%>
 
-Each worker will attempt to clear its database tables before running any specs via `DELETE FROM <table_name>;`. Additionally, test databases will be created if they don't exist (i.e. `CREATE DATABASE blog_test8` for the 8th worker) and will load your schema when it has fallen behind.
+Add the specjour gem to your project:
+
+    config.gem 'specjour'
+
+Doing this enables a rails plugin wherein each worker will attempt to clear its database tables before running any specs via `DELETE FROM <table_name>;`. Additionally, test databases will be created if they don't exist (i.e. `CREATE DATABASE blog_test8` for the 8th worker) and your schema will be loaded when the database is out of date.
+
+### Customizing database setup
+If the plugin doesn't set up the database properly for your test suite, bypass it entirely. Remove specjour as a project gem and create your own initializer to setup the database. Specjour sets the environment variable PREPARE_DB when it runs your specs so you can look for that when setting up the database.
+
+    # config/initializers/specjour.rb
+
+    if ENV['PREPARE_DB']
+      load 'Rakefile'
+      
+      # clear the db and load db/seeds.rb
+      Rake::Task['db:reset'].invoke
+    end
 
 ## Only listen to supported projects
 By default, a manager will listen to all projects trying to distribute specs over the network. Sometimes you'll only want a manager to respond to one specific spec suite. You can accomplish this with the `--projects` flags.
