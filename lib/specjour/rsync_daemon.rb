@@ -30,8 +30,8 @@ module Specjour
 
     def start
       write_config
-      system *command
-      at_exit { stop }
+      Kernel.system *command
+      Kernel.at_exit { stop }
     end
 
     def stop

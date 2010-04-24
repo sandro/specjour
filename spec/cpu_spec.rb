@@ -18,7 +18,7 @@ Load average: 0.09, Mach factor: 1.90
     end
 
     before do
-      Specjour::CPU.stub(:command => hostinfo)
+      stub(Specjour::CPU).command.returns(hostinfo)
     end
 
     it "returns the number of logically available processors" do
