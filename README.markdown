@@ -72,6 +72,8 @@ Distributed testing doesn't have to happen over multiple machines, just multiple
 * shayarnett - Cucumber support, pairing and other various patches
 * voxdolo - Endless support, alpha testing, various patches
 * leshill - Made rsync daemon configurable
+* testjour - Ripped off your name
+* parallel_tests - Made my test suite twice as fast
 
 ## Note on Patches/Pull Requests
 
