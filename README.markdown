@@ -55,7 +55,7 @@ If the plugin doesn't set up the database properly for your test suite, bypass i
 
     if ENV['PREPARE_DB']
       load 'Rakefile'
-      
+
       # clear the db and load db/seeds.rb
       Rake::Task['db:reset'].invoke
     end
