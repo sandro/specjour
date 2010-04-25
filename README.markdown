@@ -90,6 +90,8 @@ Distributed testing doesn't have to happen over multiple machines, just multiple
 ## Note on Patches/Pull Requests
 
 * Fork the project.
+* `$ source .dev` to ensure you're using the local specjour binary, not the
+  rubygems version
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a
   future version unintentionally.
