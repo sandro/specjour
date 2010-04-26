@@ -3,12 +3,15 @@ History
 
 0.2.3
 -----
-*(master)*
+*2010-04-25*
 
 * [fixed] Absolute paths in rsyncd.conf restrict portability. The rsync daemon
-  completely fails when it can't find the path to serve which likely happens
+  completely fails when it can't find the path to serve which typically happens
   running specjour on another computer. Remove your rsyncd.conf to regenerate a
   new one. Back it up first if you've made changes to it.
+  **Backwards Incompatible**
+
+* [fixed] CPU core detection works on OSX Core i7 (thanks Hashrocket!)
 
 0.2.2
 -----
