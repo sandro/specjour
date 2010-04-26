@@ -61,7 +61,7 @@ If the plugin doesn't set up the database properly for your test suite, bypass i
     end
 
 ## Only listen to supported projects
-By default, a manager will listen to all projects trying to distribute specs over the network. Sometimes you'll only want a manager to respond to one specific spec suite. You can accomplish this with the `--projects` flags.
+By default, a manager will listen to all projects trying to distribute specs over the network. Sometimes you'll only want a manager to respond to one specific spec suite. You can accomplish this with the `--projects` flag.
 
     $ specjour --projects bizconf # only run specs for the bizconf project
 
