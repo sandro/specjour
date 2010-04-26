@@ -65,13 +65,13 @@ describe Specjour::RsyncDaemon do
   describe "#check_config_version" do
     it "warns when the version is out of date" do
       stub(File).read { "# 0.0.0\n" }
-      mock(Kernel).warn(/made changes/)
+      mock($stderr).puts(/made changes/)
       subject.send(:check_config_version)
     end
 
     it "doesn't warn when the version isn't out of date" do
       stub(File).read { "# #{Specjour::RsyncDaemon::CONFIG_VERSION}\n" }
-      dont_allow(Kernel).warn
+      dont_allow($stderr).puts
       subject.send(:check_config_version)
     end
   end

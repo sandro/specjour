@@ -58,11 +58,12 @@ module Specjour
     def check_config_version
       File.read(config_file) =~ /\A# (\d+.\d+.\d+)/
       if out_of_date? Regexp.last_match(1)
-        Kernel.warn <<-WARN
+        $stderr.puts <<-WARN
 
 Specjour has made changes to the way #{CONFIG_FILE_NAME} is generated.
 Back up '#{config_file}'
 and re-run the dispatcher to generate the new config file.
+
         WARN
       end
     end
