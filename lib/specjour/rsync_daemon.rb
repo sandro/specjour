@@ -6,6 +6,7 @@ module Specjour
     # Corresponds to the version of specjour that changed the configuration
     # file.
     CONFIG_VERSION = "0.2.3".freeze
+    CONFIG_FILE_NAME = "rsyncd.conf"
     PID_FILE_NAME = "rsyncd.pid"
 
     attr_reader :project_path, :project_name
@@ -20,7 +21,7 @@ module Specjour
     end
 
     def config_file
-      @config_file ||= File.join(config_directory, "rsyncd.conf")
+      @config_file ||= File.join(config_directory, CONFIG_FILE_NAME)
     end
 
     def pid
@@ -59,7 +60,7 @@ module Specjour
       if out_of_date? Regexp.last_match(1)
         Kernel.warn <<-WARN
 
-Specjour has made changes to the way rsync.d is generated.
+Specjour has made changes to the way #{CONFIG_FILE_NAME} is generated.
 Back up '#{config_file}'
 and re-run the dispatcher to generate the new config file.
         WARN
