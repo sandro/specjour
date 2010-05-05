@@ -33,8 +33,10 @@ module Specjour
     end
 
     def ready(client)
-      client.print specs_to_run.shift
-      client.flush
+      synchronize do
+        client.print specs_to_run.shift
+        client.flush
+      end
     end
 
     def done(client)
@@ -81,6 +83,10 @@ module Specjour
       if disconnections != completed_workers && !Specjour::Dispatcher.interrupted?
         puts abandoned_worker_message
       end
+    end
+
+    def synchronize(&block)
+      @connectionsMutex.synchronize &block
     end
 
     def abandoned_worker_message
