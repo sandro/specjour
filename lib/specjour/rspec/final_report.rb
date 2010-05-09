@@ -22,6 +22,10 @@ module Specjour
         end
       end
 
+      def exit_status
+        failing_examples.empty?
+      end
+
       def increment(key, value)
         current = instance_variable_get("@#{key}")
         instance_variable_set("@#{key}", current + value)

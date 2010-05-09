@@ -24,6 +24,7 @@ module Specjour
       gather_managers
       dispatch_work
       printer.join
+      exit printer.exit_status
     end
 
     protected

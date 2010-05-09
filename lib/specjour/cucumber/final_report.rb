@@ -55,6 +55,10 @@ module Specjour
         @summarizer.add(stats)
       end
 
+      def exit_status
+        @summarizer.failing_scenarios.empty?
+      end
+
       def summarize
         if @summarizer.failing_scenarios.any?
           puts "\n\n"

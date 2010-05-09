@@ -43,6 +43,10 @@ module Specjour
       self.completed_workers += 1
     end
 
+    def exit_status
+      report.exit_status
+    end
+
     def worker_summary=(client, summary)
       report.add(summary)
     end
