@@ -22,22 +22,16 @@ module Specjour
     end
 
     def run
-      connection.send_message(:ready)
       run_time = 0
       Dir.chdir(project_path)
-      while !connection.closed? && data = connection.gets(TERMINATOR)
-        test = load_object(data)
-        if test
-          run_time += Benchmark.realtime do
-            run_test test
-          end
-          connection.send_message(:ready)
-        else
-          connection.send_message(:worker_summary=, {:duration => sprintf("%6f", run_time)})
-          connection.send_message(:done)
-          connection.disconnect
+      while test = connection.next_test
+        run_time += Benchmark.realtime do
+          run_test test
         end
       end
+      connection.send_message(:worker_summary=, {:duration => sprintf("%6f", run_time)})
+      connection.send_message(:done)
+      connection.disconnect
     end
 
     protected

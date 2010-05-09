@@ -39,11 +39,17 @@ module Specjour
       raise Error, "Connection to dispatcher timed out"
     end
 
+    def next_test
+      will_reconnect do
+        send_message(:ready)
+        load_object socket.gets(TERMINATOR)
+      end
+    end
+
     def print(arg)
-      socket.print dump_object(arg)
-    rescue SystemCallError => error
-      reconnect
-      retry
+      will_reconnect do
+        socket.print dump_object(arg)
+      end
     end
 
     def puts(arg)
@@ -67,6 +73,13 @@ module Specjour
     def reconnect
       socket.close unless socket.closed?
       connect
+    end
+
+    def will_reconnect(&block)
+      block.call
+    rescue SystemCallError => error
+      reconnect
+      retry
     end
   end
 end
