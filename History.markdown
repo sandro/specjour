@@ -1,6 +1,13 @@
 History
 =======
 
+0.2.4
+-----
+*2010-05-10*
+
+* [added] Correct exit status
+* [fixed] Will reconnect when connection is lost while requesting tests
+
 0.2.3
 -----
 *2010-04-25*
