@@ -56,7 +56,8 @@ Gem::Specification.new do |s|
      "spec/rsync_daemon_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
-     "spec/specjour_spec.rb"
+     "spec/specjour_spec.rb",
+     "specjour.gemspec"
   ]
   s.homepage = %q{http://github.com/sandro/specjour}
   s.rdoc_options = ["--charset=UTF-8"]
