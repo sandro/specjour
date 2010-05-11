@@ -37,7 +37,7 @@ Run the rake task to distribute the features among the managers you started.
     $ rake specjour:cucumber
 
 ## Rails
-Each worker should run their specs in an isolated database. Modify the test database name in your `config/database.yml` to include the following environment variable (Influenced by [parallel_tests](http://github.com/grosser/parallel_tests)):
+Each worker should run their specs in an isolated database. Modify the test database name in your `config/database.yml` to include the following environment variable (Influenced by [parallel\_tests](http://github.com/grosser/parallel_tests)):
 
     test:
       database: blog_test<%=ENV['TEST_ENV_NUMBER']%>
@@ -49,7 +49,7 @@ Add the specjour gem to your project:
 Doing this enables a rails plugin wherein each worker will attempt to clear its database tables before running any specs via `DELETE FROM <table_name>;`. Additionally, test databases will be created if they don't exist (i.e. `CREATE DATABASE blog_test8` for the 8th worker) and your schema will be loaded when the database is out of date.
 
 ### Customizing database setup
-If the plugin doesn't set up the database properly for your test suite, bypass it entirely. Remove specjour as a project gem and create your own initializer to setup the database. Specjour sets the environment variable PREPARE_DB when it runs your specs so you can look for that when setting up the database.
+If the plugin doesn't set up the database properly for your test suite, bypass it entirely. Remove specjour as a project gem and create your own initializer to setup the database. Specjour sets the environment variable PREPARE\_DB when it runs your specs so you can look for that when setting up the database.
 
     # config/initializers/specjour.rb
 
@@ -85,7 +85,7 @@ Distributed testing doesn't have to happen over multiple machines, just multiple
 * voxdolo - Endless support, alpha testing, various patches
 * leshill - Made rsync daemon configurable
 * testjour - Ripped off your name
-* parallel_tests - Made my test suite twice as fast
+* parallel\_tests - Made my test suite twice as fast
 
 ## Note on Patches/Pull Requests
 
@@ -101,4 +101,4 @@ Distributed testing doesn't have to happen over multiple machines, just multiple
 
 ## Copyright
 
-Copyright (c) 2010 Sandro Turriate. See MIT_LICENSE for details.
+Copyright (c) 2010 Sandro Turriate. See MIT\_LICENSE for details.
