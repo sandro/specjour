@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe Specjour::Manager do
   describe "#available_for?" do
-    it "is available for all projects by default" do
-      subject.available_for?(rand.to_s).should be_true
+    it "isn't available for all projects by default" do
+      subject.available_for?(rand.to_s).should be_false
     end
 
     it "is available for one project" do
