@@ -44,7 +44,7 @@ module Specjour
     end
 
     def exit_status
-      report.exit_status
+      rspec_report.exit_status && cucumber_report.exit_status
     end
 
     def rspec_summary=(client, summary)
