@@ -1,5 +1,11 @@
 History
 =======
+0.2.5
+-----
+*2010-05-13*
+
+* [changed] The rails plugin now runs in a Rails.configuration.after_intialize
+  block
 
 0.2.4
 -----
