@@ -1,4 +1,6 @@
 if ENV['PREPARE_DB']
-  require 'specjour/db_scrub'
-  Specjour::DbScrub.scrub
+  Rails.configuration.after_initialize do
+    require 'specjour/db_scrub'
+    Specjour::DbScrub.scrub
+  end
 end
