@@ -11,6 +11,7 @@ module Specjour
       @worker_size = options[:worker_size]
       @registered_projects = options[:registered_projects]
       @worker_pids = []
+      at_exit { kill_worker_processes }
     end
 
     def available_for?(project_name)
@@ -31,7 +32,7 @@ module Specjour
     end
 
     def kill_worker_processes
-      Process.kill('TERM', *worker_pids) rescue nil
+      Process.kill('TERM', *worker_pids) rescue Errno::ESRCH
     end
 
     def project_path
@@ -48,13 +49,13 @@ module Specjour
 
     def dispatch_workers
       GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
+      worker_pids.clear
       (1..worker_size).each do |index|
         worker_pids << fork do
           exec("specjour work --project-path #{project_path} --printer-uri #{dispatcher_uri} --number #{index} #{'--log' if Specjour.log?}")
           Kernel.exit!
         end
       end
-      at_exit { puts "manager kills"; kill_worker_processes }
       Process.waitall
     end
 
