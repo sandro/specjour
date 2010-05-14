@@ -70,7 +70,7 @@ module Specjour
     end
 
     def error(exception)
-      Specjour.logger.debug exception.inspect
+      Specjour.logger.debug "#{exception.inspect}\n#{exception.backtrace.join("\n")}"
     end
 
     def process(message, client)
