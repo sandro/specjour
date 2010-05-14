@@ -20,7 +20,6 @@ module Specjour
     end
 
     def start
-      connection.send_message(:ready)
       run_time = 0
       Dir.chdir(project_path)
       while test = connection.next_test
