@@ -53,7 +53,6 @@ module Specjour
     end
 
     def run_feature(feature)
-      set_up_cucumber
       cli = ::Cucumber::Cli::Main.new(['--format', 'Specjour::Cucumber::DistributedFormatter', feature], connection)
       cli.execute!(::Cucumber::Cli::Main.step_mother)
     end
@@ -72,13 +71,6 @@ module Specjour
       ENV['PREPARE_DB'] = 'true'
       ENV['RSPEC_COLOR'] = 'true'
       ENV['TEST_ENV_NUMBER'] = number.to_s
-    end
-
-    def set_up_cucumber
-      unless @cucumber_loaded
-        ::Cucumber::Cli::Options.class_eval { def print_profile_information; end }
-        @cucumber_loaded = true
-      end
     end
   end
 end

@@ -6,6 +6,8 @@ module Specjour
 
       require 'specjour/cucumber/distributed_formatter'
       require 'specjour/cucumber/final_report'
+
+      ::Cucumber::Cli::Options.class_eval { def print_profile_information; end }
     rescue LoadError
     end
   end
