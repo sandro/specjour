@@ -69,8 +69,7 @@ module Specjour
 
     def drb_start
       DRb.start_service nil, self
-      puts "Manager started at #{drb_uri}"
-      at_exit { puts "stopping service"; DRb.stop_service }
+      at_exit { DRb.stop_service }
     end
 
     def sync

@@ -141,20 +141,13 @@ module Specjour
     end
 
     def start_manager
-      puts "STARTING MANAGER"
       process = IO.popen %(specjour listen --projects #{project_name} --workers #{options[:worker_size]})
       Process.detach process.pid
-      at_exit { Process.kill('TERM', process.pid) rescue nil }
+      at_exit { Process.kill('TERM', process.pid) rescue Errno::ESRCH }
     end
 
     def wait_on_managers
       manager_threads.each {|t| t.join; t.exit}
-      clear_manager_threads
-    end
-
-    def exit_manager_threads
-      puts "EXITING MANAGER TREA"
-      manager_threads.each {|t| t.run; sleep 1; t.exit}
       clear_manager_threads
     end
   end
