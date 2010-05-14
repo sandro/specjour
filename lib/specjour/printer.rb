@@ -1,5 +1,6 @@
 module Specjour
   require 'specjour/rspec'
+  require 'specjour/cucumber/final_report'
 
   class Printer < GServer
     include Protocol
