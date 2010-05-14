@@ -1,8 +1,8 @@
 History
 =======
 
-0.3.0
------
+0.3.0.rc1
+---------
 *(master)*
 
 * [removed] Rake tasks have been removed, use the command-line instead.
@@ -23,16 +23,16 @@ History
   cluster, tell them to listen for a different project name and run the
   dispatcher with that new name.
 
-        $ specjour listen --projects bizconf09
-        $ specjour dispatch --alias bizconf09
+        $ specjour listen --projects foo2
+        $ specjour dispatch --alias foo2
 
 * [removed] --batch option which sent back results in batches. Now that each
   spec is run one at a time, batching no longer makes sense.
 
-* [removed] Global listening. You now must provide the project name you want to
+* [removed] Global listening. You now must provide the project names you want to
   run specs for.
 
-        $ specjour listen --projects bizconf workbeast
+        $ specjour listen --projects foo bar
 
 
 ## 0.2.6 / master
