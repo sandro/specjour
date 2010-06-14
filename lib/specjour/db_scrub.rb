@@ -1,6 +1,9 @@
 module Specjour
   module DbScrub
-    load 'Rakefile'
+    require 'rake'
+    load 'tasks/misc.rake'
+    load 'tasks/databases.rake'
+
     extend self
 
     def scrub
