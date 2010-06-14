@@ -10,6 +10,13 @@ module Specjour
       method_option :workers, :aliases => "-w", :type => :numeric, :desc => "Number of concurent processes to run. Defaults to your system's available cores."
     end
 
+    def self.start(original_args=ARGV, config={})
+      unless tasks[original_args.first]
+        original_args.unshift default_task
+      end
+      super(original_args, config)
+    end
+
     default_task :dispatch
 
     class_option :log, :aliases => "-l", :type => :boolean, :desc => "Print debug messages to $stdout"
