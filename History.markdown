@@ -1,5 +1,12 @@
 History
 =======
+0.2.6
+-----
+*master*
+* [fixed] Rsync now transfer symbolic links. gh-6
+* [fixed] DbScrub explicitly requires its dependencies and no longer loads the
+  Rakefile. gh-10
+
 0.2.5
 -----
 *2010-05-13*
