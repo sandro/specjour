@@ -48,7 +48,7 @@ describe Specjour::CLI do
     end
 
     it "accepts a project alias" do
-      dispatcher_receives_options("alias" => "eh")
+      dispatcher_receives_options("project_alias" => "eh")
       Specjour::CLI.start %w(dispatch --alias eh)
     end
   end

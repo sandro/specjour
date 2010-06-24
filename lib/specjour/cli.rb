@@ -38,6 +38,7 @@ module Specjour
       handle_logging
       handle_workers
       args[:project_path] = path
+      args[:project_alias] = args.delete(:alias)
       Specjour::Dispatcher.new(args).start
     end
 
