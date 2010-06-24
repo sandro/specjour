@@ -2,7 +2,7 @@ module Specjour
   class Dispatcher
     require 'dnssd'
     Thread.abort_on_exception = true
-    include SocketHelpers
+    include SocketHelper
 
     class << self
       attr_accessor :interrupted

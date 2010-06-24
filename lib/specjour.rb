@@ -18,7 +18,7 @@ module Specjour
   autoload :Printer, 'specjour/printer'
   autoload :Protocol, 'specjour/protocol'
   autoload :RsyncDaemon, 'specjour/rsync_daemon'
-  autoload :SocketHelpers, 'specjour/socket_helpers'
+  autoload :SocketHelper, 'specjour/socket_helper'
   autoload :Worker, 'specjour/worker'
 
   autoload :Cucumber, 'specjour/cucumber'

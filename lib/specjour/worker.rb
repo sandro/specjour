@@ -4,7 +4,7 @@ module Specjour
 
   class Worker
     include Protocol
-    include SocketHelpers
+    include SocketHelper
     attr_accessor :printer_uri
     attr_reader :project_path, :number
 

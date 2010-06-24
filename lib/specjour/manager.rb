@@ -2,7 +2,7 @@ module Specjour
   class Manager
     require 'dnssd'
     include DRbUndumped
-    include SocketHelpers
+    include SocketHelper
 
     attr_accessor :project_name, :specs_to_run
     attr_reader :worker_size, :dispatcher_uri, :registered_projects, :bonjour_service, :worker_pids
