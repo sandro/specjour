@@ -1,9 +1,7 @@
 History
 =======
 
-0.3.0.rc1
----------
-*(master)*
+## 0.3.0.rc1 / thor
 
 * [removed] Rake tasks have been removed, use the command-line instead.
 
@@ -47,7 +45,6 @@ History
   block
 
 ## 0.2.4 / 2010-05-10
-=======
 
 * [added] Correct exit status
 * [fixed] Will reconnect when connection is lost while requesting tests
