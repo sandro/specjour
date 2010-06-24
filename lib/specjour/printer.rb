@@ -109,7 +109,7 @@ module Specjour
     end
 
     def warn_if_workers_deserted
-      if disconnections != completed_workers && !Specjour::Dispatcher.interrupted?
+      if disconnections != completed_workers && !Dispatcher.interrupted?
         puts
         puts workers_deserted_message
       end

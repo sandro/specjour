@@ -7,6 +7,8 @@ module Specjour
     class << self
       attr_accessor :interrupted
       alias interrupted? interrupted
+
+      Signal.trap('INT') { Dispatcher.interrupted = true; exit 1 }
     end
 
     attr_reader :project_alias, :managers, :manager_threads, :hosts, :options, :all_tests
@@ -83,7 +85,6 @@ module Specjour
 
     def gather_managers
       puts "Looking for managers..."
-      Signal.trap('INT') { self.class.interrupted = true; exit }
       browser = DNSSD::Service.new
       begin
         Timeout.timeout(10) do
