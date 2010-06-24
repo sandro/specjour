@@ -83,13 +83,25 @@ module Specjour
       Timeout.timeout(8) do
         manager = DRbObject.new_with_uri(uri.to_s)
         if !managers.include?(manager) && manager.available_for?(project_name)
-          set_up_manager(manager, uri)
-          managers << manager
-          self.worker_size += manager.worker_size
+          add_manager(manager)
         end
       end
     rescue Timeout::Error
       Specjour.logger.debug "Couldn't work with manager at #{uri}"
+    rescue DRb::DRbConnError
+      retry
+    end
+
+    def fork_local_manager
+      puts "No remote managers found, starting a local manager..."
+      manager_options = {:worker_size => options[:worker_size], :registered_projects => [project_name]}
+      manager = Manager.new manager_options
+      manager.drb_uri
+      pid = fork do
+        manager.start
+      end
+      fetch_manager(manager.drb_uri)
+      at_exit { Process.kill('TERM', pid) rescue Errno::ESRCH }
     end
 
     def gather_managers
@@ -101,6 +113,13 @@ module Specjour
             resolve_reply(reply)
           end
           browser.stop unless reply.flags.more_coming?
+        end
+      end
+      if managers.size.zero?
+        if options[:worker_size] > 0
+          fork_local_manager
+        else
+          abort "No managers found"
         end
       end
       rescue Timeout::Error

@@ -67,8 +67,15 @@ module Specjour
     end
 
     def drb_start
-      DRb.start_service nil, self
+      DRb.start_service drb_uri.to_s, self
       at_exit { DRb.stop_service }
+    end
+
+    def drb_uri
+      @drb_uri ||= begin
+        current_uri.scheme = "druby"
+        current_uri
+      end
     end
 
     def sync
@@ -84,10 +91,6 @@ module Specjour
     def cmd(command)
       puts command
       system command
-    end
-
-    def drb_uri
-      @drb_uri ||= URI.parse(DRb.uri)
     end
 
     def suspend_bonjour(&block)
