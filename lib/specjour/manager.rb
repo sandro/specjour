@@ -48,7 +48,6 @@ module Specjour
     end
 
     def dispatch_workers
-      GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
       worker_pids.clear
       (1..worker_size).each do |index|
         worker_pids << fork do

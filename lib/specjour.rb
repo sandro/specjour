@@ -41,4 +41,6 @@ module Specjour
   def self.log?
     logger.level != Logger::UNKNOWN
   end
+
+  GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
 end
