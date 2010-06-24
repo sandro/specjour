@@ -24,7 +24,7 @@ module Specjour
     end
 
     def start
-      start_manager if options[:worker_size] > 0
+      abort("#{project_path} doesn't exist") unless File.exists?(project_path)
       rsync_daemon.start
       gather_managers
       dispatch_work
