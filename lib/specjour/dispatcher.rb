@@ -12,14 +12,13 @@ module Specjour
     end
 
     attr_reader :project_alias, :managers, :manager_threads, :hosts, :options, :all_tests
-    attr_accessor :worker_size, :discovery_attempts, :project_path
+    attr_accessor :worker_size, :project_path
 
     def initialize(options = {})
       @options = options
       @project_path = File.expand_path options[:project_path]
       @worker_size = 0
       @managers = []
-      @discovery_attempts = 0
       find_tests
       clear_manager_threads
     end
@@ -56,11 +55,21 @@ module Specjour
       end if File.exists? File.join(project_path, tests_path)
     end
 
+    def add_manager(manager)
+      set_up_manager(manager)
+      managers << manager
+      self.worker_size += manager.worker_size
+    end
+
     def command_managers(async = false, &block)
       managers.each do |manager|
         manager_threads << Thread.new(manager, &block)
       end
       wait_on_managers unless async
+    end
+
+    def dispatcher_uri
+      @dispatcher_uri ||= URI::Generic.build :scheme => "specjour", :host => hostname, :port => printer.port
     end
 
     def dispatch_work
@@ -86,24 +95,15 @@ module Specjour
     def gather_managers
       puts "Looking for managers..."
       browser = DNSSD::Service.new
-      begin
-        Timeout.timeout(10) do
-          browser.browse '_druby._tcp' do |reply|
-            if reply.flags.add?
-              resolve_reply(reply)
-            end
-            browser.stop unless reply.flags.more_coming?
+      Timeout.timeout(10) do
+        browser.browse '_druby._tcp' do |reply|
+          if reply.flags.add?
+            resolve_reply(reply)
           end
+          browser.stop unless reply.flags.more_coming?
         end
+      end
       rescue Timeout::Error
-      end
-      if managers.size < 1 && discovery_attempts < 10
-        sleep 1
-        self.discovery_attempts += 1
-        gather_managers
-      elsif managers.size == 0 && discovery_attempts == 10
-        abort "No managers found"
-      end
     end
 
     def printer
@@ -135,9 +135,9 @@ module Specjour
       @rsync_daemon ||= RsyncDaemon.new(project_path, project_name)
     end
 
-    def set_up_manager(manager, uri)
+    def set_up_manager(manager)
       manager.project_name = project_name
-      manager.dispatcher_uri = URI::Generic.build :scheme => "specjour", :host => hostname, :port => printer.port
+      manager.dispatcher_uri = dispatcher_uri
       at_exit { manager.kill_worker_processes rescue DRb::DRbConnError }
     end
 
