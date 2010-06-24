@@ -45,7 +45,7 @@ module Specjour
     end
 
     def exit_status
-      rspec_report.exit_status && cucumber_report.exit_status
+      reporters.all? {|r| r.exit_status == true}
     end
 
     def rspec_summary=(client, summary)
