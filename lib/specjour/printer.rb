@@ -1,6 +1,6 @@
 module Specjour
   require 'specjour/rspec'
-  require 'specjour/cucumber/final_report'
+  require 'specjour/cucumber'
 
   class Printer < GServer
     include Protocol
@@ -91,20 +91,33 @@ module Specjour
       @cucumber_report ||= Cucumber::FinalReport.new
     end
 
+    def reporters
+      [@rspec_report, @cucumber_report].compact
+    end
+
     def stopping
-      rspec_report.summarize
-      cucumber_report.summarize
-      if disconnections != completed_workers && !Specjour::Dispatcher.interrupted?
-        puts
-        puts abandoned_worker_message
-      end
+      summarize_reports
+      warn_if_workers_deserted
+    end
+
+    def summarize_reports
+      reporters.each {|r| r.summarize}
     end
 
     def synchronize(&block)
       @connectionsMutex.synchronize &block
     end
 
-    def abandoned_worker_message
+    protected
+
+    def warn_if_workers_deserted
+      if disconnections != completed_workers && !Specjour::Dispatcher.interrupted?
+        puts
+        puts workers_deserted_message
+      end
+    end
+
+    def workers_deserted_message
       data = "* ERROR: NOT ALL WORKERS COMPLETED PROPERLY *"
       filler = "*" * data.size
       [filler, data, filler].join "\n"
