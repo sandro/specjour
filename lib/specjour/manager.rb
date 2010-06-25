@@ -16,7 +16,7 @@ module Specjour
 
     def available_for?(project_name)
       registered_projects ? registered_projects.include?(project_name) : false
-   end
+    end
 
     def bundle_install
       Dir.chdir(project_path) do
