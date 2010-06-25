@@ -34,7 +34,7 @@ module Specjour
 
     def default_before_fork
       lambda do
-        ActiveRecord::Base.connection.disconnect! if defined?(ActiveRecord::Base)
+        ActiveRecord::Base.remove_connection if defined?(ActiveRecord::Base)
       end
     end
 

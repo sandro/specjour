@@ -20,6 +20,7 @@ module Specjour
     end
 
     def start
+      Configuration.after_fork.call
       run_time = 0
       Dir.chdir(project_path)
       while test = connection.next_test

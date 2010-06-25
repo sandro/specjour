@@ -56,10 +56,12 @@ module Specjour
 
     def dispatch_workers
       preload_app if Configuration.preload_app?
+      Configuration.before_fork.call
       worker_pids.clear
       (1..worker_size).each do |index|
         worker_pids << fork do
-          exec("specjour work --project-path #{project_path} --printer-uri #{dispatcher_uri} --number #{index} #{'--log' if Specjour.log?}")
+          options = {:project_path => project_path, :printer_uri => dispatcher_uri.to_s, :number => index}
+          Worker.new(options).start
           Kernel.exit!
         end
       end

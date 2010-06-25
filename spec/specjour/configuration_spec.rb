@@ -20,7 +20,7 @@ describe Specjour::Configuration do
         end
 
         it "disconnects from the database" do
-          mock(ActiveRecord::Base).connection { mock!.disconnect! }
+          mock(ActiveRecord::Base).remove_connection
           subject.before_fork.call
         end
       end
