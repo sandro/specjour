@@ -97,15 +97,19 @@ module Specjour
       manager_options = {:worker_size => options[:worker_size], :registered_projects => [project_name]}
       manager = Manager.new manager_options
       manager.drb_uri
-      pid = fork do
-        manager.start
-      end
+      pid = fork { manager.start }
       fetch_manager(manager.drb_uri)
       at_exit { Process.kill('TERM', pid) rescue Errno::ESRCH }
     end
 
     def gather_managers
       puts "Looking for managers..."
+      gather_remote_managers
+      fork_local_manager if local_manager_needed?
+      abort "No managers found" if managers.size.zero?
+    end
+
+    def gather_remote_managers
       browser = DNSSD::Service.new
       Timeout.timeout(10) do
         browser.browse '_druby._tcp' do |reply|
@@ -115,14 +119,15 @@ module Specjour
           browser.stop unless reply.flags.more_coming?
         end
       end
-      if managers.size.zero?
-        if options[:worker_size] > 0
-          fork_local_manager
-        else
-          abort "No managers found"
-        end
-      end
       rescue Timeout::Error
+    end
+
+    def local_manager_needed?
+      options[:worker_size] > 0 && no_local_managers?
+    end
+
+    def no_local_managers?
+      !managers.any? {|m| m.hostname == hostname}
     end
 
     def printer
