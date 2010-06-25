@@ -162,6 +162,8 @@ module Specjour
     def set_up_manager(manager)
       manager.project_name = project_name
       manager.dispatcher_uri = dispatcher_uri
+      manager.preload_spec = all_tests.detect {|f| f =~ /_spec\.rb$/}
+      manager.preload_feature = all_tests.detect {|f| f =~ /\.feature$/}
       at_exit { manager.kill_worker_processes rescue DRb::DRbConnError }
     end
 

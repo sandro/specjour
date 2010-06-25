@@ -1,10 +1,13 @@
 module Specjour
   class Manager
     require 'dnssd'
+    require 'specjour/rspec'
+    require 'specjour/cucumber'
+
     include DRbUndumped
     include SocketHelper
 
-    attr_accessor :project_name, :specs_to_run
+    attr_accessor :project_name, :preload_spec, :preload_feature
     attr_reader :worker_size, :dispatcher_uri, :registered_projects, :bonjour_service, :worker_pids
 
     def initialize(options = {})
@@ -19,7 +22,7 @@ module Specjour
     end
 
     def bundle_install
-      Dir.chdir(project_path) do
+      in_project do
         unless system('bundle check > /dev/null')
           system("bundle install --relock > /dev/null")
         end
@@ -52,6 +55,7 @@ module Specjour
     end
 
     def dispatch_workers
+      preload_app if Configuration.preload_app?
       worker_pids.clear
       (1..worker_size).each do |index|
         worker_pids << fork do
@@ -62,8 +66,19 @@ module Specjour
       Process.waitall
     end
 
+    def in_project(&block)
+      Dir.chdir(project_path, &block)
+    end
+
     def kill_worker_processes
       Process.kill('TERM', *worker_pids) rescue Errno::ESRCH
+    end
+
+    def preload_app
+      in_project do
+        Rspec::Preloader.load(preload_spec) if preload_spec
+        Cucumber::Preloader.load(preload_feature) if preload_feature
+      end
     end
 
     def project_path
