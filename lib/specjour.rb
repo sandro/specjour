@@ -11,6 +11,7 @@ autoload :Socket, 'socket'
 module Specjour
   autoload :CLI, 'specjour/cli'
   autoload :CPU, 'specjour/cpu'
+  autoload :Configuration, 'specjour/configuration'
   autoload :Connection, 'specjour/connection'
   autoload :Dispatcher, 'specjour/dispatcher'
   autoload :Manager, 'specjour/manager'
