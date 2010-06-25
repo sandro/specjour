@@ -82,7 +82,7 @@ module Specjour
     def fetch_manager(uri)
       Timeout.timeout(8) do
         manager = DRbObject.new_with_uri(uri.to_s)
-        if !managers.include?(manager) && manager.available_for?(project_name)
+        if !managers.include?(manager) && manager.available_for?(project_alias)
           add_manager(manager)
         end
       end
@@ -94,7 +94,7 @@ module Specjour
 
     def fork_local_manager
       puts "No remote managers found, starting a local manager..."
-      manager_options = {:worker_size => options[:worker_size], :registered_projects => [project_name]}
+      manager_options = {:worker_size => options[:worker_size], :registered_projects => [project_alias]}
       manager = Manager.new manager_options
       manager.drb_uri
       pid = fork { manager.start }
