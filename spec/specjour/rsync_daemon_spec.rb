@@ -11,6 +11,8 @@ describe Specjour::RsyncDaemon do
     stub(Dir).chdir
     stub(File).open
     stub(File).read
+    stub(FileUtils).rm
+    stub(Process).kill
   end
 
   specify { subject.config_directory.should == '/tmp/seasonal/.specjour' }
