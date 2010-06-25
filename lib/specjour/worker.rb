@@ -43,8 +43,14 @@ module Specjour
       Connection.new printer_uri
     end
 
+    def print_status(test)
+      status = "[#{ENV['TEST_ENV_NUMBER']}] Running #{test}"
+      puts status
+      $PROGRAM_NAME = "specjour#{status}"
+    end
+
     def run_test(test)
-      puts "[#{ENV['TEST_ENV_NUMBER']}] Running #{test}"
+      print_status(test)
       if test =~ /\.feature$/
         run_feature test
       else

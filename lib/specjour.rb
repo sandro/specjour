@@ -41,6 +41,7 @@ module Specjour
   end
 
   Error = Class.new(StandardError)
+  PROGRAM_NAME = $PROGRAM_NAME # keep a reference of the original program name
 
   GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
 end
