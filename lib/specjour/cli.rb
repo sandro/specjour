@@ -11,7 +11,8 @@ module Specjour
     end
 
     def self.start(original_args=ARGV, config={})
-      unless all_tasks.keys.include? original_args.first
+      real_tasks = all_tasks.keys | %w(--help -h)
+      unless real_tasks.include? original_args.first
         original_args.unshift default_task
       end
       super(original_args, config)
