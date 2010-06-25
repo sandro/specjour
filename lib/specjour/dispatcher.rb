@@ -165,12 +165,6 @@ module Specjour
       at_exit { manager.kill_worker_processes rescue DRb::DRbConnError }
     end
 
-    def start_manager
-      process = IO.popen %(specjour listen --projects #{project_name} --workers #{options[:worker_size]})
-      Process.detach process.pid
-      at_exit { Process.kill('TERM', process.pid) rescue Errno::ESRCH }
-    end
-
     def wait_on_managers
       manager_threads.each {|t| t.join; t.exit}
       clear_manager_threads

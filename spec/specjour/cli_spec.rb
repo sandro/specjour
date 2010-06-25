@@ -78,23 +78,4 @@ describe Specjour::CLI do
       subject.send(:handle_logging)
     end
   end
-
-  # describe "#start_manager" do
-    # it "starts a listener in a subprocess" do
-      # stub(subject).args.returns({:project_path => 'eh', :worker_size => 1})
-      # command = %(specjour listen --projects eh --workers 1)
-      # mock(IO).popen(command).returns(stub!.pid.returns(fake_pid))
-      # subject.send(:start_manager)
-    # end
-
-    # it "detaches the subprocess' pid" do
-      # mock(Process).detach(fake_pid)
-      # subject.send :start_manager
-    # end
-
-    # it "does something at exit" do
-      # mock(Kernel).at_exit
-      # subject.send :start_manager
-    # end
-  # end
 end
