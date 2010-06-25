@@ -26,8 +26,6 @@ module Specjour
 
   VERSION = "0.2.5".freeze
 
-  class Error < StandardError; end
-
   def self.logger
     @logger ||= new_logger
   end
@@ -41,6 +39,8 @@ module Specjour
   def self.log?
     logger.level != Logger::UNKNOWN
   end
+
+  Error = Class.new(StandardError)
 
   GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
 end
