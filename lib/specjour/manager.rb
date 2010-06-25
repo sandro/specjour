@@ -31,19 +31,23 @@ module Specjour
       @dispatcher_uri = uri
     end
 
-    def kill_worker_processes
-      Process.kill('TERM', *worker_pids) rescue Errno::ESRCH
-    end
-
-    def project_path
-      File.join("/tmp", project_name)
-    end
-
     def dispatch
       suspend_bonjour do
         sync
         bundle_install
         dispatch_workers
+      end
+    end
+
+    def drb_start
+      DRb.start_service drb_uri.to_s, self
+      at_exit { DRb.stop_service }
+    end
+
+    def drb_uri
+      @drb_uri ||= begin
+        current_uri.scheme = "druby"
+        current_uri
       end
     end
 
@@ -58,6 +62,14 @@ module Specjour
       Process.waitall
     end
 
+    def kill_worker_processes
+      Process.kill('TERM', *worker_pids) rescue Errno::ESRCH
+    end
+
+    def project_path
+      File.join("/tmp", project_name)
+    end
+
     def start
       drb_start
       puts "Workers ready: #{worker_size}."
@@ -65,18 +77,6 @@ module Specjour
       bonjour_announce
       Signal.trap('INT') { puts; puts "Shutting down manager..."; exit }
       DRb.thread.join
-    end
-
-    def drb_start
-      DRb.start_service drb_uri.to_s, self
-      at_exit { DRb.stop_service }
-    end
-
-    def drb_uri
-      @drb_uri ||= begin
-        current_uri.scheme = "druby"
-        current_uri
-      end
     end
 
     def sync
