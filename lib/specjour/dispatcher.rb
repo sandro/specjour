@@ -25,8 +25,8 @@ module Specjour
 
     def start
       abort("#{project_path} doesn't exist") unless File.exists?(project_path)
-      rsync_daemon.start
       gather_managers
+      rsync_daemon.start
       dispatch_work
       printer.join
       exit printer.exit_status
