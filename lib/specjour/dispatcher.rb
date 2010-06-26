@@ -97,7 +97,7 @@ module Specjour
       manager_options = {:worker_size => options[:worker_size], :registered_projects => [project_alias]}
       manager = Manager.new manager_options
       manager.drb_uri
-      pid = fork { manager.start }
+      pid = PipeFork.fork { manager.start }
       fetch_manager(manager.drb_uri)
       at_exit { Process.kill('TERM', pid) rescue Errno::ESRCH }
     end
