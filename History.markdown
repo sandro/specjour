@@ -28,7 +28,7 @@ History
   spec is run one at a time, batching no longer makes sense.
 
 * [removed] Global listening. You now must provide the project names you want to
-  run specs for.
+  run specs for. Defaults to the project in your current working directory.
 
         $ specjour listen --projects foo bar
 
