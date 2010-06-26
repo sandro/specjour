@@ -16,6 +16,7 @@ module Specjour
   autoload :Dispatcher, 'specjour/dispatcher'
   autoload :Manager, 'specjour/manager'
   autoload :OpenStruct, 'ostruct'
+  autoload :PipeFork, 'specjour/pipe_fork'
   autoload :Printer, 'specjour/printer'
   autoload :Protocol, 'specjour/protocol'
   autoload :RsyncDaemon, 'specjour/rsync_daemon'
