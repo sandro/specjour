@@ -29,6 +29,7 @@ module Specjour
       rsync_daemon.start
       dispatch_work
       printer.join
+      wait_on_managers
       exit printer.exit_status
     end
 
