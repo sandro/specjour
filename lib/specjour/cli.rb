@@ -22,13 +22,13 @@ module Specjour
 
     class_option :log, :aliases => "-l", :type => :boolean, :desc => "Print debug messages to $stdout"
 
-    desc "listen", "Advertise availability to run specs"
+    desc "listen", "Advertise availability to run specs\nDefaults to current directory"
     worker_option
-    method_option :projects, :aliases => "-p", :type => :array, :desc => "Projects supported by this listener", :required => true
+    method_option :projects, :aliases => "-p", :type => :array, :desc => "Projects supported by this listener"
     def listen
       handle_logging
       handle_workers
-      args[:registered_projects] = args.delete(:projects)
+      args[:registered_projects] = args.delete(:projects) || [File.basename(Dir.pwd)]
       Specjour::Manager.new(args).start
     end
 

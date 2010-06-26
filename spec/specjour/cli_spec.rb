@@ -12,6 +12,10 @@ describe Specjour::CLI do
   describe "#listen" do
     let(:manager) { NullObject.new }
 
+    before do
+      stub(Dir).pwd { '/home/someone/foo-bar' }
+    end
+
     def manager_receives_options(options)
       expected_options = hash_including(options)
       mock(Specjour::Manager).new(expected_options).returns(manager)
@@ -25,6 +29,11 @@ describe Specjour::CLI do
     it "accepts an array of projects to listen to" do
       manager_receives_options("registered_projects" => %w(one two three))
       Specjour::CLI.start %w(listen --projects one two three)
+    end
+
+    it "listens to the current path by default" do
+      manager_receives_options("registered_projects" => %w(foo-bar))
+      Specjour::CLI.start %w(listen)
     end
   end
 
