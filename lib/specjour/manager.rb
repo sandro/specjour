@@ -55,7 +55,6 @@ module Specjour
     end
 
     def dispatch_workers
-      preload_app if Configuration.preload_app?
       Configuration.before_fork.call
       worker_pids.clear
       (1..worker_size).each do |index|
@@ -74,13 +73,6 @@ module Specjour
 
     def kill_worker_processes
       Process.kill('TERM', *worker_pids) rescue Errno::ESRCH
-    end
-
-    def preload_app
-      in_project do
-        Rspec::Preloader.load(preload_spec) if preload_spec
-        Cucumber::Preloader.load(preload_feature) if preload_feature
-      end
     end
 
     def project_path

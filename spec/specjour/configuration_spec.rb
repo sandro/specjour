@@ -50,15 +50,4 @@ describe Specjour::Configuration do
       subject.after_fork.call.should == :custom_after
     end
   end
-
-  describe "#preload_app?" do
-    it "defaults to true" do
-      subject.preload_app?.should be_true
-    end
-
-    it "returns false when not preloading app" do
-      subject.preload_app = false
-      subject.preload_app?.should be_false
-    end
-  end
 end
