@@ -4,6 +4,7 @@ class Specjour::Cucumber::Preloader
     cli = ::Cucumber::Cli::Main.new []
     step_mother = cli.class.step_mother
 
+    step_mother.log = cli.configuration.log
     step_mother.load_code_files(cli.configuration.support_to_load)
     step_mother.after_configuration(cli.configuration)
     features = step_mother.load_plain_text_features(cli.configuration.feature_files)
