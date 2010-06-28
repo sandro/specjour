@@ -85,7 +85,7 @@ module Specjour
       puts "Workers ready: #{worker_size}."
       puts "Listening for #{registered_projects.join(', ')}"
       bonjour_announce
-      Signal.trap('INT') { puts; puts "Shutting down manager..."; exit }
+      Signal.trap('INT') { puts; puts "Shutting down manager..."; exit 1 }
       DRb.thread.join
     end
 
