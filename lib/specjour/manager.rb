@@ -59,6 +59,7 @@ module Specjour
       worker_pids.clear
       (1..worker_size).each do |index|
         worker_pids << fork do
+          DRb.stop_service
           options = {:project_path => project_path, :printer_uri => dispatcher_uri.to_s, :number => index}
           Worker.new(options).start
           Kernel.exit!
