@@ -6,23 +6,27 @@ module Specjour
     include Protocol
     include SocketHelper
     attr_accessor :printer_uri
-    attr_reader :project_path, :number
+    attr_reader :project_path, :number, :preload_spec, :preload_feature
 
     def initialize(options = {})
       @project_path = options[:project_path]
       @number = options[:number].to_i
+      @preload_spec = options[:preload_spec]
+      @preload_feature = options[:preload_feature]
       self.printer_uri = options[:printer_uri]
       set_env_variables
+      Dir.chdir(project_path)
     end
 
     def printer_uri=(val)
       @printer_uri = URI.parse(val)
     end
 
-    def start
+    def run_tests
+      load_app
       Configuration.after_fork.call
       run_time = 0
-      Dir.chdir(project_path)
+
       while test = connection.next_test
         time = Benchmark.realtime do
           run_test test
@@ -38,6 +42,11 @@ module Specjour
 
     def connection
       @connection ||= printer_connection
+    end
+
+    def load_app
+      Rspec::Preloader.load(preload_spec) if preload_spec
+      Cucumber::Preloader.load(preload_feature) if preload_feature
     end
 
     def printer_connection

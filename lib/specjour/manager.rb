@@ -60,8 +60,8 @@ module Specjour
       (1..worker_size).each do |index|
         worker_pids << fork do
           DRb.stop_service
-          options = {:project_path => project_path, :printer_uri => dispatcher_uri.to_s, :number => index}
-          Worker.new(options).start
+          options = {:project_path => project_path, :printer_uri => dispatcher_uri.to_s, :number => index, :preload_spec => preload_spec, :preload_feature => preload_feature}
+          Worker.new(options).run_tests
           Kernel.exit!
         end
       end
