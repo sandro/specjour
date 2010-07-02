@@ -22,6 +22,12 @@ module Specjour
       @printer_uri = URI.parse(val)
     end
 
+    def prepare
+      load_app
+      Configuration.prepare.call
+      Configuration.after_fork.call
+    end
+
     def run_tests
       load_app
       Configuration.after_fork.call

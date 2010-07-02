@@ -50,4 +50,15 @@ describe Specjour::Configuration do
       subject.after_fork.call.should == :custom_after
     end
   end
+
+  describe "#prepare" do
+    it "defaults to nothing" do
+      subject.prepare.call.should be_nil
+    end
+
+    it "runs the block" do
+      subject.prepare = lambda { :custom_preparation }
+      subject.prepare.call.should == :custom_preparation
+    end
+  end
 end

@@ -2,7 +2,7 @@ module Specjour
   module Configuration
     extend self
 
-    attr_writer :before_fork, :after_fork
+    attr_writer :before_fork, :after_fork, :prepare
 
     # This block is run by each worker the manager forks.
     # The Rails plugin uses this block to clear the databases defined in
@@ -18,6 +18,10 @@ module Specjour
       @before_fork ||= default_before_fork
     end
 
+    def prepare
+      @prepare ||= default_prepare
+    end
+
     def reset
       @before_fork = nil
       @after_fork = nil
@@ -30,6 +34,10 @@ module Specjour
     end
 
     def default_after_fork
+      lambda {}
+    end
+
+    def default_prepare
       lambda {}
     end
   end
