@@ -28,7 +28,7 @@ module Specjour
       gather_managers
       rsync_daemon.start
       dispatch_work
-      printer.join
+      printer.join if dispatching_tests?
       wait_on_managers
       exit printer.exit_status
     end
@@ -78,6 +78,10 @@ module Specjour
       puts "Workers found: #{worker_size}"
       printer.worker_size = worker_size
       command_managers(true) { |m| m.dispatch }
+    end
+
+    def dispatching_tests?
+      worker_task == 'run_tests'
     end
 
     def fetch_manager(uri)
@@ -165,12 +169,17 @@ module Specjour
       manager.dispatcher_uri = dispatcher_uri
       manager.preload_spec = all_tests.detect {|f| f =~ /_spec\.rb$/}
       manager.preload_feature = all_tests.detect {|f| f =~ /\.feature$/}
+      manager.worker_task = worker_task
       at_exit { manager.kill_worker_processes rescue DRb::DRbConnError }
     end
 
     def wait_on_managers
       manager_threads.each {|t| t.join; t.exit}
       clear_manager_threads
+    end
+
+    def worker_task
+      options[:worker_task] || 'run_tests'
     end
   end
 end

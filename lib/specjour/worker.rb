@@ -6,13 +6,14 @@ module Specjour
     include Protocol
     include SocketHelper
     attr_accessor :printer_uri
-    attr_reader :project_path, :number, :preload_spec, :preload_feature
+    attr_reader :project_path, :number, :preload_spec, :preload_feature, :task
 
     def initialize(options = {})
       @project_path = options[:project_path]
       @number = options[:number].to_i
       @preload_spec = options[:preload_spec]
       @preload_feature = options[:preload_feature]
+      @task = options[:task]
       self.printer_uri = options[:printer_uri]
       set_env_variables
       Dir.chdir(project_path)
@@ -42,6 +43,10 @@ module Specjour
       connection.send_message(:rspec_summary=, {:duration => sprintf("%6f", run_time)})
       connection.send_message(:done)
       connection.disconnect
+    end
+
+    def start
+      send task
     end
 
     protected

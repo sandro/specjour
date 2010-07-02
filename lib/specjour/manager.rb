@@ -7,11 +7,12 @@ module Specjour
     include DRbUndumped
     include SocketHelper
 
-    attr_accessor :project_name, :preload_spec, :preload_feature
+    attr_accessor :project_name, :preload_spec, :preload_feature, :worker_task
     attr_reader :worker_size, :dispatcher_uri, :registered_projects, :bonjour_service, :worker_pids
 
     def initialize(options = {})
       @worker_size = options[:worker_size]
+      @worker_task = options[:worker_task]
       @registered_projects = options[:registered_projects]
       @worker_pids = []
       at_exit { kill_worker_processes }
@@ -60,8 +61,15 @@ module Specjour
       (1..worker_size).each do |index|
         worker_pids << fork do
           DRb.stop_service
-          options = {:project_path => project_path, :printer_uri => dispatcher_uri.to_s, :number => index, :preload_spec => preload_spec, :preload_feature => preload_feature}
-          Worker.new(options).run_tests
+          worker_options = {
+            :project_path => project_path,
+            :printer_uri => dispatcher_uri.to_s,
+            :number => index,
+            :preload_spec => preload_spec,
+            :preload_feature => preload_feature,
+            :task => worker_task
+          }
+          Worker.new(worker_options).start
           Kernel.exit!
         end
       end

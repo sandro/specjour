@@ -6,6 +6,10 @@ module Specjour
 
     extend self
 
+    def drop
+      Rake::Task['db:drop']
+    end
+
     def scrub
       connect_to_database
       if pending_migrations?

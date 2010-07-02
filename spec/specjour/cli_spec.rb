@@ -87,4 +87,18 @@ describe Specjour::CLI do
       subject.send(:handle_logging)
     end
   end
+
+  describe "#prepare" do
+    let(:dispatcher) { NullObject.new }
+
+    def dispatcher_receives_options(options)
+      expected_options = hash_including(options)
+      mock(Specjour::Dispatcher).new(expected_options).returns(dispatcher)
+    end
+
+    it "sets the worker task to 'prepare'" do
+      dispatcher_receives_options("worker_task" => "prepare")
+      Specjour::CLI.start %w(prepare)
+    end
+  end
 end

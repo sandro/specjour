@@ -10,6 +10,10 @@ module Specjour
       method_option :workers, :aliases => "-w", :type => :numeric, :desc => "Number of concurent processes to run. Defaults to your system's available cores."
     end
 
+    def self.dispatcher_option
+      method_option :alias, :aliases => "-a", :desc => "Project name advertised to listeners"
+    end
+
     def self.start(original_args=ARGV, config={})
       real_tasks = all_tasks.keys | %w(--help -h)
       unless real_tasks.include? original_args.first
@@ -34,12 +38,22 @@ module Specjour
 
     desc "dispatch [PROJECT_PATH]", "Run specs in this project"
     worker_option
-    method_option :alias, :aliases => "-a", :desc => "Project name advertised to listeners"
+    dispatcher_option
     def dispatch(path = Dir.pwd)
       handle_logging
       handle_workers
-      args[:project_path] = path
-      args[:project_alias] = args.delete(:alias)
+      handle_dispatcher(path)
+      Specjour::Dispatcher.new(args).start
+    end
+
+    desc "prepare [PROJECT_PATH]", "Run the prepare block on all listening workers"
+    worker_option
+    dispatcher_option
+    def prepare(path = Dir.pwd)
+      handle_logging
+      handle_workers
+      handle_dispatcher(path)
+      args[:worker_task] = 'prepare'
       Specjour::Dispatcher.new(args).start
     end
 
@@ -68,6 +82,11 @@ module Specjour
 
     def handle_workers
       args[:worker_size] = options["workers"] || CPU.cores
+    end
+
+    def handle_dispatcher(path)
+      args[:project_path] = path
+      args[:project_alias] = args.delete(:alias)
     end
   end
 end
