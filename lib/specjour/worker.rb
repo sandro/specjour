@@ -9,6 +9,7 @@ module Specjour
     attr_reader :project_path, :number, :preload_spec, :preload_feature, :task
 
     def initialize(options = {})
+      ARGV.replace []
       @project_path = options[:project_path]
       @number = options[:number].to_i
       @preload_spec = options[:preload_spec]
