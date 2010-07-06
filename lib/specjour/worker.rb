@@ -26,7 +26,6 @@ module Specjour
     def prepare
       load_app
       Configuration.prepare.call
-      Configuration.after_fork.call
     end
 
     def run_tests
