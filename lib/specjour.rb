@@ -33,7 +33,7 @@ module Specjour
   end
 
   def self.new_logger(level = Logger::UNKNOWN)
-    @logger = Logger.new $stdout
+    @logger = Logger.new $stderr
     @logger.level = level
     @logger
   end
