@@ -15,11 +15,11 @@ module Specjour
     end
 
     def self.start(original_args=ARGV, config={})
-      real_tasks = all_tasks.keys | %w(--help -h)
+      real_tasks = all_tasks.keys | HELP_MAPPINGS
       unless real_tasks.include? original_args.first
         original_args.unshift default_task
       end
-      super(original_args, config)
+      super(original_args)
     end
 
     default_task :dispatch
