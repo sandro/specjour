@@ -24,6 +24,10 @@ History
         $ specjour listen --projects foo2
         $ specjour dispatch --alias foo2
 
+* [added] Preparation. Running `specjour prepare` invokes the
+  `Specjour::Configuration.prepare` block on each worker. By default this
+  drops the worker's database and brings it back up.
+
 * [removed] --batch option which sent back results in batches. Now that each
   spec is run one at a time, batching no longer makes sense.
 
