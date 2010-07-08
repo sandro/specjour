@@ -30,14 +30,6 @@ module Specjour
       registered_projects ? registered_projects.include?(project_name) : false
     end
 
-    def bundle_install
-      in_project do
-        unless system('bundle check > /dev/null')
-          system("bundle install --relock > /dev/null")
-        end
-      end
-    end
-
     def dispatcher_uri=(uri)
       uri.host = ip_from_hostname(uri.host)
       @dispatcher_uri = uri
@@ -46,7 +38,7 @@ module Specjour
     def dispatch
       suspend_bonjour do
         sync
-        bundle_install
+        in_project { Configuration.before_fork.call }
         dispatch_workers
       end
     end
@@ -64,7 +56,6 @@ module Specjour
     end
 
     def dispatch_workers
-      Configuration.before_fork.call
       worker_pids.clear
       (1..worker_size).each do |index|
         worker_pids << fork do

@@ -35,6 +35,10 @@ module Specjour
     def default_before_fork
       lambda do
         ActiveRecord::Base.remove_connection if defined?(ActiveRecord::Base)
+
+        if system('which bundle')
+          system('bundle check') || system('bundle install')
+        end
       end
     end
 
@@ -57,6 +61,10 @@ module Specjour
 
     def rails_with_ar?
       defined?(Rails) && defined?(ActiveRecord::Base)
+    end
+
+    def system(cmd)
+      Kernel.system("#{cmd} > /dev/null")
     end
   end
 end

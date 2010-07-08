@@ -9,6 +9,12 @@ class NullObject
   end
 end
 
+begin
+  Specjour::DbScrub
+rescue LoadError
+  $stderr.puts "DbScrub failed to load properly, that's okay though"
+end
+
 Spec::Runner.configure do |config|
   config.mock_with :rr
 end
