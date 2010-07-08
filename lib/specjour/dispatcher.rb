@@ -7,8 +7,6 @@ module Specjour
     class << self
       attr_accessor :interrupted
       alias interrupted? interrupted
-
-      Signal.trap('INT') { Dispatcher.interrupted = true; exit 1 }
     end
 
     attr_reader :project_alias, :managers, :manager_threads, :hosts, :options, :all_tests
@@ -28,6 +26,7 @@ module Specjour
       gather_managers
       rsync_daemon.start
       dispatch_work
+      Signal.trap('INT') { Dispatcher.interrupted = true; exit 1 }
       printer.join if dispatching_tests?
       wait_on_managers
       exit printer.exit_status
