@@ -1,4 +1,4 @@
-module Specjour::SilentFork
+module Specjour::QuietFork
   extend self
   attr_reader :pid
 

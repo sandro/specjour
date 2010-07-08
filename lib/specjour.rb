@@ -19,8 +19,8 @@ module Specjour
   autoload :OpenStruct, 'ostruct'
   autoload :Printer, 'specjour/printer'
   autoload :Protocol, 'specjour/protocol'
+  autoload :QuietFork, 'specjour/quiet_fork'
   autoload :RsyncDaemon, 'specjour/rsync_daemon'
-  autoload :SilentFork, 'specjour/silent_fork'
   autoload :SocketHelper, 'specjour/socket_helper'
   autoload :Worker, 'specjour/worker'
 

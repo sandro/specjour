@@ -13,7 +13,7 @@ module Specjour
     def self.start_quietly(options)
       manager = new options.merge(:quiet => true)
       manager.drb_uri
-      manager.pid = SilentFork.fork { manager.start }
+      manager.pid = QuietFork.fork { manager.start }
       manager
     end
 
