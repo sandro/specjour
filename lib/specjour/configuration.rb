@@ -18,6 +18,10 @@ module Specjour
       @before_fork ||= default_before_fork
     end
 
+    # This block is run on all workers when invoking `specjour prepare`
+    # Defaults to dropping the worker's database and recreating it. This
+    # is especially useful when two teams are sharing workers and writing
+    # migrations at around the same time causing databases to get out of sync.
     def prepare
       @prepare ||= default_prepare
     end
