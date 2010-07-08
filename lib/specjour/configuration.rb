@@ -29,6 +29,7 @@ module Specjour
     def reset
       @before_fork = nil
       @after_fork = nil
+      @prepare = nil
     end
 
     def default_before_fork
