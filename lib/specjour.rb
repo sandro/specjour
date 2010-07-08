@@ -7,6 +7,7 @@ autoload :Timeout, 'timeout'
 autoload :Benchmark, 'benchmark'
 autoload :Logger, 'logger'
 autoload :Socket, 'socket'
+autoload :StringIO, 'stringio'
 
 module Specjour
   autoload :CLI, 'specjour/cli'
@@ -16,10 +17,10 @@ module Specjour
   autoload :Dispatcher, 'specjour/dispatcher'
   autoload :Manager, 'specjour/manager'
   autoload :OpenStruct, 'ostruct'
-  autoload :PipeFork, 'specjour/pipe_fork'
   autoload :Printer, 'specjour/printer'
   autoload :Protocol, 'specjour/protocol'
   autoload :RsyncDaemon, 'specjour/rsync_daemon'
+  autoload :SilentFork, 'specjour/silent_fork'
   autoload :SocketHelper, 'specjour/socket_helper'
   autoload :Worker, 'specjour/worker'
 
