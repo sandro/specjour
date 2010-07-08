@@ -96,7 +96,6 @@ module Specjour
     end
 
     def set_env_variables
-      ENV['PREPARE_DB'] = 'true'
       ENV['RSPEC_COLOR'] = 'true'
       ENV['TEST_ENV_NUMBER'] = number.to_s
     end

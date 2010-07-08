@@ -34,11 +34,24 @@ module Specjour
     end
 
     def default_after_fork
-      lambda {}
+      lambda do
+        DbScrub.scrub if rails_with_ar?
+      end
     end
 
     def default_prepare
-      lambda {}
+      lambda do
+        if rails_with_ar?
+          DbScrub.drop
+          DbScrub.scrub
+        end
+      end
+    end
+
+    protected
+
+    def rails_with_ar?
+      defined?(Rails) && defined?(ActiveRecord::Base)
     end
   end
 end

@@ -14,6 +14,7 @@ module Specjour
   autoload :CPU, 'specjour/cpu'
   autoload :Configuration, 'specjour/configuration'
   autoload :Connection, 'specjour/connection'
+  autoload :DbScrub, 'specjour/db_scrub'
   autoload :Dispatcher, 'specjour/dispatcher'
   autoload :Manager, 'specjour/manager'
   autoload :OpenStruct, 'ostruct'
