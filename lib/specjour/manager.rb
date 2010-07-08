@@ -7,10 +7,18 @@ module Specjour
     include DRbUndumped
     include SocketHelper
 
-    attr_accessor :project_name, :preload_spec, :preload_feature, :worker_task
-    attr_reader :worker_size, :dispatcher_uri, :registered_projects, :bonjour_service, :worker_pids
+    attr_accessor :project_name, :preload_spec, :preload_feature, :worker_task, :pid
+    attr_reader :worker_size, :dispatcher_uri, :registered_projects, :bonjour_service, :worker_pids, :options
+
+    def self.start_quietly(options)
+      manager = new options.merge(:quiet => true)
+      manager.drb_uri
+      manager.pid = SilentFork.fork { manager.start }
+      manager
+    end
 
     def initialize(options = {})
+      @options = options
       @worker_size = options[:worker_size]
       @worker_task = options[:worker_task]
       @registered_projects = options[:registered_projects]
@@ -60,17 +68,7 @@ module Specjour
       worker_pids.clear
       (1..worker_size).each do |index|
         worker_pids << fork do
-          DRb.stop_service
-          worker_options = {
-            :project_path => project_path,
-            :printer_uri => dispatcher_uri.to_s,
-            :number => index,
-            :preload_spec => preload_spec,
-            :preload_feature => preload_feature,
-            :task => worker_task
-          }
-          Worker.new(worker_options).start
-          Kernel.exit!
+          exec "specjour work #{worker_options(index)}"
         end
       end
       Process.waitall
@@ -84,6 +82,10 @@ module Specjour
       Process.kill('TERM', *worker_pids) rescue Errno::ESRCH
     end
 
+    def pid
+      @pid || Process.pid
+    end
+
     def project_path
       File.join("/tmp", project_name)
     end
@@ -95,6 +97,10 @@ module Specjour
       bonjour_announce
       Signal.trap('INT') { puts; puts "Shutting down manager..."; exit 1 }
       DRb.thread.join
+    end
+
+    def quiet?
+      options.has_key? :quiet
     end
 
     def sync
@@ -116,6 +122,15 @@ module Specjour
       bonjour_service.stop
       block.call
       bonjour_announce
+    end
+
+    def worker_options(index)
+      exec_options = "--project-path #{project_path} --printer-uri #{dispatcher_uri} --number #{index} --task #{worker_task}"
+      exec_options << " --preload-spec #{preload_spec}" if preload_spec
+      exec_options << " --preload-feature #{preload_feature}" if preload_feature
+      exec_options << " --log" if Specjour.log?
+      exec_options << " --quiet" if quiet?
+      exec_options
     end
   end
 end

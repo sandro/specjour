@@ -99,11 +99,9 @@ module Specjour
     def fork_local_manager
       puts "No remote managers found, starting a local manager..."
       manager_options = {:worker_size => options[:worker_size], :registered_projects => [project_alias]}
-      manager = Manager.new manager_options
-      manager.drb_uri
-      pid = SilentFork.fork { manager.start }
+      manager = Manager.start_quietly manager_options
       fetch_manager(manager.drb_uri)
-      at_exit { Process.kill('TERM', pid) rescue Errno::ESRCH }
+      at_exit { Process.kill('TERM', manager.pid) rescue Errno::ESRCH }
     end
 
     def gather_managers

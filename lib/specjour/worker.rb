@@ -10,6 +10,7 @@ module Specjour
 
     def initialize(options = {})
       ARGV.replace []
+      $stdout = StringIO.new if options[:quiet]
       @project_path = options[:project_path]
       @number = options[:number].to_i
       @preload_spec = options[:preload_spec]

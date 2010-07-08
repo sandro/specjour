@@ -65,9 +65,9 @@ describe Specjour::CLI do
   describe "#work" do
     it "starts a worker with the required parameters" do
       worker = NullObject.new
-      args = {'project_path' => "eh", 'printer_uri' => "specjour://1.1.1.1:12345", 'number' => 1}
+      args = {'project_path' => "eh", 'printer_uri' => "specjour://1.1.1.1:12345", 'number' => 1, 'task' => 'run_tests'}
       mock(Specjour::Worker).new(hash_including(args)).returns(worker)
-      Specjour::CLI.start %w(work --project-path eh --printer-uri specjour://1.1.1.1:12345 --number 1)
+      Specjour::CLI.start %w(work --project-path eh --printer-uri specjour://1.1.1.1:12345 --number 1 --task run_tests)
     end
   end
 
