@@ -32,13 +32,16 @@ module Specjour
       @prepare = nil
     end
 
+    def bundle_install
+      if system('which bundle')
+        system('bundle check') || system('bundle install')
+      end
+    end
+
     def default_before_fork
       lambda do
         ActiveRecord::Base.remove_connection if defined?(ActiveRecord::Base)
-
-        if system('which bundle')
-          system('bundle check') || system('bundle install')
-        end
+        bundle_install
       end
     end
 
