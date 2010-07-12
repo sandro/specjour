@@ -24,7 +24,7 @@ module Specjour
 
     default_task :dispatch
 
-    class_option :log, :aliases => "-l", :type => :boolean, :desc => "Print debug messages to $stdout"
+    class_option :log, :aliases => "-l", :type => :boolean, :desc => "Print debug messages to $stderr"
 
     desc "listen", "Advertise availability to run specs\nDefaults to current directory"
     worker_option
