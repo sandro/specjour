@@ -57,9 +57,9 @@ Specjour contains ActiveRecord hooks that clear database tables before running t
 
 ## Custom Hooks
 Specjour allows you to hook in to the test process on a per-machine and
-per-worker level through the before_fork and after_fork configuration blocks.
+per-worker level through the before\_fork and after\_fork configuration blocks.
 If the default ActiveRecord hook doesn't set up the database properly for your
-test suite, override it with a custom after_fork hook.
+test suite, override it with a custom after\_fork hook.
 
     # config/initializers/specjour.rb
     Rails.configuration.after_initialize do
@@ -91,13 +91,9 @@ and recreates the database on all workers.
     end
 
 ## Only listen to supported projects
-By default, a manager will listen to all projects trying to distribute specs over the network. Sometimes you'll only want a manager to respond to one specific spec suite. You can accomplish this with the `--projects` flag.
+By default, a manager will listen to the project in the current directory. If you want to listen for multiple projects, use the `--projects` flag.
 
-    $ specjour listen --projects bizconf # only run specs for the bizconf project
-
-You could also listen to multiple projects:
-
-    $ specjour listen --projects bizconf,workbeast # only run specs for the bizconf and workbeast projects
+    $ specjour listen --projects bizconf workbeast # run specs for the bizconf and workbeast projects
 
 ## Customize what gets rsync'd
 The standard rsync configuration file may be too broad for your
