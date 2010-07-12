@@ -28,7 +28,7 @@ module Specjour
   autoload :Cucumber, 'specjour/cucumber'
   autoload :Rspec, 'specjour/rspec'
 
-  VERSION = "0.2.5".freeze
+  VERSION = "0.3.0.rc1".freeze
 
   def self.logger
     @logger ||= new_logger
