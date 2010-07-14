@@ -56,7 +56,7 @@ module Specjour
     end
 
     def check_config_version
-      File.read(config_file) =~ /\A# (\d+.\d+.\d+)/
+      File.read(config_file) =~ /\A# (\d.\d.\d[.rc\d]*)/
       if out_of_date? Regexp.last_match(1)
         $stderr.puts <<-WARN
 
