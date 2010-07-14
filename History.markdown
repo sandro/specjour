@@ -1,6 +1,18 @@
 History
 =======
 
+## 0.3.0.rc2 / thor
+
+* [fixed] Cucumber compatibility with 0.8.5
+
+* [fixed] The before\_fork hook did not work in the rc1 because the custom hooks
+  were loaded by the worker (after fork). We could have the manager preload the app
+  but then you'll have stale managers. Instead, custom hooks are now located in
+  the .specjour/hooks.rb file, essentially living outside of your application.
+
+* [changed] The generated rsyncd.conf now syncs the .specjour directory
+  allowing hooks to be loaded by managers and workers.
+
 ## 0.3.0.rc1 / 2010-07-12
 
 * [removed] Rake tasks have been removed, use the command-line instead.

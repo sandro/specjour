@@ -61,33 +61,27 @@ per-worker level through the before\_fork and after\_fork configuration blocks.
 If the default ActiveRecord hook doesn't set up the database properly for your
 test suite, override it with a custom after\_fork hook.
 
-    # config/initializers/specjour.rb
-    Rails.configuration.after_initialize do
+    # .specjour/hooks.rb
 
-      # Modify the way you use bundler
-      Specjour::Configuration.before_fork = lambda do
-        # TODO: not working as advertised
-        system('bundle install --without production')
-      end
+    # Modify the way you use bundler
+    Specjour::Configuration.before_fork = lambda do
+      system('bundle install --without production')
+    end
 
-      # Modify your database setup
-      Specjour::Configuration.after_fork = lambda do
-        # custom database setup here
-      end
-
+    # Modify your database setup
+    Specjour::Configuration.after_fork = lambda do
+      # custom database setup here
     end
 
 A preparation hook is run when `specjour prepare` is invoked. This hook allows
 you to run arbitrary code on all of the listening workers. By default, it drops
 and recreates the database on all workers.
 
-    Rails.configuration.after_initialize do
+    # .specjour/hooks.rb
 
-      # Modify preparation
-      Specjour::Configuration.prepare = lambda do
-        # custom preparation code
-      end
-
+    # Modify preparation
+    Specjour::Configuration.prepare = lambda do
+      # custom preparation code
     end
 
 ## Only listen to supported projects
