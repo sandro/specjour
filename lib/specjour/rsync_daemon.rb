@@ -61,8 +61,8 @@ module Specjour
         $stderr.puts <<-WARN
 
 Specjour has made changes to the way #{CONFIG_FILE_NAME} is generated.
-Back up '#{config_file}'
-and re-run the dispatcher to generate the new config file.
+Back up '#{config_file}',
+remove it, and re-run the dispatcher to generate the new config file.
 
         WARN
       end
