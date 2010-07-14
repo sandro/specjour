@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{specjour}
-  s.version = "0.3.0.rc1"
+  s.version = "0.3.0.rc2"
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Sandro Turriate"]
-  s.date = %q{2010-07-12}
+  s.date = %q{2010-07-14}
   s.default_executable = %q{specjour}
   s.description = %q{Distribute your spec suite amongst your LAN via Bonjour.}
   s.email = %q{sandro.turriate@gmail.com}
