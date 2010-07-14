@@ -19,6 +19,7 @@ module Specjour
       self.printer_uri = options[:printer_uri]
       set_env_variables
       Dir.chdir(project_path)
+      Specjour.load_custom_hooks
     end
 
     def printer_uri=(val)

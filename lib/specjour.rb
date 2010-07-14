@@ -29,6 +29,7 @@ module Specjour
   autoload :Rspec, 'specjour/rspec'
 
   VERSION = "0.3.0.rc1".freeze
+  HOOKS_PATH = ".specjour/hooks.rb"
 
   def self.logger
     @logger ||= new_logger
@@ -42,6 +43,10 @@ module Specjour
 
   def self.log?
     logger.level != Logger::UNKNOWN
+  end
+
+  def self.load_custom_hooks
+    require HOOKS_PATH if File.exists?(HOOKS_PATH)
   end
 
   Error = Class.new(StandardError)

@@ -38,7 +38,7 @@ module Specjour
     def dispatch
       suspend_bonjour do
         sync
-        in_project { Configuration.before_fork.call }
+        execute_before_fork
         dispatch_workers
       end
     end
@@ -107,6 +107,13 @@ module Specjour
     def cmd(command)
       puts command
       system command
+    end
+
+    def execute_before_fork
+      in_project do
+        Specjour.load_custom_hooks
+        Configuration.before_fork.call
+      end
     end
 
     def suspend_bonjour(&block)
