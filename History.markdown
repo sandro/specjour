@@ -1,7 +1,7 @@
 History
 =======
 
-## 0.3.0.rc1 / thor
+## 0.3.0.rc1 / 2010-07-12
 
 * [removed] Rake tasks have been removed, use the command-line instead.
 
