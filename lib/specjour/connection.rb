@@ -78,8 +78,10 @@ module Specjour
     def will_reconnect(&block)
       block.call
     rescue SystemCallError => error
-      reconnect
-      retry
+      unless Specjour.interrupted?
+        reconnect
+        retry
+      end
     end
   end
 end

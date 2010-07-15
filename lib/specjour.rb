@@ -31,6 +31,11 @@ module Specjour
   VERSION = "0.3.0.rc2".freeze
   HOOKS_PATH = ".specjour/hooks.rb"
 
+  class << self
+    attr_accessor :interrupted
+    alias interrupted? interrupted
+  end
+
   def self.logger
     @logger ||= new_logger
   end
@@ -53,4 +58,6 @@ module Specjour
   PROGRAM_NAME = $PROGRAM_NAME # keep a reference of the original program name
 
   GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
+
+  Signal.trap('INT') { Specjour.interrupted = true; exit 1 }
 end

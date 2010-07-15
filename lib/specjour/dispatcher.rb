@@ -4,11 +4,6 @@ module Specjour
     Thread.abort_on_exception = true
     include SocketHelper
 
-    class << self
-      attr_accessor :interrupted
-      alias interrupted? interrupted
-    end
-
     attr_reader :project_alias, :managers, :manager_threads, :hosts, :options, :all_tests
     attr_accessor :worker_size, :project_path
 
@@ -26,7 +21,6 @@ module Specjour
       gather_managers
       rsync_daemon.start
       dispatch_work
-      Signal.trap('INT') { Dispatcher.interrupted = true; exit 1 }
       printer.join if dispatching_tests?
       wait_on_managers
       exit printer.exit_status
