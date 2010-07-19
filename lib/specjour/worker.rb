@@ -87,13 +87,7 @@ module Specjour
     end
 
     def run_spec(spec)
-      options = Spec::Runner::OptionParser.parse(
-        ['--format=Specjour::Rspec::DistributedFormatter', spec],
-        $stderr,
-        connection
-      )
-      Spec::Runner.use options
-      options.run_examples
+      Specjour::Rspec::Runner.run(spec, connection)
     end
 
     def set_env_variables
