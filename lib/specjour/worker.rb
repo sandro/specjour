@@ -60,6 +60,8 @@ module Specjour
     def load_app
       Rspec::Preloader.load(preload_spec) if preload_spec
       Cucumber::Preloader.load(preload_feature) if preload_feature
+    rescue StandardError => exception
+      $stderr.puts "Caught exception: #{exception.class} #{exception.message}\nProceeding..."
     end
 
     def printer_connection
