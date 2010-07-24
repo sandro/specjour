@@ -7,6 +7,6 @@ module Specjour::Rspec::Runner
 
   def self.reset
     ::Rspec.instance_variable_set(:@world, nil)
-    ::Rspec.instance_variable_set(:@configuration, nil)
+    ::Rspec.configuration.instance_variable_set(:@formatter, nil)
   end
 end
