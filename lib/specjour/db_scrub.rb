@@ -1,7 +1,7 @@
 module Specjour
   module DbScrub
     require 'rake'
-    if Rails.version =~ /^3/
+    if defined?(Rails) && Rails.version =~ /^3/
       task(:environment) {}
       load 'rails/tasks/misc.rake'
       load 'active_record/railties/databases.rake'
