@@ -5,7 +5,7 @@ module Specjour::Rspec
 
     def initialize
       @examples = []
-      self.duration = 0
+      @duration = 0.0
     end
 
     def add(data)
@@ -16,8 +16,8 @@ module Specjour::Rspec
       end
     end
 
-    def duration=(duration)
-      @duration = duration.to_f
+    def duration=(value)
+      @duration = value.to_f if duration < value.to_f
     end
 
     def exit_status
@@ -42,7 +42,9 @@ module Specjour::Rspec
 
     def summarize
       if examples.size > 0
-        formatter.dump(duration)
+        formatter.dump_summary(duration, formatter.example_count, formatter.failure_count, formatter.pending_count)
+        formatter.dump_pending
+        formatter.dump_failures
       end
     end
 
