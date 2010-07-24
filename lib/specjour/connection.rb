@@ -52,7 +52,7 @@ module Specjour
       end
     end
 
-    def puts(arg)
+    def puts(arg='')
       print(arg << "\n")
     end
 
