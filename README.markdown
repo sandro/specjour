@@ -2,16 +2,9 @@
 
 ## FUCK SETI. Run specs with your spare CPU cycles.
 
-_Distribute your spec suite amongst your LAN via Bonjour._
-
 1. Spin up a manager on each machine that can run your specs.
 2. Start a dispatcher in your project directory.
 3. Say farewell to your long coffee breaks.
-
-## Requirements
-* Bonjour or DNSSD (the capability and the gem)
-* Rsync (system command used)
-* Rspec (officially v1.3.0)
 
 ## Installation
     gem install specjour
