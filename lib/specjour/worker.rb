@@ -34,15 +34,16 @@ module Specjour
     def run_tests
       load_app
       Configuration.after_fork.call
-      run_time = 0
+      run_times = Hash.new(0)
 
       while test = connection.next_test
         time = Benchmark.realtime do
           run_test test
         end
-        run_time += time if test =~ /_spec\.rb$/
+        run_times[test_type(test)] += time
       end
-      connection.send_message(:rspec_summary=, {:duration => sprintf("%6f", run_time)})
+
+      send_run_times(run_times)
       connection.send_message(:done)
       connection.disconnect
     end
@@ -76,7 +77,7 @@ module Specjour
 
     def run_test(test)
       print_status(test)
-      if test =~ /\.feature$/
+      if test_type(test) == :cucumber
         run_feature test
       else
         run_spec test
@@ -90,6 +91,16 @@ module Specjour
 
     def run_spec(spec)
       Specjour::Rspec::Runner.run(spec, connection)
+    end
+
+    def send_run_times(run_times)
+      [:rspec, :cucumber].each do |type|
+        connection.send_message(:"#{type}_summary=", {:duration => sprintf("%6f", run_times[type])})
+      end
+    end
+
+    def test_type(test)
+      test =~ /\.feature$/ ? :cucumber : :rspec
     end
 
     def set_env_variables
