@@ -67,8 +67,10 @@ module Specjour
     end
 
     def dispatch_work
-      puts "Managers found: #{managers.size}"
       puts "Workers found: #{worker_size}"
+      managers.each do |manager|
+        puts "#{manager.hostname} (#{manager.worker_size})"
+      end
       printer.worker_size = worker_size
       command_managers(true) { |m| m.dispatch }
     end
