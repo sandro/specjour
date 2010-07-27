@@ -46,3 +46,17 @@ rescue LoadError
     abort "YARD is not available. In order to run yardoc, you must: sudo gem install yard"
   end
 end
+
+desc "tag, push gem, push to github"
+task :prerelease do
+  version = `cat VERSION`.strip
+  command = %(
+    git tag v#{version} &&
+    rake build &&
+    gem push pkg/specjour-#{version}.gem &&
+    git push &&
+    git push --tags
+  )
+  puts command
+  puts %x(command)
+end
