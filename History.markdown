@@ -1,6 +1,10 @@
 History
 =======
 
+## 0.3.0.rc4 / 2010-07-27
+
+* [fixed] Only print cucumber summary when running features
+
 ## 0.3.0.rc3 / 2010-07-27
 
 * [fixed] Cucumber prints elapsed time
