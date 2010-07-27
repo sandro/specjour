@@ -1,7 +1,16 @@
 History
 =======
 
-## 0.3.0.rc2 / thor
+## 0.3.0.rc3 / 2010-07-27
+
+* [fixed] Cucumber prints elapsed time
+
+* [added] Print hostname for each hostname (closes gh-8)
+
+* [added] Rspec2 support
+
+
+## 0.3.0.rc2 / 2010-07-14
 
 * [fixed] Cucumber compatibility with 0.8.5
 
