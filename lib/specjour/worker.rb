@@ -95,7 +95,7 @@ module Specjour
 
     def send_run_times(run_times)
       [:rspec, :cucumber].each do |type|
-        connection.send_message(:"#{type}_summary=", {:duration => sprintf("%6f", run_times[type])})
+        connection.send_message(:"#{type}_summary=", {:duration => sprintf("%6f", run_times[type])}) if run_times[type] > 0
       end
     end
 
