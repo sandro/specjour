@@ -87,8 +87,9 @@ module Specjour
         end
       end
     rescue Timeout::Error
-      Specjour.logger.debug "Couldn't work with manager at #{uri}"
-    rescue DRb::DRbConnError
+      Specjour.logger.debug "Timeout: couldn't connect to manager at #{uri}"
+    rescue DRb::DRbConnError => e
+      Specjour.logger.debug "DRb error at #{uri}: #{e.backtrace.join("\n")}"
       retry
     end
 
