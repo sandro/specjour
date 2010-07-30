@@ -7,7 +7,7 @@ describe Specjour::CPU do
 Mach kernel version:
 	 Darwin Kernel Version 10.2.0: Tue Nov  3 10:37:10 PST 2009; root:xnu-1486.2.11~1/RELEASE_I386
 Kernel configured for up to 2 processors.
-2 processors are physically available.
+440 processors are physically available.
 220 processors are logically available.
 Processor type: i486 (Intel 80486)
 Processors active: 0 1
@@ -21,8 +21,8 @@ Load average: 0.09, Mach factor: 1.90
       stub(Specjour::CPU).command.returns(hostinfo)
     end
 
-    it "returns the number of logically available processors" do
-      Specjour::CPU.cores.should == 220
+    it "returns the number of physically available processors" do
+      Specjour::CPU.cores.should == 440
     end
   end
 end
