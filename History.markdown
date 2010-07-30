@@ -1,6 +1,13 @@
 History
 =======
 
+## 0.3.0.rc5 / 2010-07-30
+
+* [fixed] Shared example groups now supported in Rspec2
+
+* [removed] Hyperthread detection removed as it proved too unstable while
+  running selenium
+
 ## 0.3.0.rc4 / 2010-07-27
 
 * [fixed] Only print cucumber summary when running features
