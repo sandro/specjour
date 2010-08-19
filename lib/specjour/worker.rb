@@ -38,9 +38,11 @@ module Specjour
       run_times = Hash.new(0)
 
       while test = connection.next_test
+        print_status(test)
         time = Benchmark.realtime do
           run_test test
         end
+        print_time_for(test, time)
         run_times[test_type(test)] += time
       end
 
@@ -79,9 +81,14 @@ module Specjour
       puts status
       $PROGRAM_NAME = "specjour#{status}"
     end
+    
+    def print_time_for(test, time)
+      status = "[#{ENV['TEST_ENV_NUMBER']}] Finished #{test} in #{time}"
+      puts status
+      $PROGRAM_NAME = "specjour#{status}"
+    end
 
     def run_test(test)
-      print_status(test)
       if test_type(test) == :cucumber
         run_feature test
       else
