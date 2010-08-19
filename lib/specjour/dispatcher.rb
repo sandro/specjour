@@ -8,6 +8,7 @@ module Specjour
     attr_accessor :worker_size, :project_path
 
     def initialize(options = {})
+      Specjour.load_custom_hooks
       @options = options
       @project_path = File.expand_path options[:project_path]
       @worker_size = 0
