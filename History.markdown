@@ -1,6 +1,10 @@
 History
 =======
 
+## 0.3.0.rc6 / (master)
+
+* [fixed] Ruby 1.9.2 support through minor changes and DNSSD upgrade
+
 ## 0.3.0.rc5 / 2010-07-30
 
 * [fixed] Shared example groups now supported in Rspec2
