@@ -15,6 +15,7 @@ begin
     gem.add_development_dependency "rspec", "1.3.0"
     gem.add_development_dependency "rr", ">=0.10.11"
     gem.add_development_dependency "yard", ">=0.5.3"
+    gem.add_development_dependency "jeweler", ">=1.4.0"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
