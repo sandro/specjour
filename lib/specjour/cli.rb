@@ -2,10 +2,6 @@ module Specjour
   require 'thor'
   class CLI < Thor
 
-    def self.printable_tasks
-      super.reject{|t| t.last =~ /INTERNAL USE/ }
-    end
-
     def self.worker_option
       method_option :workers, :aliases => "-w", :type => :numeric, :desc => "Number of concurent processes to run. Defaults to your system's available cores."
     end
@@ -62,7 +58,7 @@ module Specjour
       puts Specjour::VERSION
     end
 
-    desc "work", "INTERNAL USE ONLY"
+    desc "work", "INTERNAL USE ONLY", :hide => true
     method_option :project_path, :required => true
     method_option :printer_uri, :required => true
     method_option :number, :type => :numeric, :required => true
