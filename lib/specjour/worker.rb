@@ -62,7 +62,11 @@ module Specjour
       Rspec::Preloader.load(preload_spec) if preload_spec
       Cucumber::Preloader.load(preload_feature) if preload_feature
     rescue StandardError => exception
-      $stderr.puts "Caught exception: #{exception.class} #{exception.message}\nProceeding..."
+      msg = [
+        "Caught exception: #{exception.class} #{exception.message}",
+        "Proceeding... you may need to re-run the dispatcher."
+      ]
+      $stderr.puts msg.join("\n")
     end
 
     def printer_connection
