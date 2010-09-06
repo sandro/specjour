@@ -147,6 +147,7 @@ module Specjour
 
     def resolve_reply(reply)
       DNSSD.resolve!(reply) do |resolved|
+        Specjour.logger.debug "Bonjour discovered #{resolved.target}"
         resolved_ip = ip_from_hostname(resolved.target)
         uri = URI::Generic.build :scheme => reply.service_name, :host => resolved_ip, :port => resolved.port
         fetch_manager(uri)
