@@ -12,6 +12,7 @@
 ## Give it a try
 Running `specjour` starts a dispatcher, a manager, and multiple workers - all
 of the componenets necessary for distributing your test suite.
+(Read the Rails section first if your project uses Rails)
 
     $ cd myproject
     $ specjour
@@ -45,6 +46,8 @@ Each worker should run their specs in an isolated database. Modify the test data
     test:
       database: blog_test<%=ENV['TEST_ENV_NUMBER']%>
 
+Running `specjour prepare` will set up the database for each worker.
+
 ### ActiveRecord Hooks
 Specjour contains ActiveRecord hooks that clear database tables before running tests using `DELETE FROM <table_name>;`. Additionally, test databases will be created if they don't exist (i.e. `CREATE DATABASE blog_test8` for the 8th worker) and your schema will be loaded when the database is out of date.
 
@@ -68,7 +71,7 @@ test suite, override it with a custom after\_fork hook.
 
 A preparation hook is run when `specjour prepare` is invoked. This hook allows
 you to run arbitrary code on all of the listening workers. By default, it drops
-and recreates the database on all workers.
+and recreates the ActiveRecord database on all workers.
 
     # .specjour/hooks.rb
 
@@ -77,17 +80,26 @@ and recreates the database on all workers.
       # custom preparation code
     end
 
-## Only listen to supported projects
-By default, a manager will listen to the project in the current directory. If you want to listen for multiple projects, use the `--projects` flag.
-
-    $ specjour listen --projects bizconf workbeast # run specs for the bizconf and workbeast projects
-
 ## Customize what gets rsync'd
 The standard rsync configuration file may be too broad for your
 project. If you find you're rsyncing gigs of extraneous data from your public
 directory, add an exclusion to your projects rsyncd.conf file.
 
     $ vi workbeast/.specjour/rsyncd.conf
+
+## Listen for multiple projects
+By default, a manager will listen to the project in the current directory. If you want to listen for multiple projects, use the `--projects` flag.
+
+    $ specjour listen --projects bizconf workbeast # run specs for the bizconf and workbeast projects
+
+## Give your project an alias
+By default, the dispatcher looks for managers matching the project's directory name. If you have multiple teams working on different branches of the same project you may want to isolate each specjour cluster. Give your project an alias and only listen for that alias.
+
+    ~/bizconf $ specjour listen -p bizconf_08
+    ~/bizconf $ specjour -a bizconf_08
+
+    ~/bizconf $ specjour listen -p bizconf_09
+    ~/bizconf $ specjour -a bizconf_09
 
 ## Thanks
 
