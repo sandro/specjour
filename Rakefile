@@ -10,7 +10,7 @@ begin
     gem.email = "sandro.turriate@gmail.com"
     gem.homepage = "http://github.com/sandro/specjour"
     gem.authors = ["Sandro Turriate"]
-    gem.add_dependency "dnssd", "1.3.1"
+    gem.add_dependency "dnssd", "1.3.4"
     gem.add_dependency "thor", ">=0.13.4"
     gem.add_development_dependency "rspec", "1.3.0"
     gem.add_development_dependency "rr", ">=0.10.11"
