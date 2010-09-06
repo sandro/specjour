@@ -64,7 +64,7 @@ module Specjour::Rspec
     protected
 
     def print_and_flush(messages)
-      output.print messages.to_s
+      output.print messages.join
       output.flush
       messages.replace []
     end

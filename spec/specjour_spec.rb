@@ -8,7 +8,9 @@ def boo
 end
 
 describe Specjour do
-  it "pends as an example"
+  it "pends as an example" do
+    pending
+  end
 
   it "fails as an example" do
     boo

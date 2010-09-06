@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Specjour::CLI do
+  subject { Specjour::CLI.new }
   let(:fake_pid) { 100_000_000 }
   before do
     stub(Specjour::CPU).cores.returns(27)

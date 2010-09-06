@@ -38,15 +38,17 @@ module Specjour
     end
 
     def all_specs(tests_path = 'spec')
-      Dir.chdir(project_path) do
-        Dir[File.join(tests_path, "**/*_spec.rb")].sort
-      end if File.exists? File.join(project_path, tests_path)
+      full_path = File.join(project_path, tests_path)
+      if File.exists? full_path
+        Dir[File.join(full_path, "**/*_spec.rb")].sort
+      end
     end
 
     def all_features(tests_path = 'features')
-      Dir.chdir(project_path) do
-        Dir[File.join(tests_path, "**/*.feature")].sort
-      end if File.exists? File.join(project_path, tests_path)
+      full_path = File.join(project_path, tests_path)
+      if File.exists? full_path
+        Dir[File.join(full_path, "**/*.feature")].sort
+      end
     end
 
     def add_manager(manager)
