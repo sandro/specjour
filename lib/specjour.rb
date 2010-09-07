@@ -28,7 +28,7 @@ module Specjour
   autoload :Cucumber, 'specjour/cucumber'
   autoload :Rspec, 'specjour/rspec'
 
-  VERSION = "0.3.0.rc5".freeze
+  VERSION = "0.3.0.rc6".freeze
   HOOKS_PATH = ".specjour/hooks.rb"
 
   class << self
