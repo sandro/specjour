@@ -12,6 +12,7 @@
 ## Give it a try
 Running `specjour` starts a dispatcher, a manager, and multiple workers - all
 of the componenets necessary for distributing your test suite.
+
 (Read the Rails section first if your project uses Rails)
 
     $ cd myproject
