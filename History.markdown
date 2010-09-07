@@ -1,9 +1,12 @@
 History
 =======
 
-## 0.3.0.rc6 / (master)
+## 0.3.0.rc6 / 2010-08-07
 
 * [fixed] Ruby 1.9.2 support through minor changes and DNSSD upgrade
+* [fixed] DbScrub.drop actually invokes the db:drop rake task
+* [fixed] Prepare task ignores rspec's at_exit callback, disabling the test
+  suite from running after the prepare task completes.
 
 ## 0.3.0.rc5 / 2010-07-30
 
