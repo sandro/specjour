@@ -13,7 +13,7 @@ module Specjour
     extend self
 
     def drop
-      Rake::Task['db:drop']
+      Rake::Task['db:drop'].invoke
     end
 
     def scrub
