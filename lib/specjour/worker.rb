@@ -29,6 +29,7 @@ module Specjour
     def prepare
       load_app
       Configuration.prepare.call
+      Kernel.exit!
     end
 
     def run_tests
