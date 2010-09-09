@@ -5,6 +5,10 @@ History
 
 * [fixed] Distributing absolute paths to remote machines.
 
+* [added] Workers print the elapsed time of each test (redsquirrel)
+* [added] Dispatcher loads specjour/hooks.rb, useful for monkey patching
+  (redsquirrel)
+
 ## 0.3.0.rc6 / 2010-08-07
 
 * [fixed] Ruby 1.9.2 support through minor changes and DNSSD upgrade
