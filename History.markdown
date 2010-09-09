@@ -1,6 +1,10 @@
 History
 =======
 
+## 0.3.0.rc8 / (thor)
+
+* [fixed] Custom hooks now load in Ruby 1.9.2
+
 ## 0.3.0.rc7 / 2010-08-09
 
 * [fixed] Distributing absolute paths to remote machines.
