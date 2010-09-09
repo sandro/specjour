@@ -18,11 +18,16 @@ module Specjour
       super(original_args)
     end
 
+
     default_task :dispatch
 
     class_option :log, :aliases => "-l", :type => :boolean, :desc => "Print debug messages to $stderr"
 
-    desc "listen", "Advertise availability to run specs\nDefaults to current directory"
+
+    desc "listen", "Wait for incoming tests"
+    long_desc <<-D
+      Advertise availability to run tests for the current directory.
+    D
     worker_option
     method_option :projects, :aliases => "-p", :type => :array, :desc => "Projects supported by this listener"
     def listen
@@ -32,7 +37,7 @@ module Specjour
       Specjour::Manager.new(args).start
     end
 
-    desc "dispatch [PROJECT_PATH]", "Run specs in this project"
+    desc "dispatch [PROJECT_PATH]", "Run tests in the current directory"
     worker_option
     dispatcher_option
     def dispatch(path = Dir.pwd)
@@ -42,7 +47,11 @@ module Specjour
       Specjour::Dispatcher.new(args).start
     end
 
-    desc "prepare [PROJECT_PATH]", "Run the prepare block on all listening workers"
+    desc "prepare [PROJECT_PATH]", "Prepare all listening workers"
+    long_desc <<-D
+      Run the Specjour::Configuration.prepare block on all listening workers.
+      Defaults to dropping and schema loading the database.
+    D
     worker_option
     dispatcher_option
     def prepare(path = Dir.pwd)
@@ -53,7 +62,7 @@ module Specjour
       Specjour::Dispatcher.new(args).start
     end
 
-    desc "version", "Show the version of specjour"
+    desc "version", "Show the current version"
     def version
       puts Specjour::VERSION
     end
