@@ -76,7 +76,7 @@ module Specjour
 
     def print_status(test)
       status = "[#{ENV['TEST_ENV_NUMBER']}] Running #{test}"
-      puts status
+      Specjour.logger.debug status
       $PROGRAM_NAME = "specjour#{status}"
     end
 
