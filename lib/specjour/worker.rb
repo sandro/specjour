@@ -39,9 +39,7 @@ module Specjour
 
       while test = connection.next_test
         print_status(test)
-        time = Benchmark.realtime do
-          run_test test
-        end
+        time = Benchmark.realtime { run_test test }
         print_time_for(test, time)
         run_times[test_type(test)] += time
       end
@@ -81,11 +79,9 @@ module Specjour
       puts status
       $PROGRAM_NAME = "specjour#{status}"
     end
-    
+
     def print_time_for(test, time)
-      status = "[#{ENV['TEST_ENV_NUMBER']}] Finished #{test} in #{time}"
-      puts status
-      $PROGRAM_NAME = "specjour#{status}"
+      printf "[#{ENV['TEST_ENV_NUMBER']}] Finished #{test} in %.4f\n", time
     end
 
     def run_test(test)
