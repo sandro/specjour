@@ -33,22 +33,16 @@ module Specjour
         self.project_path = $1
         @all_tests = $3 == 'spec' ? all_specs($2) : all_features($2)
       else
-        @all_tests = Array(all_specs) | Array(all_features)
+        @all_tests = all_specs | all_features
       end
     end
 
     def all_specs(tests_path = 'spec')
-      full_path = File.join(project_path, tests_path)
-      if File.exists? full_path
-        Dir[File.join(full_path, "**/*_spec.rb")].sort
-      end
+      Dir[File.join(".", tests_path, "**/*_spec.rb")].sort
     end
 
     def all_features(tests_path = 'features')
-      full_path = File.join(project_path, tests_path)
-      if File.exists? full_path
-        Dir[File.join(full_path, "**/*.feature")].sort
-      end
+      Dir[File.join(".", tests_path, "**/*.feature")].sort
     end
 
     def add_manager(manager)
