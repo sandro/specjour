@@ -1,6 +1,10 @@
 History
 =======
 
+## 0.3.0.rc7 / 2010-08-09
+
+* [fixed] Distributing absolute paths to remote machines.
+
 ## 0.3.0.rc6 / 2010-08-07
 
 * [fixed] Ruby 1.9.2 support through minor changes and DNSSD upgrade
