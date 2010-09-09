@@ -9,6 +9,8 @@ History
 * [added] Dispatcher loads specjour/hooks.rb, useful for monkey patching
   (redsquirrel)
 
+* [changed] Decreased timeout to 2 seconds when searching for remote managers
+
 ## 0.3.0.rc6 / 2010-08-07
 
 * [fixed] Ruby 1.9.2 support through minor changes and DNSSD upgrade
