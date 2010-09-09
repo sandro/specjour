@@ -29,7 +29,7 @@ module Specjour
   autoload :Rspec, 'specjour/rspec'
 
   VERSION = "0.3.0.rc7".freeze
-  HOOKS_PATH = ".specjour/hooks.rb"
+  HOOKS_PATH = "./.specjour/hooks.rb"
 
   class << self
     attr_accessor :interrupted
