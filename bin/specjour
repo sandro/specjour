@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
 require 'specjour'
 
+$PROGRAM_NAME = File.basename(__FILE__)
 Specjour::CLI.start
