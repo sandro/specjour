@@ -77,7 +77,7 @@ module Specjour
     end
 
     def fetch_manager(uri)
-      Timeout.timeout(8) do
+      Timeout.timeout(1) do
         manager = DRbObject.new_with_uri(uri.to_s)
         if !managers.include?(manager) && manager.available_for?(project_alias)
           add_manager(manager)
@@ -86,7 +86,7 @@ module Specjour
     rescue Timeout::Error
       Specjour.logger.debug "Timeout: couldn't connect to manager at #{uri}"
     rescue DRb::DRbConnError => e
-      Specjour.logger.debug "DRb error at #{uri}: #{e.backtrace.join("\n")}"
+      Specjour.logger.debug "#{e.message}: #{e.backtrace.join("\n")}"
       retry
     end
 
@@ -107,7 +107,7 @@ module Specjour
 
     def gather_remote_managers
       browser = DNSSD::Service.new
-      Timeout.timeout(2) do
+      Timeout.timeout(1) do
         browser.browse '_druby._tcp' do |reply|
           if reply.flags.add?
             resolve_reply(reply)
