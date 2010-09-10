@@ -91,7 +91,7 @@ module Specjour
     end
 
     def fork_local_manager
-      puts "No remote managers found, starting a local manager..."
+      puts "No remote managers found on this machine, starting a local manager..."
       manager_options = {:worker_size => options[:worker_size], :registered_projects => [project_alias]}
       manager = Manager.start_quietly manager_options
       fetch_manager(manager.drb_uri)
@@ -123,7 +123,7 @@ module Specjour
     end
 
     def no_local_managers?
-      !managers.any? {|m| m.hostname == hostname}
+      managers.none? {|m| m.hostname == hostname}
     end
 
     def printer
