@@ -91,7 +91,7 @@ module Specjour
     end
 
     def fork_local_manager
-      puts "No remote managers found on this machine, starting a local manager..."
+      puts "No listeners found on this machine, starting one..."
       manager_options = {:worker_size => options[:worker_size], :registered_projects => [project_alias]}
       manager = Manager.start_quietly manager_options
       fetch_manager(manager.drb_uri)
