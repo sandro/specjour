@@ -1,16 +1,17 @@
 History
 =======
 
-## 0.3.0.rc8 / 2010-08-13
+## 0.3.0.rc8 / 2010-09-13
 
 * [fixed] Custom hooks now load in Ruby 1.9.2
 * [fixed] Specjour prepare correctly recreates the db
 
+
 * [added] Support for loading test DB from SQL file
-  (config.active_record.schema_format = :sql)
+  (config.active\_record.schema\_format = :sql)
 * [added] Rsync failures raise Specjour::Error
 
-## 0.3.0.rc7 / 2010-08-09
+## 0.3.0.rc7 / 2010-09-09
 
 * [fixed] Distributing absolute paths to remote machines.
 
@@ -20,11 +21,11 @@ History
 
 * [changed] Decreased timeout to 2 seconds when searching for remote managers
 
-## 0.3.0.rc6 / 2010-08-07
+## 0.3.0.rc6 / 2010-09-07
 
 * [fixed] Ruby 1.9.2 support through minor changes and DNSSD upgrade
 * [fixed] DbScrub.drop actually invokes the db:drop rake task
-* [fixed] Prepare task ignores rspec's at_exit callback, disabling the test
+* [fixed] Prepare task ignores rspec's at\_exit callback, disabling the test
   suite from running after the prepare task completes.
 
 ## 0.3.0.rc5 / 2010-07-30
