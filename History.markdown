@@ -1,9 +1,14 @@
 History
 =======
 
-## 0.3.0.rc8 / (thor)
+## 0.3.0.rc8 / 2010-08-13
 
 * [fixed] Custom hooks now load in Ruby 1.9.2
+* [fixed] Specjour prepare correctly recreates the db
+
+* [added] Support for loading test DB from SQL file
+  (config.active_record.schema_format = :sql)
+* [added] Rsync failures raise Specjour::Error
 
 ## 0.3.0.rc7 / 2010-08-09
 
