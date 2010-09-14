@@ -95,7 +95,9 @@ module Specjour
     end
 
     def sync
-      cmd "rsync -aL --delete --port=8989 #{dispatcher_uri.host}::#{project_name} #{project_path}"
+      unless cmd "rsync -aL --delete --port=8989 #{dispatcher_uri.host}::#{project_name} #{project_path}"
+        raise Error, "Rsync Failed."
+      end
     end
 
     protected
