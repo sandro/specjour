@@ -13,7 +13,6 @@ module Specjour
 
     def self.load_rspec2
       require 'rspec/core'
-      ::Rspec::Core::Runner.disable_autorun!
 
       require 'specjour/rspec/marshalable_exception'
       require 'specjour/rspec/preloader'
