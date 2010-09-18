@@ -18,7 +18,7 @@ module Specjour
     end
 
     def start
-      abort("#{project_path} doesn't exist") unless File.exists?(project_path)
+      abort("#{project_path} doesn't exist") unless File.directory?(project_path)
       gather_managers
       rsync_daemon.start
       dispatch_work
