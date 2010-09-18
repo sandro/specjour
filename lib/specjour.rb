@@ -8,6 +8,7 @@ autoload :Benchmark, 'benchmark'
 autoload :Logger, 'logger'
 autoload :Socket, 'socket'
 autoload :StringIO, 'stringio'
+autoload :OpenStruct, 'ostruct'
 
 module Specjour
   autoload :CLI, 'specjour/cli'
@@ -17,7 +18,6 @@ module Specjour
   autoload :DbScrub, 'specjour/db_scrub'
   autoload :Dispatcher, 'specjour/dispatcher'
   autoload :Manager, 'specjour/manager'
-  autoload :OpenStruct, 'ostruct'
   autoload :Printer, 'specjour/printer'
   autoload :Protocol, 'specjour/protocol'
   autoload :QuietFork, 'specjour/quiet_fork'
