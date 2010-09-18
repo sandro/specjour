@@ -25,6 +25,11 @@ module Specjour::Rspec
       output.send_message :rspec_summary=, metadata_for_examples
     end
 
+    def close
+      @examples = []
+      super
+    end
+
     protected
 
     def marshalable_execution_result(execution_result)
