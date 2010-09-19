@@ -9,6 +9,7 @@ module Specjour
       load 'tasks/misc.rake'
       load 'tasks/databases.rake'
       Rake::Task["db:structure:dump"].clear
+      Rake::Task["environment"].clear
     end
 
     extend self
