@@ -32,6 +32,7 @@ module Specjour
 
     def connect_to_database
       ActiveRecord::Base.remove_connection
+      ActiveRecord::Base.establish_connection
       connection
     rescue # assume the database doesn't exist
       Rake::Task['db:create'].invoke
