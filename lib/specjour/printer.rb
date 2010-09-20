@@ -62,7 +62,7 @@ module Specjour
       self.disconnections += 1
       if disconnections == worker_size
         shutdown
-        stop unless stopped?
+        stop unless Specjour.interrupted
       end
     end
 
