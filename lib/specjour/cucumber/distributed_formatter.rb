@@ -20,15 +20,17 @@ module Specjour::Cucumber
     end
 
     def prepare_failures
-      @failures = step_mother.scenarios(:failed).select { |s| s.is_a?(Cucumber::Ast::Scenario) }
-
-      if !@failures.empty?
-        @failures.each do |failure|
-          failure_message = ''
-          failure_message += format_string("cucumber " + failure.file_colon_line, :failed) +
-          failure_message += format_string(" # Scenario: " + failure.name, :comment)
-          @failing_scenarios << failure_message
+      step_mother.scenarios(:failed).select do |s|
+        s.is_a?(Cucumber::Ast::Scenario) || s.is_a?(Cucumber::Ast::OutlineTable::ExampleRow)
+      end.map do |failure|
+        if failure.is_a?(Cucumber::Ast::Scenario)
+          failure
+        elsif failure.is_a?(Cucumber::Ast::OutlineTable::ExampleRow)
+          failure.scenario_outline
         end
+      end.each do |failure|
+        @failing_scenarios << format_string("cucumber " + failure.file_colon_line[2..-1], :failed) +
+                              format_string(" # Scenario: " + failure.name, :comment)
       end
     end
 
@@ -46,7 +48,7 @@ module Specjour::Cucumber
           output += format_string(element.backtrace_line, status)
           output += "\n"
         end
-        @step_summary << output unless output.blank?
+        @step_summary << output unless output.nil? || output.empty?
       end
     end
 
