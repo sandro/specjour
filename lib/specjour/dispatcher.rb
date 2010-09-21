@@ -77,7 +77,7 @@ module Specjour
     end
 
     def fetch_manager(uri)
-      Timeout.timeout(1) do
+      Timeout.timeout(0.5) do
         manager = DRbObject.new_with_uri(uri.to_s)
         if !managers.include?(manager) && manager.available_for?(project_alias)
           add_manager(manager)
@@ -107,7 +107,7 @@ module Specjour
 
     def gather_remote_managers
       browser = DNSSD::Service.new
-      Timeout.timeout(1) do
+      Timeout.timeout(3) do
         browser.browse '_druby._tcp' do |reply|
           if reply.flags.add?
             resolve_reply(reply)
