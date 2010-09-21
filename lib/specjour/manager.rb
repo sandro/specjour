@@ -70,7 +70,7 @@ module Specjour
     end
 
     def kill_worker_processes
-      Process.kill('KILL', *worker_pids) rescue Errno::ESRCH
+      Process.kill('TERM', *worker_pids) rescue Errno::ESRCH
     end
 
     def pid
