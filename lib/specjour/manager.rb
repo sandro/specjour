@@ -94,7 +94,7 @@ module Specjour
       drb_start
       puts "Workers ready: #{worker_size}."
       puts "Listening for #{registered_projects.join(', ')}"
-      bonjour_announce unless quiet?
+      bonjour_announce
       DRb.thread.join
     end
 
@@ -111,7 +111,9 @@ module Specjour
     protected
 
     def bonjour_announce
-      bonjour_service.register "specjour_manager_#{object_id}", "_#{drb_uri.scheme}._tcp", nil, drb_uri.port
+      unless quiet?
+        bonjour_service.register "specjour_manager_#{object_id}", "_#{drb_uri.scheme}._tcp", nil, drb_uri.port
+      end
     end
 
     def bonjour_service
