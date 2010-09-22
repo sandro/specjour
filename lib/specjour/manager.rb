@@ -115,7 +115,7 @@ module Specjour
     end
 
     def bonjour_service
-      @bonjour_service ||= DNSSD::Service.new
+      @bonjour_service = DNSSD::Service.new
     end
 
     def cmd(command)
