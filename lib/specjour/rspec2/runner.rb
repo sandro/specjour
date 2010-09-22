@@ -1,8 +1,11 @@
 module Specjour::Rspec::Runner
   def self.run(spec, output)
     reset
-    options = ['--format=Specjour::Rspec::DistributedFormatter', spec]
-    ::Rspec::Core::Runner.run options, $stderr, output
+    args = ['--format=Specjour::Rspec::DistributedFormatter', spec]
+    options = ::Rspec::Core::ConfigurationOptions.new(args)
+    options.parse_options
+
+    ::Rspec::Core::Runner.run_in_process options, $stderr, output
   end
 
   def self.reset

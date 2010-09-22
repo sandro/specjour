@@ -7,9 +7,16 @@ module Specjour
       require 'specjour/cucumber/distributed_formatter'
       require 'specjour/cucumber/final_report'
       require 'specjour/cucumber/preloader'
+      require 'specjour/cucumber/main_ext'
 
       ::Cucumber::Cli::Options.class_eval { def print_profile_information; end }
     rescue LoadError
+    end
+
+    def self.wants_to_quit
+      if defined?(::Cucumber) && ::Cucumber.respond_to?(:wants_to_quit=)
+        ::Cucumber.wants_to_quit = true
+      end
     end
   end
 end

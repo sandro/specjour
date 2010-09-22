@@ -31,9 +31,14 @@ module Specjour
   VERSION = "0.3.0.rc8".freeze
   HOOKS_PATH = "./.specjour/hooks.rb"
 
-  class << self
-    attr_accessor :interrupted
-    alias interrupted? interrupted
+  def self.interrupted?
+    @interrupted
+  end
+
+  def self.interrupted=(bool)
+    Cucumber.wants_to_quit
+    Rspec.wants_to_quit
+    @interrupted = bool
   end
 
   def self.logger
@@ -54,10 +59,18 @@ module Specjour
     require HOOKS_PATH if File.exists?(HOOKS_PATH)
   end
 
+  def self.trap_interrupt
+    Signal.trap('INT') do
+      self.interrupted = true
+      exit 1
+    end
+  end
+
   Error = Class.new(StandardError)
   PROGRAM_NAME = $PROGRAM_NAME # keep a reference of the original program name
 
   GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
 
-  Signal.trap('INT') { Specjour.interrupted = true; exit 1 }
+  trap_interrupt
+
 end

@@ -70,8 +70,16 @@ module Specjour
       Dir.chdir(project_path, &block)
     end
 
+    def interrupted=(bool)
+      Specjour.interrupted = bool
+    end
+
     def kill_worker_processes
-      Process.kill('TERM', *worker_pids) rescue Errno::ESRCH
+      if Specjour.interrupted?
+        Process.kill('INT', *worker_pids) rescue Errno::ESRCH
+      else
+        Process.kill('TERM', *worker_pids) rescue Errno::ESRCH
+      end
     end
 
     def pid
@@ -86,7 +94,6 @@ module Specjour
       drb_start
       puts "Workers ready: #{worker_size}."
       puts "Listening for #{registered_projects.join(', ')}"
-      Signal.trap('INT') { puts; puts "Shutting down manager..."; exit 1 }
       bonjour_announce unless quiet?
       DRb.thread.join
     end

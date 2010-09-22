@@ -28,5 +28,10 @@ module Specjour
       load_rspec1
     end
 
+    def self.wants_to_quit
+      if defined?(::RSpec) && ::RSpec.respond_to?(:wants_to_quit=)
+        ::RSpec.wants_to_quit = true
+      end
+    end
   end
 end

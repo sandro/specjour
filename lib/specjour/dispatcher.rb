@@ -95,7 +95,11 @@ module Specjour
       manager_options = {:worker_size => options[:worker_size], :registered_projects => [project_alias]}
       manager = Manager.start_quietly manager_options
       fetch_manager(manager.drb_uri)
-      at_exit { Process.kill('TERM', manager.pid) rescue Errno::ESRCH }
+      at_exit do
+        unless Specjour.interrupted?
+          Process.kill('TERM', manager.pid) rescue Errno::ESRCH
+        end
+      end
     end
 
     def gather_managers
@@ -162,7 +166,13 @@ module Specjour
       manager.preload_spec = all_tests.detect {|f| f =~ /_spec\.rb$/}
       manager.preload_feature = all_tests.detect {|f| f =~ /\.feature$/}
       manager.worker_task = worker_task
-      at_exit { manager.kill_worker_processes rescue DRb::DRbConnError }
+      at_exit do
+        begin
+          manager.interrupted = Specjour.interrupted?
+          manager.kill_worker_processes
+        rescue DRb::DRbConnError
+        end
+      end
     end
 
     def wait_on_managers
