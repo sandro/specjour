@@ -121,11 +121,11 @@ module Specjour
     def stopping
       summarize_reports
       warn_if_workers_deserted
+      record_performance unless Specjour.interrupted?
     end
 
     def summarize_reports
       reporters.each {|r| r.summarize}
-      record_performance
     end
 
     def synchronize(&block)
