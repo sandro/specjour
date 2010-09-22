@@ -69,7 +69,7 @@ module Specjour
         puts "#{manager.hostname} (#{manager.worker_size})"
       end
       printer.worker_size = worker_size
-      command_managers(true) { |m| m.dispatch }
+      command_managers(true) { |m| m.dispatch rescue DRb::DRbConnError }
     end
 
     def dispatching_tests?
