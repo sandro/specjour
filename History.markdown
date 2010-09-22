@@ -1,12 +1,18 @@
 History
 =======
 
+## 0.3.0.rc9 / (thor)
+
+* [fixed] Cucumber output for scenario outlines (delitescere & supaspoida)
+* [fixed] Undefined shared examples in Rspec2
+* [fixed] INT signal sent to managers and workers, sets wants_to_quit where
+  appropriate for Rspec2 and Cucumber
+
+
 ## 0.3.0.rc8 / 2010-09-13
 
 * [fixed] Custom hooks now load in Ruby 1.9.2
 * [fixed] Specjour prepare correctly recreates the db
-
-
 * [added] Support for loading test DB from SQL file
   (config.active\_record.schema\_format = :sql)
 * [added] Rsync failures raise Specjour::Error
