@@ -40,7 +40,7 @@ module Specjour
       while test = connection.next_test
         print_status(test)
         time = Benchmark.realtime { run_test test }
-        print_time_for(test, time)
+        profile(test, time)
         run_times[test_type(test)] += time
       end
 
@@ -80,6 +80,11 @@ module Specjour
 
     def print_time_for(test, time)
       printf "[#{ENV['TEST_ENV_NUMBER']}] Finished #{test} in %.4f\n", time
+    end
+
+    def profile(test, time)
+      connection.send_message(:add_to_profiler, [test, time])
+      print_time_for(test, time)
     end
 
     def run_test(test)

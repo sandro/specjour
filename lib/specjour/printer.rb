@@ -10,7 +10,7 @@ module Specjour
       new(specs_to_run).start
     end
 
-    attr_accessor :worker_size, :specs_to_run, :completed_workers, :disconnections
+    attr_accessor :worker_size, :specs_to_run, :completed_workers, :disconnections, :profiler
 
     def initialize(specs_to_run)
       super(
@@ -23,7 +23,8 @@ module Specjour
       )
       @completed_workers = 0
       @disconnections = 0
-      self.specs_to_run = specs_to_run
+      @profiler = {}
+      self.specs_to_run = run_order(specs_to_run)
     end
 
     def serve(client)
@@ -56,6 +57,11 @@ module Specjour
       cucumber_report.add(summary)
     end
 
+    def add_to_profiler(client, args)
+      test, time = *args
+      self.profiler[test] = time
+    end
+
     protected
 
     def disconnecting(client_port)
@@ -83,12 +89,35 @@ module Specjour
       end
     end
 
+    def run_order(specs_to_run)
+      if File.exist?('.specjour/.performance')
+        profile = {}
+        File.open('.specjour/.performance', 'r').each_line do |line|
+          test, time = line.strip.split(':')
+          profile[time] = test
+        end
+        run_times = profile.keys.sort.reverse
+        ordered_specs = run_times.map{|time| profile[time]}
+        (specs_to_run - ordered_specs) | (ordered_specs & specs_to_run)
+      else
+        specs_to_run
+      end
+    end
+
     def rspec_report
       @rspec_report ||= Rspec::FinalReport.new
     end
 
     def cucumber_report
       @cucumber_report ||= Cucumber::FinalReport.new
+    end
+
+    def record_performance
+      File.open('.specjour/.performance', 'w') do |file|
+        profiler.keys.each do |key|
+          file.puts "#{key}:#{profiler[key]}\n"
+        end
+      end
     end
 
     def reporters
@@ -102,6 +131,7 @@ module Specjour
 
     def summarize_reports
       reporters.each {|r| r.summarize}
+      record_performance
     end
 
     def synchronize(&block)
