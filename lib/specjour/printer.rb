@@ -91,13 +91,7 @@ module Specjour
 
     def run_order(specs_to_run)
       if File.exist?('.specjour/performance')
-        profile = {}
-        File.open('.specjour/performance', 'r').each_line do |line|
-          test, time = line.strip.split(':')
-          profile[time.to_f] = test
-        end
-        run_times = profile.keys.sort.reverse
-        ordered_specs = run_times.map{|time| profile[time]}
+        ordered_specs = File.readlines('.specjour/performance').map {|l| l.chop.split(':')[1]}
         (specs_to_run - ordered_specs) | (ordered_specs & specs_to_run)
       else
         specs_to_run
@@ -114,8 +108,8 @@ module Specjour
 
     def record_performance
       File.open('.specjour/performance', 'w') do |file|
-        profiler.keys.each do |key|
-          file.puts "#{key}:#{profiler[key]}\n"
+        ordered_specs = profiler.to_a.sort_by {|a| -a[1].to_f}.map do |test, time|
+          file.puts "%6f:%s" % [time, test]
         end
       end
     end
