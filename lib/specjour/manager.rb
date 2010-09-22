@@ -8,7 +8,7 @@ module Specjour
     include SocketHelper
 
     attr_accessor :project_name, :preload_spec, :preload_feature, :worker_task, :pid
-    attr_reader :worker_size, :dispatcher_uri, :registered_projects, :bonjour_service, :worker_pids, :options
+    attr_reader :worker_size, :dispatcher_uri, :registered_projects, :worker_pids, :options
 
     def self.start_quietly(options)
       manager = new options.merge(:quiet => true)
@@ -86,8 +86,8 @@ module Specjour
       drb_start
       puts "Workers ready: #{worker_size}."
       puts "Listening for #{registered_projects.join(', ')}"
-      bonjour_announce
       Signal.trap('INT') { puts; puts "Shutting down manager..."; exit 1 }
+      bonjour_announce unless quiet?
       DRb.thread.join
     end
 
@@ -104,7 +104,11 @@ module Specjour
     protected
 
     def bonjour_announce
-      @bonjour_service = DNSSD.register! "specjour_manager_#{object_id}", "_#{drb_uri.scheme}._tcp", nil, drb_uri.port
+      bonjour_service.register "specjour_manager_#{object_id}", "_#{drb_uri.scheme}._tcp", nil, drb_uri.port
+    end
+
+    def bonjour_service
+      @bonjour_service ||= DNSSD::Service.new
     end
 
     def cmd(command)
