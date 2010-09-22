@@ -67,6 +67,7 @@ module Specjour
       @socket = TCPSocket.open(uri.host, uri.port)
     rescue Errno::ECONNREFUSED => error
       Specjour.logger.debug "Could not connect to #{uri.to_s}\n#{error.inspect}"
+      sleep 0.1
       retry
     end
 
