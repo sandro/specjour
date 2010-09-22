@@ -14,6 +14,7 @@ module Specjour
       manager = new options.merge(:quiet => true)
       manager.drb_uri
       manager.pid = QuietFork.fork { manager.start }
+      sleep 0.2
       manager
     end
 
