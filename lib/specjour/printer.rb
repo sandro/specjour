@@ -90,9 +90,9 @@ module Specjour
     end
 
     def run_order(specs_to_run)
-      if File.exist?('.specjour/.performance')
+      if File.exist?('.specjour/performance')
         profile = {}
-        File.open('.specjour/.performance', 'r').each_line do |line|
+        File.open('.specjour/performance', 'r').each_line do |line|
           test, time = line.strip.split(':')
           profile[time.to_f] = test
         end
@@ -113,7 +113,7 @@ module Specjour
     end
 
     def record_performance
-      File.open('.specjour/.performance', 'w') do |file|
+      File.open('.specjour/performance', 'w') do |file|
         profiler.keys.each do |key|
           file.puts "#{key}:#{profiler[key]}\n"
         end
