@@ -19,6 +19,7 @@ module Specjour
       require 'specjour/rspec2/distributed_formatter'
       require 'specjour/rspec2/final_report'
       require 'specjour/rspec2/runner'
+      require 'specjour/rspec2/shared_example_group_ext'
     end
 
     begin
