@@ -94,7 +94,7 @@ module Specjour
         profile = {}
         File.open('.specjour/.performance', 'r').each_line do |line|
           test, time = line.strip.split(':')
-          profile[time] = test
+          profile[time.to_f] = test
         end
         run_times = profile.keys.sort.reverse
         ordered_specs = run_times.map{|time| profile[time]}
