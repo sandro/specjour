@@ -15,11 +15,12 @@ module Specjour::Rspec
       end
     end
 
-    def noop
+    def noop(*args)
     end
     alias dump_pending noop
     alias dump_failures noop
     alias start_dump noop
+    alias message noop
 
     def dump_summary(*args)
       output.send_message :rspec_summary=, metadata_for_examples
