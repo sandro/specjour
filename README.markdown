@@ -35,6 +35,14 @@ Run the rake task to distribute the specs among the managers you started.
 Run the rake task to distribute the features among the managers you started.
 
     $ rake specjour:cucumber
+    
+Specjour will run your features in the default profile. If you are having problems with undefined steps, make sure you have `-r features` in your default profile. Here is an example:
+  
+  # cucumber.yml
+  default: --tag ~@wip -r features
+  
+Specjour also runs your features with its own formatter. Any format options in your profile are ignored.
+
 
 ## Rails
 Each worker should run their specs in an isolated database. Modify the test database name in your `config/database.yml` to include the following environment variable (Influenced by [parallel\_tests](http://github.com/grosser/parallel_tests)):

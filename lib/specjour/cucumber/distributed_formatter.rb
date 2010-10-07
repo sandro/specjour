@@ -46,7 +46,7 @@ module Specjour::Cucumber
           output += format_string(element.backtrace_line, status)
           output += "\n"
         end
-        @step_summary << output unless output.blank?
+        @step_summary << output unless output.nil? || output.empty?
       end
     end
 
