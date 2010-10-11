@@ -13,6 +13,7 @@ module Specjour
 
     def self.load_rspec2
       require 'rspec/core'
+      require 'rspec/core/formatters/progress_formatter'
 
       require 'specjour/rspec/marshalable_exception'
       require 'specjour/rspec/preloader'
@@ -20,6 +21,8 @@ module Specjour
       require 'specjour/rspec2/final_report'
       require 'specjour/rspec2/runner'
       require 'specjour/rspec2/shared_example_group_ext'
+
+      ::Rspec::Core::Runner.disable_autorun!
     end
 
     begin

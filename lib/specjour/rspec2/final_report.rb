@@ -6,7 +6,8 @@ module Specjour::Rspec
     def initialize
       @examples = []
       @duration = 0.0
-      Rspec.configuration.color_enabled = true
+      ::Rspec.configuration.color_enabled = true
+      ::Rspec.configuration.output_stream = $stdout
     end
 
     def add(data)

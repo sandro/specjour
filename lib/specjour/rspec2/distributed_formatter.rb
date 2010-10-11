@@ -22,6 +22,10 @@ module Specjour::Rspec
     alias start_dump noop
     alias message noop
 
+    def color_enabled?
+      true
+    end
+
     def dump_summary(*args)
       output.send_message :rspec_summary=, metadata_for_examples
     end
