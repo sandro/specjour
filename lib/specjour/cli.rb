@@ -34,6 +34,7 @@ module Specjour
       handle_logging
       handle_workers
       args[:registered_projects] = args.delete(:projects) || [File.basename(Dir.pwd)]
+      append_to_program_name "listen"
       Specjour::Manager.new(args).start
     end
 
@@ -44,6 +45,7 @@ module Specjour
       handle_logging
       handle_workers
       handle_dispatcher(path)
+      append_to_program_name "dispatch"
       Specjour::Dispatcher.new(args).start
     end
 
@@ -59,6 +61,7 @@ module Specjour
       handle_workers
       handle_dispatcher(path)
       args[:worker_task] = 'prepare'
+      append_to_program_name "prepare"
       Specjour::Dispatcher.new(args).start
     end
 
@@ -77,10 +80,15 @@ module Specjour
     method_option :quiet, :type => :boolean
     def work
       handle_logging
+      append_to_program_name "work"
       Specjour::Worker.new(args).start
     end
 
     protected
+
+    def append_to_program_name(command)
+      $PROGRAM_NAME = "#{$PROGRAM_NAME} #{command}"
+    end
 
     def args
       @args ||= options.dup
