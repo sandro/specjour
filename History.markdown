@@ -8,6 +8,7 @@ History
 * [fixed] INT signal sent to managers and workers, sets wants\_to\_quit where
   appropriate for Rspec2 and Cucumber
 * [added] Cucumber 0.9.x compatibility
+* [added] RSpec 2.0.0 compatibility
 
 
 ## 0.3.0.rc8 / 2010-09-13
