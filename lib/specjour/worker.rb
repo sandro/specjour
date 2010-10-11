@@ -96,8 +96,7 @@ module Specjour
     end
 
     def run_feature(feature)
-      cli = ::Cucumber::Cli::Main.new(['--format', 'Specjour::Cucumber::DistributedFormatter', feature], connection)
-      cli.execute!(::Cucumber::Cli::Main.step_mother)
+      Specjour::Cucumber::Runner.run(feature, connection)
     end
 
     def run_spec(spec)
