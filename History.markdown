@@ -5,8 +5,9 @@ History
 
 * [fixed] Cucumber output for scenario outlines (delitescere & supaspoida)
 * [fixed] Undefined shared examples in Rspec2
-* [fixed] INT signal sent to managers and workers, sets wants_to_quit where
+* [fixed] INT signal sent to managers and workers, sets wants\_to\_quit where
   appropriate for Rspec2 and Cucumber
+* [added] Cucumber 0.9.x compatibility
 
 
 ## 0.3.0.rc8 / 2010-09-13
