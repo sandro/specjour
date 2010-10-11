@@ -65,7 +65,7 @@ module Specjour
     protected
 
     def disconnecting(client_port)
-      self.disconnections += 1
+      synchronize { self.disconnections += 1 }
       if disconnections == worker_size
         shutdown
         stop unless Specjour.interrupted?
