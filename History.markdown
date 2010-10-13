@@ -7,6 +7,7 @@ History
 * [fixed] Undefined shared examples in Rspec2
 * [fixed] INT signal sent to managers and workers, sets wants\_to\_quit where
   appropriate for Rspec2 and Cucumber
+* [fixed] Error reporting for failed steps within a Background
 * [added] Cucumber 0.9.x compatibility
 * [added] RSpec 2.0.0 compatibility
 
