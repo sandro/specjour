@@ -60,9 +60,12 @@ module Specjour
       end
 
       def summarize
-        if @summarizer.failing_scenarios.any?
+        if @summarizer.steps(:failed).any?
           puts "\n\n"
           @summarizer.step_summary.each {|f| puts f }
+        end
+
+        if @summarizer.failing_scenarios.any?
           puts "\n\n"
           puts format_string("Failing Scenarios:", :failed)
           @summarizer.failing_scenarios.each {|f| puts f }

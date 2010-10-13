@@ -50,7 +50,7 @@ module Specjour::Cucumber
     end
 
     def prepare_steps(type)
-      prepare_elements(step_mother.scenarios(type), type, 'steps')
+      prepare_elements(step_mother.steps(type), type, 'steps')
     end
 
     def print_exception(e, status, indent)
