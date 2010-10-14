@@ -102,6 +102,15 @@ By default, the dispatcher looks for managers matching the project's directory n
     ~/bizconf $ specjour listen -p bizconf_09
     ~/bizconf $ specjour -a bizconf_09
 
+## Compatibility
+
+* RSpec 1.3.x
+* RSpec 2.0.0
+* Cucumber 0.8.5
+* Cucumber 0.9.2
+* Rails 2
+* Rails 3
+
 ## Thanks
 
 * shayarnett - Cucumber support, pairing and other various patches
