@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{specjour}
-  s.version = "0.3.0.rc8"
+  s.version = "0.3.0"
 
-  s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
+  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Sandro Turriate"]
-  s.date = %q{2010-09-13}
+  s.date = %q{2010-10-14}
   s.default_executable = %q{specjour}
   s.description = %q{Distribute your spec suite amongst your LAN via Bonjour.}
   s.email = %q{sandro.turriate@gmail.com}
@@ -37,7 +37,9 @@ Gem::Specification.new do |s|
      "lib/specjour/cucumber.rb",
      "lib/specjour/cucumber/distributed_formatter.rb",
      "lib/specjour/cucumber/final_report.rb",
+     "lib/specjour/cucumber/main_ext.rb",
      "lib/specjour/cucumber/preloader.rb",
+     "lib/specjour/cucumber/runner.rb",
      "lib/specjour/db_scrub.rb",
      "lib/specjour/dispatcher.rb",
      "lib/specjour/manager.rb",
@@ -54,9 +56,14 @@ Gem::Specification.new do |s|
      "lib/specjour/rspec2/distributed_formatter.rb",
      "lib/specjour/rspec2/final_report.rb",
      "lib/specjour/rspec2/runner.rb",
+     "lib/specjour/rspec2/shared_example_group_ext.rb",
      "lib/specjour/rsync_daemon.rb",
      "lib/specjour/socket_helper.rb",
      "lib/specjour/worker.rb",
+     "sample/features/fail.feature",
+     "sample/features/pass.feature",
+     "sample/features/step_definitions/sample_steps.rb",
+     "sample/features/undefined.feature",
      "spec/spec.opts",
      "spec/spec_helper.rb",
      "spec/specjour/cli_spec.rb",
@@ -93,6 +100,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<thor>, [">= 0.14.0"])
       s.add_development_dependency(%q<rspec>, ["= 1.3.0"])
       s.add_development_dependency(%q<rr>, [">= 0.10.11"])
+      s.add_development_dependency(%q<cucumber>, [">= 0.9.0"])
       s.add_development_dependency(%q<yard>, [">= 0.5.3"])
       s.add_development_dependency(%q<jeweler>, [">= 1.4.0"])
     else
@@ -100,6 +108,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<thor>, [">= 0.14.0"])
       s.add_dependency(%q<rspec>, ["= 1.3.0"])
       s.add_dependency(%q<rr>, [">= 0.10.11"])
+      s.add_dependency(%q<cucumber>, [">= 0.9.0"])
       s.add_dependency(%q<yard>, [">= 0.5.3"])
       s.add_dependency(%q<jeweler>, [">= 1.4.0"])
     end
@@ -108,6 +117,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<thor>, [">= 0.14.0"])
     s.add_dependency(%q<rspec>, ["= 1.3.0"])
     s.add_dependency(%q<rr>, [">= 0.10.11"])
+    s.add_dependency(%q<cucumber>, [">= 0.9.0"])
     s.add_dependency(%q<yard>, [">= 0.5.3"])
     s.add_dependency(%q<jeweler>, [">= 1.4.0"])
   end
