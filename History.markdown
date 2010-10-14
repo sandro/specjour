@@ -1,7 +1,7 @@
 History
 =======
 
-## 0.3.0.rc9 / (thor)
+## 0.3.0 / 2010-10-14
 
 * [fixed] Cucumber output for scenario outlines (delitescere & supaspoida)
 * [fixed] Undefined shared examples in Rspec2
@@ -103,9 +103,6 @@ History
   run specs for. Defaults to the project in your current working directory.
 
         $ specjour listen --projects foo bar
-
-
-## 0.2.6 / master
 
 * [fixed] Rsync copies symbolic links. gh-6
 * [fixed] DbScrub explicitly requires its dependencies and no longer loads the
