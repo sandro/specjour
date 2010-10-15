@@ -1,6 +1,14 @@
 History
 =======
 
+0.3.1 / (master)
+----------------
+
+#### Fixes
+* Stopping bonjour actually stops the currently running service
+* Only retry connecting to a DRb object 5 times instead of timing out
+  trying to connect to one bad connection
+
 ## 0.3.0 / 2010-10-14
 
 * [fixed] Cucumber output for scenario outlines (delitescere & supaspoida)
