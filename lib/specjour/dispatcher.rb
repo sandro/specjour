@@ -4,7 +4,7 @@ module Specjour
     Thread.abort_on_exception = true
     include SocketHelper
 
-    attr_reader :project_alias, :managers, :manager_threads, :hosts, :options, :all_tests
+    attr_reader :project_alias, :managers, :manager_threads, :hosts, :options, :all_tests, :drb_connection_errors
     attr_accessor :worker_size, :project_path
 
     def initialize(options = {})
@@ -13,6 +13,7 @@ module Specjour
       @project_path = File.expand_path options[:project_path]
       @worker_size = 0
       @managers = []
+      @drb_connection_errors = Hash.new(0)
       find_tests
       clear_manager_threads
     end
@@ -77,17 +78,14 @@ module Specjour
     end
 
     def fetch_manager(uri)
-      Timeout.timeout(0.5) do
-        manager = DRbObject.new_with_uri(uri.to_s)
-        if !managers.include?(manager) && manager.available_for?(project_alias)
-          add_manager(manager)
-        end
+      manager = DRbObject.new_with_uri(uri.to_s)
+      if !managers.include?(manager) && manager.available_for?(project_alias)
+        add_manager(manager)
       end
-    rescue Timeout::Error
-      Specjour.logger.debug "Timeout: couldn't connect to manager at #{uri}"
     rescue DRb::DRbConnError => e
-      Specjour.logger.debug "#{e.message}: #{e.backtrace.join("\n")}"
-      retry
+      drb_connection_errors[uri] += 1
+      Specjour.logger.debug "#{e.message}: couldn't connect to manager at #{uri}"
+      retry if drb_connection_errors[uri] < 5
     end
 
     def fork_local_manager
