@@ -117,7 +117,7 @@ module Specjour
     end
 
     def bonjour_service
-      @bonjour_service = DNSSD::Service.new
+      @bonjour_service ||= DNSSD::Service.new
     end
 
     def cmd(command)
@@ -132,8 +132,13 @@ module Specjour
       end
     end
 
-    def suspend_bonjour(&block)
+    def stop_bonjour
       bonjour_service.stop
+      @bonjour_service = nil
+    end
+
+    def suspend_bonjour(&block)
+      stop_bonjour
       block.call
       bonjour_announce
     end
