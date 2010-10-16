@@ -45,6 +45,7 @@ module Specjour
     end
 
     def drb_start
+      $PROGRAM_NAME = "specjour listen" if quiet?
       DRb.start_service drb_uri.to_s, self
       at_exit { DRb.stop_service }
     end
