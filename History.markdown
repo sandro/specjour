@@ -1,13 +1,14 @@
 History
 =======
 
-0.3.1 / (master)
+0.3.1 / 2010-10-16
 ----------------
 
 #### Fixes
 * Stopping bonjour actually stops the currently running service
 * Only retry connecting to a DRb object 5 times instead of timing out
   trying to connect to one bad connection
+* Set correct process name when the dispatcher starts a listener
 
 ## 0.3.0 / 2010-10-14
 
