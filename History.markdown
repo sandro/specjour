@@ -1,7 +1,117 @@
 History
 =======
 
-## 0.2.6 / master
+0.3.1 / 2010-10-16
+----------------
+
+#### Fixes
+* Stopping bonjour actually stops the currently running service
+* Only retry connecting to a DRb object 5 times instead of timing out
+  trying to connect to one bad connection
+* Set correct process name when the dispatcher starts a listener
+
+## 0.3.0 / 2010-10-14
+
+* [fixed] Cucumber output for scenario outlines (delitescere & supaspoida)
+* [fixed] Undefined shared examples in Rspec2
+* [fixed] INT signal sent to managers and workers, sets wants\_to\_quit where
+  appropriate for Rspec2 and Cucumber
+* [fixed] Error reporting for failed steps within a Background
+* [added] Cucumber 0.9.x compatibility
+* [added] RSpec 2.0.0 compatibility
+
+
+## 0.3.0.rc8 / 2010-09-13
+
+* [fixed] Custom hooks now load in Ruby 1.9.2
+* [fixed] Specjour prepare correctly recreates the db
+* [added] Support for loading test DB from SQL file
+  (config.active\_record.schema\_format = :sql)
+* [added] Rsync failures raise Specjour::Error
+
+## 0.3.0.rc7 / 2010-09-09
+
+* [fixed] Distributing absolute paths to remote machines.
+
+* [added] Workers print the elapsed time of each test (redsquirrel)
+* [added] Dispatcher loads specjour/hooks.rb, useful for monkey patching
+  (redsquirrel)
+
+* [changed] Decreased timeout to 2 seconds when searching for remote managers
+
+## 0.3.0.rc6 / 2010-09-07
+
+* [fixed] Ruby 1.9.2 support through minor changes and DNSSD upgrade
+* [fixed] DbScrub.drop actually invokes the db:drop rake task
+* [fixed] Prepare task ignores rspec's at\_exit callback, disabling the test
+  suite from running after the prepare task completes.
+
+## 0.3.0.rc5 / 2010-07-30
+
+* [fixed] Shared example groups now supported in Rspec2
+
+* [removed] Hyperthread detection removed as it proved too unstable while
+  running selenium
+
+## 0.3.0.rc4 / 2010-07-27
+
+* [fixed] Only print cucumber summary when running features
+
+## 0.3.0.rc3 / 2010-07-27
+
+* [fixed] Cucumber prints elapsed time
+
+* [added] Print hostname for each hostname (closes gh-8)
+
+* [added] Rspec2 support
+
+
+## 0.3.0.rc2 / 2010-07-14
+
+* [fixed] Cucumber compatibility with 0.8.5
+
+* [fixed] The before\_fork hook did not work in the rc1 because the custom hooks
+  were loaded by the worker (after fork). We could have the manager preload the app
+  but then you'll have stale managers. Instead, custom hooks are now located in
+  the .specjour/hooks.rb file, essentially living outside of your application.
+
+* [changed] The generated rsyncd.conf now syncs the .specjour directory
+  allowing hooks to be loaded by managers and workers.
+
+## 0.3.0.rc1 / 2010-07-12
+
+* [removed] Rake tasks have been removed, use the command-line instead.
+
+* [added] Thor is now used to parse command-line arguments. Try `specjour help`
+  for more details.
+
+* [added] Test discovery. Features will be autodiscovered by looking for a
+  `features` directory in your project. If you only want to run features, use
+  `specjour dispatch project_path/features`.
+
+* [changed] No longer need to run a manager and a dispatcher in separate
+  processes. When not distributing to other computers, simply run `specjour` in
+  your project directory to run the suite among the number of cores on your
+  machine.
+
+* [added] Project aliases. If you want to isolate a few computers in the
+  cluster, tell them to listen for a different project name and run the
+  dispatcher with that new name.
+
+        $ specjour listen --projects foo2
+        $ specjour dispatch --alias foo2
+
+* [added] Preparation. Running `specjour prepare` invokes the
+  `Specjour::Configuration.prepare` block on each worker. By default this
+  drops the worker's database and brings it back up.
+
+* [removed] --batch option which sent back results in batches. Now that each
+  spec is run one at a time, batching no longer makes sense.
+
+* [removed] Global listening. You now must provide the project names you want to
+  run specs for. Defaults to the project in your current working directory.
+
+        $ specjour listen --projects foo bar
 
 * [fixed] Rsync copies symbolic links. gh-6
 * [fixed] DbScrub explicitly requires its dependencies and no longer loads the

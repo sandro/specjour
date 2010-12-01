@@ -10,11 +10,13 @@ begin
     gem.email = "sandro.turriate@gmail.com"
     gem.homepage = "http://github.com/sandro/specjour"
     gem.authors = ["Sandro Turriate"]
-    gem.add_dependency "dnssd", "1.3.1"
-    gem.add_dependency "rspec"
+    gem.add_dependency "dnssd", "1.3.4"
+    gem.add_dependency "thor", ">=0.14.0"
     gem.add_development_dependency "rspec", "1.3.0"
-    gem.add_development_dependency "rr", "0.10.11"
-    gem.add_development_dependency "yard", "0.5.3"
+    gem.add_development_dependency "rr", ">=0.10.11"
+    gem.add_development_dependency "cucumber", ">=0.9.0"
+    gem.add_development_dependency "yard", ">=0.5.3"
+    gem.add_development_dependency "jeweler", ">=1.4.0"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
@@ -47,5 +49,16 @@ rescue LoadError
   end
 end
 
-$:.unshift(File.dirname(__FILE__) + "/lib")
-require 'specjour/tasks/specjour'
+desc "tag, push gem, push to github"
+task :prerelease do
+  version = `cat VERSION`.strip
+  command = %(
+    git tag v#{version} &&
+    rake build &&
+    git push &&
+    gem push pkg/specjour-#{version}.gem &&
+    git push --tags
+  )
+  puts command
+  puts %x(#{command})
+end

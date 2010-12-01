@@ -21,3 +21,5 @@ pkg
 ## PROJECT::SPECIFIC
 .specjour
 spec/spec.opts
+.bundle
+Gemfile.lock

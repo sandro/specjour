@@ -36,7 +36,7 @@ module Specjour
     def timeout(&block)
       Timeout.timeout(2, &block)
     rescue Timeout::Error
-      raise Error, "Connection to dispatcher timed out"
+      raise Error, "Connection to dispatcher timed out", []
     end
 
     def next_test
@@ -52,7 +52,7 @@ module Specjour
       end
     end
 
-    def puts(arg)
+    def puts(arg='')
       print(arg << "\n")
     end
 
@@ -67,6 +67,7 @@ module Specjour
       @socket = TCPSocket.open(uri.host, uri.port)
     rescue Errno::ECONNREFUSED => error
       Specjour.logger.debug "Could not connect to #{uri.to_s}\n#{error.inspect}"
+      sleep 0.1
       retry
     end
 
@@ -78,8 +79,10 @@ module Specjour
     def will_reconnect(&block)
       block.call
     rescue SystemCallError => error
-      reconnect
-      retry
+      unless Specjour.interrupted?
+        reconnect
+        retry
+      end
     end
   end
 end

@@ -1,5 +1,18 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'spec_helper'
+
+class CustomException < RuntimeError
+end
+
+def boo
+  raise CustomException, 'fails'
+end
 
 describe Specjour do
-  it "lives"
+  it "pends as an example" do
+    pending
+  end
+
+  it "fails as an example" do
+    boo
+  end
 end

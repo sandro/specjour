@@ -1,9 +1,6 @@
 module Specjour::Cucumber
+  ::Term::ANSIColor.coloring = true
   class DistributedFormatter < ::Cucumber::Formatter::Progress
-    class << self
-      attr_accessor :batch_size
-    end
-    @batch_size = 1
 
     def initialize(step_mother, io, options)
       @step_mother = step_mother
@@ -20,15 +17,17 @@ module Specjour::Cucumber
     end
 
     def prepare_failures
-      @failures = step_mother.scenarios(:failed).select { |s| s.is_a?(Cucumber::Ast::Scenario) }
-
-      if !@failures.empty?
-        @failures.each do |failure|
-          failure_message = ''
-          failure_message += format_string("cucumber " + failure.file_colon_line, :failed) +
-          failure_message += format_string(" # Scenario: " + failure.name, :comment)
-          @failing_scenarios << failure_message
+      step_mother.scenarios(:failed).select do |s|
+        s.is_a?(Cucumber::Ast::Scenario) || s.is_a?(Cucumber::Ast::OutlineTable::ExampleRow)
+      end.map do |failure|
+        if failure.is_a?(Cucumber::Ast::Scenario)
+          failure
+        elsif failure.is_a?(Cucumber::Ast::OutlineTable::ExampleRow)
+          failure.scenario_outline
         end
+      end.each do |failure|
+        @failing_scenarios << format_string("cucumber " + failure.file_colon_line[2..-1], :failed) +
+                              format_string(" # Scenario: " + failure.name, :comment)
       end
     end
 
@@ -51,7 +50,7 @@ module Specjour::Cucumber
     end
 
     def prepare_steps(type)
-      prepare_elements(step_mother.scenarios(type), type, 'steps')
+      prepare_elements(step_mother.steps(type), type, 'steps')
     end
 
     def print_exception(e, status, indent)
@@ -63,7 +62,7 @@ module Specjour::Cucumber
       prepare_steps(:failed)
       prepare_steps(:undefined)
 
-      @io.send_message(:worker_summary=, to_hash)
+      @io.send_message(:cucumber_summary=, to_hash)
     end
 
     OUTCOMES = [:failed, :skipped, :undefined, :pending, :passed]

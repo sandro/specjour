@@ -2,46 +2,45 @@
 
 ## FUCK SETI. Run specs with your spare CPU cycles.
 
-_Distribute your spec suite amongst your LAN via Bonjour._
-
 1. Spin up a manager on each machine that can run your specs.
 2. Start a dispatcher in your project directory.
 3. Say farewell to your long coffee breaks.
 
-## Requirements
-* Bonjour or DNSSD (the capability and the gem)
-* Rsync (system command used)
-* Rspec (officially v1.3.0)
-
 ## Installation
     gem install specjour
 
+## Give it a try
+Running `specjour` starts a dispatcher, a manager, and multiple workers - all
+of the componenets necessary for distributing your test suite.
+
+_(Read the Rails section first if your project uses Rails)_
+
+    $ cd myproject
+    $ specjour
+
 ## Start a manager
-Running `specjour` on the command-line will start a manager which advertises that it's ready to run specs. By default, the manager will use your system cores to determine the number of workers to use. Two cores equals two workers. If you only want to dedicate 1 core to running specs, use `$ specjour --workers 1`.
+Running `specjour listen` will start a manager which advertises that it's ready
+to run specs. By default, the manager runs tests for the project in the
+current directory and uses your system cores to determine the number of workers
+to start. If your system has two cores, two workers will run tests.
+
+    $ specjour listen
+
+## Distribute the tests
+Dispatch the tests among the managers you started. Specjour checks the 'spec' and
+'features' directories for tests.
 
     $ specjour
 
-## Setup the dispatcher
-Require specjour's rake tasks in your project's `Rakefile`.
+## Distribute a subset of tests
+The first parameter to the specjour command is a test directory. It defalts to
+the current directory and searches for 'spec' and 'features' paths therein.
 
-    require 'specjour/tasks/specjour'
-
-## Distribute the specs
-Run the rake task to distribute the specs among the managers you started.
-
-    $ rake specjour
-
-## Distribute the features
-Run the rake task to distribute the features among the managers you started.
-
-    $ rake specjour:cucumber
     
-Specjour will run your features in the default profile. If you are having problems with undefined steps, make sure you have `-r features` in your default profile. Here is an example:
-  
-  # cucumber.yml
-  default: --tag ~@wip -r features
-  
-Specjour also runs your features with its own formatter. Any format options in your profile are ignored.
+    $ specjour spec # all rspec tests
+    $ specjour spec/models # only model tests
+    $ specjour features # only features
+    $ specjour ~/my_other_project/features
 
 
 ## Rails
@@ -50,32 +49,39 @@ Each worker should run their specs in an isolated database. Modify the test data
     test:
       database: blog_test<%=ENV['TEST_ENV_NUMBER']%>
 
-Add the specjour gem to your project:
+Running `specjour prepare` will set up the database for each worker.
 
-    config.gem 'specjour'
+### ActiveRecord Hooks
+Specjour contains ActiveRecord hooks that clear database tables before running tests using `DELETE FROM <table_name>;`. Additionally, test databases will be created if they don't exist (i.e. `CREATE DATABASE blog_test8` for the 8th worker) and your schema will be loaded when the database is out of date.
 
-Doing this enables a rails plugin wherein each worker will attempt to clear its database tables before running any specs via `DELETE FROM <table_name>;`. Additionally, test databases will be created if they don't exist (i.e. `CREATE DATABASE blog_test8` for the 8th worker) and your schema will be loaded when the database is out of date.
+## Custom Hooks
+Specjour allows you to hook in to the test process on a per-machine and
+per-worker level through the before\_fork and after\_fork configuration blocks.
+If the default ActiveRecord hook doesn't set up the database properly for your
+test suite, override it with a custom after\_fork hook.
 
-### Customizing database setup
-If the plugin doesn't set up the database properly for your test suite, bypass it entirely. Remove specjour as a project gem and create your own initializer to setup the database. Specjour sets the environment variable PREPARE\_DB when it runs your specs so you can look for that when setting up the database.
+    # .specjour/hooks.rb
 
-    # config/initializers/specjour.rb
-
-    if ENV['PREPARE_DB']
-      load 'Rakefile'
-
-      # clear the db and load db/seeds.rb
-      Rake::Task['db:reset'].invoke
+    # Modify the way you use bundler
+    Specjour::Configuration.before_fork = lambda do
+      system('bundle install --without production')
     end
 
-## Only listen to supported projects
-By default, a manager will listen to all projects trying to distribute specs over the network. Sometimes you'll only want a manager to respond to one specific spec suite. You can accomplish this with the `--projects` flag.
+    # Modify your database setup
+    Specjour::Configuration.after_fork = lambda do
+      # custom database setup here
+    end
 
-    $ specjour --projects bizconf # only run specs for the bizconf project
+A preparation hook is run when `specjour prepare` is invoked. This hook allows
+you to run arbitrary code on all of the listening workers. By default, it drops
+and recreates the ActiveRecord database on all workers.
 
-You could also listen to multiple projects:
+    # .specjour/hooks.rb
 
-    $ specjour --projects bizconf,workbeast # only run specs for the bizconf and workbeast projects
+    # Modify preparation
+    Specjour::Configuration.prepare = lambda do
+      # custom preparation code
+    end
 
 ## Customize what gets rsync'd
 The standard rsync configuration file may be too broad for your
@@ -84,8 +90,28 @@ directory, add an exclusion to your projects rsyncd.conf file.
 
     $ vi workbeast/.specjour/rsyncd.conf
 
-## Use one machine
-Distributed testing doesn't have to happen over multiple machines, just multiple processes. Specjour is an excellent candidiate for running 4 tests at once on one machine with 4 cores. Just run `$ specjour` in one window and `$ rake specjour` in another.
+## Listen for multiple projects
+By default, a manager will listen to the project in the current directory. If you want to listen for multiple projects, use the `--projects` flag.
+
+    $ specjour listen --projects bizconf workbeast # run specs for the bizconf and workbeast projects
+
+## Give your project an alias
+By default, the dispatcher looks for managers matching the project's directory name. If you have multiple teams working on different branches of the same project you may want to isolate each specjour cluster. Give your project an alias and only listen for that alias.
+
+    ~/bizconf $ specjour listen -p bizconf_08
+    ~/bizconf $ specjour -a bizconf_08
+
+    ~/bizconf $ specjour listen -p bizconf_09
+    ~/bizconf $ specjour -a bizconf_09
+
+## Compatibility
+
+* RSpec 1.3.x
+* RSpec 2.0.0
+* Cucumber 0.8.5
+* Cucumber 0.9.2
+* Rails 2
+* Rails 3
 
 ## Thanks
 

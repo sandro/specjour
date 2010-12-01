@@ -1,11 +1,11 @@
 module Specjour
   class RsyncDaemon
     require 'fileutils'
-    include SocketHelpers
+    include SocketHelper
 
     # Corresponds to the version of specjour that changed the configuration
     # file.
-    CONFIG_VERSION = "0.2.3".freeze
+    CONFIG_VERSION = "0.3.0.rc8".freeze
     CONFIG_FILE_NAME = "rsyncd.conf"
     PID_FILE_NAME = "rsyncd.pid"
 
@@ -56,13 +56,13 @@ module Specjour
     end
 
     def check_config_version
-      File.read(config_file) =~ /\A# (\d+.\d+.\d+)/
+      File.read(config_file) =~ /\A# (\d.\d.\d[.rc\d]*)/
       if out_of_date? Regexp.last_match(1)
         $stderr.puts <<-WARN
 
 Specjour has made changes to the way #{CONFIG_FILE_NAME} is generated.
-Back up '#{config_file}'
-and re-run the dispatcher to generate the new config file.
+Back up '#{config_file}',
+remove it, and re-run the dispatcher to generate the new config file.
 
         WARN
       end
@@ -101,7 +101,7 @@ pid file = ./.specjour/#{PID_FILE_NAME}
 
 [#{project_name}]
   path = .
-  exclude = .git* .specjour doc tmp/* log script
+  exclude = .git* .specjour/rsync* doc tmp/* log
       CONFIG
     end
   end

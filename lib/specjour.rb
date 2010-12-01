@@ -7,32 +7,46 @@ autoload :Timeout, 'timeout'
 autoload :Benchmark, 'benchmark'
 autoload :Logger, 'logger'
 autoload :Socket, 'socket'
+autoload :StringIO, 'stringio'
+autoload :OpenStruct, 'ostruct'
 
 module Specjour
+  autoload :CLI, 'specjour/cli'
   autoload :CPU, 'specjour/cpu'
+  autoload :Configuration, 'specjour/configuration'
   autoload :Connection, 'specjour/connection'
+  autoload :DbScrub, 'specjour/db_scrub'
   autoload :Dispatcher, 'specjour/dispatcher'
   autoload :Manager, 'specjour/manager'
-  autoload :OpenStruct, 'ostruct'
   autoload :Printer, 'specjour/printer'
   autoload :Protocol, 'specjour/protocol'
+  autoload :QuietFork, 'specjour/quiet_fork'
   autoload :RsyncDaemon, 'specjour/rsync_daemon'
-  autoload :SocketHelpers, 'specjour/socket_helpers'
+  autoload :SocketHelper, 'specjour/socket_helper'
   autoload :Worker, 'specjour/worker'
 
   autoload :Cucumber, 'specjour/cucumber'
   autoload :Rspec, 'specjour/rspec'
 
-  VERSION = "0.2.5".freeze
+  VERSION = "0.3.1".freeze
+  HOOKS_PATH = "./.specjour/hooks.rb"
 
-  class Error < StandardError; end
+  def self.interrupted?
+    @interrupted
+  end
+
+  def self.interrupted=(bool)
+    Cucumber.wants_to_quit
+    Rspec.wants_to_quit
+    @interrupted = bool
+  end
 
   def self.logger
     @logger ||= new_logger
   end
 
   def self.new_logger(level = Logger::UNKNOWN)
-    @logger = Logger.new $stdout
+    @logger = Logger.new $stderr
     @logger.level = level
     @logger
   end
@@ -40,4 +54,23 @@ module Specjour
   def self.log?
     logger.level != Logger::UNKNOWN
   end
+
+  def self.load_custom_hooks
+    require HOOKS_PATH if File.exists?(HOOKS_PATH)
+  end
+
+  def self.trap_interrupt
+    Signal.trap('INT') do
+      self.interrupted = true
+      exit 1
+    end
+  end
+
+  Error = Class.new(StandardError)
+  PROGRAM_NAME = $PROGRAM_NAME # keep a reference of the original program name
+
+  GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
+
+  trap_interrupt
+
 end

@@ -2,11 +2,6 @@ module Specjour::Rspec
   class DistributedFormatter < Spec::Runner::Formatter::BaseTextFormatter
     require 'specjour/rspec/marshalable_rspec_failure'
 
-    class << self
-      attr_accessor :batch_size
-    end
-    @batch_size = 1
-
     attr_reader :failing_messages, :passing_messages, :pending_messages, :output
     attr_reader :duration, :example_count, :failure_count, :pending_count, :pending_examples, :failing_examples
 
@@ -22,18 +17,18 @@ module Specjour::Rspec
 
     def example_failed(example, counter, failure)
       failing_messages << colorize_failure('F', failure)
-      batch_print(failing_messages)
+      print_and_flush(failing_messages)
     end
 
     def example_passed(example)
       passing_messages << green('.')
-      batch_print(passing_messages)
+      print_and_flush(passing_messages)
     end
 
     def example_pending(example, message, deprecated_pending_location=nil)
       super
       pending_messages << yellow('*')
-      batch_print(pending_messages)
+      print_and_flush(pending_messages)
     end
 
     def dump_summary(duration, example_count, failure_count, pending_count)
@@ -41,7 +36,7 @@ module Specjour::Rspec
       @example_count = example_count
       @failure_count = failure_count
       @pending_count = pending_count
-      output.send_message(:worker_summary=, to_hash)
+      output.send_message(:rspec_summary=, to_hash)
     end
 
     def dump_pending
@@ -68,14 +63,8 @@ module Specjour::Rspec
 
     protected
 
-    def batch_print(messages)
-      if messages.size == self.class.batch_size
-        print_and_flush(messages)
-      end
-    end
-
     def print_and_flush(messages)
-      output.print messages.to_s
+      output.print messages.join
       output.flush
       messages.replace []
     end

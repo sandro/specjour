@@ -4,11 +4,23 @@ module Specjour
       require 'cucumber'
       require 'cucumber/formatter/progress'
 
-      require 'specjour/cucumber/dispatcher'
       require 'specjour/cucumber/distributed_formatter'
       require 'specjour/cucumber/final_report'
-      require 'specjour/cucumber/printer'
+      require 'specjour/cucumber/preloader'
+      require 'specjour/cucumber/main_ext'
+      require 'specjour/cucumber/runner'
+
+      CUCUMBER_09x = ::Cucumber::VERSION =~ /0\.9\.\d/
+      ::Cucumber::Cli::Options.class_eval { def print_profile_information; end }
     rescue LoadError
+    end
+
+    class << self; attr_accessor :runtime; end
+
+    def self.wants_to_quit
+      if defined?(::Cucumber) && ::Cucumber.respond_to?(:wants_to_quit=)
+        ::Cucumber.wants_to_quit = true
+      end
     end
   end
 end
