@@ -33,8 +33,8 @@ module Specjour
     end
 
     def run_tests
-      load_app
       Configuration.after_fork.call
+      load_app
       run_times = Hash.new(0)
 
       while test = connection.next_test
