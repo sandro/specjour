@@ -60,6 +60,7 @@ module Specjour
     def dispatch_workers
       worker_pids.clear
       (1..worker_size).each do |index|
+        sleep index * 5
         worker_pids << fork do
           exec "specjour work #{worker_options(index)}"
         end
