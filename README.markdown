@@ -105,7 +105,7 @@ By default, the dispatcher looks for managers matching the project's directory n
 ## Working with git
 Commit the .specjour directory but ignore the performance file. The performance
 file constantly changes, there's no need to commit it. Specjour uses it in an
-attempt to optimize the run order, ensuring each machine gets at least one
+attempt to optimize the run order; ensuring each machine gets at least one
 long-running test.
 
     $ cat .gitignore
