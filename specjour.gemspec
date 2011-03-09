@@ -1,7 +1,7 @@
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 
-require 'specjour/version'
+require 'specjour'
 
 Gem::Specification.new do |s|
   s.required_rubygems_version = '>= 1.3.6'
