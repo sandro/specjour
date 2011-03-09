@@ -1,8 +1,19 @@
 History
 =======
 
+0.4.0 / 2011-03-09
+------------------
+
+l4rk and leshill
+
+* [added] Remove Jeweler
+* [added] Use RSpec2 for development
+* [added] Cucumber 0.9+ compatibility
+* [added] RSpec2 compatibility
+* [removed] No longer supporting RSpec 1 and Cucumber 0.8
+
 0.3.1 / 2010-10-16
-----------------
+------------------
 
 #### Fixes
 * Stopping bonjour actually stops the currently running service
