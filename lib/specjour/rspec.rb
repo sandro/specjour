@@ -22,7 +22,7 @@ module Specjour
       require 'specjour/rspec2/runner'
       require 'specjour/rspec2/shared_example_group_ext'
 
-      ::Rspec::Core::Runner.disable_autorun!
+      ::RSpec::Core::Runner.disable_autorun!
     end
 
     begin
