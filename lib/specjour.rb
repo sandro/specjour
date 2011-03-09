@@ -26,9 +26,8 @@ module Specjour
   autoload :Worker, 'specjour/worker'
 
   autoload :Cucumber, 'specjour/cucumber'
-  autoload :Rspec, 'specjour/rspec'
+  autoload :RSpec, 'specjour/rspec'
 
-  VERSION = "0.3.1".freeze
   HOOKS_PATH = "./.specjour/hooks.rb"
 
   def self.interrupted?
@@ -37,7 +36,7 @@ module Specjour
 
   def self.interrupted=(bool)
     Cucumber.wants_to_quit
-    Rspec.wants_to_quit
+    RSpec.wants_to_quit
     @interrupted = bool
   end
 

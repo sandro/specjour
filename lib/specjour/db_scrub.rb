@@ -1,15 +1,20 @@
 module Specjour
   module DbScrub
-    require 'rake'
-    if defined?(Rails) && Rails.version =~ /^3/
-      task(:environment) {}
-      load 'rails/tasks/misc.rake'
-      load 'active_record/railties/databases.rake'
-    else
-      load 'tasks/misc.rake'
-      load 'tasks/databases.rake'
-      Rake::Task["db:structure:dump"].clear
-      Rake::Task["environment"].clear
+
+    begin
+      require 'rake'
+      if defined?(Rails) && Rails.version =~ /^3/
+        task(:environment) {}
+        load 'rails/tasks/misc.rake'
+        load 'active_record/railties/databases.rake'
+      else
+        load 'tasks/misc.rake'
+        load 'tasks/databases.rake'
+        Rake::Task["db:structure:dump"].clear
+        Rake::Task["environment"].clear
+      end
+    rescue LoadError
+      $stderr.puts "DbScrub failed to load properly, that's okay though"
     end
 
     extend self

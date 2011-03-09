@@ -1,11 +1,12 @@
-module Specjour::Rspec::Runner
+module Specjour::RSpec::Runner
   def self.run(spec, output)
-    options = Spec::Runner::OptionParser.parse(
-      ['--format=Specjour::Rspec::DistributedFormatter', spec],
-      $stderr,
-      output
-    )
-    Spec::Runner.use options
-    options.run_examples
+    reset
+    args = ['--format=Specjour::RSpec::DistributedFormatter', spec]
+    ::RSpec::Core::Runner.run_in_process args, $stderr, output
+  end
+
+  def self.reset
+    ::RSpec.world.instance_variable_set(:@example_groups, [])
+    ::RSpec.configuration.instance_variable_set(:@formatter, nil)
   end
 end

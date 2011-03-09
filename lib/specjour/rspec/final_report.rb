@@ -1,65 +1,73 @@
-module Specjour
-  module Rspec
-    class FinalReport
-      attr_reader :duration, :example_count, :failure_count, :pending_count, :pending_examples, :failing_examples
+module Specjour::RSpec
+  class FinalReport
+    attr_reader :examples
+    attr_reader :duration
 
-      def initialize
-        @duration = 0.0
-        @example_count = 0
-        @failure_count = 0
-        @pending_count = 0
-        @pending_examples = []
-        @failing_examples = []
+    def initialize
+      @examples = []
+      @duration = 0.0
+      ::RSpec.configuration.color_enabled = true
+      ::RSpec.configuration.output_stream = $stdout
+    end
+
+    def add(data)
+      if data.respond_to?(:has_key?) && data.has_key?(:duration)
+        self.duration = data[:duration]
+      else
+        metadata_for_examples(data)
       end
+    end
 
-      def add(stats)
-        stats.each do |key, value|
-          if key == :duration
-            @duration = value.to_f if duration < value.to_f
-          else
-            increment(key, value)
-          end
+    def duration=(value)
+      @duration = value.to_f if duration < value.to_f
+    end
+
+    def exit_status
+      formatter.failed_examples.empty?
+    end
+
+    def metadata_for_examples(metadata_collection)
+      examples.concat(
+        metadata_collection.map do |partial_metadata|
+          example = ::RSpec::Core::Example.allocate
+          example.instance_variable_set(:@example_group_class,
+            OpenStruct.new(:metadata => {}, :ancestors => [])
+          )
+          metadata = ::RSpec::Core::Metadata.new
+          metadata.merge! partial_metadata
+          example.instance_variable_set(:@metadata, metadata)
+          example
         end
-      end
+      )
+    end
 
-      def exit_status
-        failing_examples.empty?
-      end
+    def pending_examples
+      ::RSpec.world.find(examples, :execution_result => { :status => 'pending' })
+    end
 
-      def increment(key, value)
-        current = instance_variable_get("@#{key}")
-        instance_variable_set("@#{key}", current + value)
-      end
+    def failed_examples
+      ::RSpec.world.find(examples, :execution_result => { :status => 'failed' })
+    end
 
-      def formatter_options
-        @formatter_options ||= OpenStruct.new(
-          :colour   => true,
-          :autospec => false,
-          :dry_run  => false
-        )
-      end
+    def formatter
+      @formatter ||= new_progress_formatter
+    end
 
-      def formatter
-        @formatter ||= begin
-          f = Spec::Runner::Formatter::BaseTextFormatter.new(formatter_options, $stdout)
-          f.instance_variable_set(:@pending_examples, pending_examples)
-          f
-        end
+    def summarize
+      if examples.size > 0
+        formatter.start_dump
+        formatter.dump_pending
+        formatter.dump_failures
+        formatter.dump_summary(duration, examples.size, failed_examples.size, pending_examples.size)
       end
+    end
 
-      def summarize
-        if example_count > 0
-          formatter.dump_pending
-          dump_failures
-          formatter.dump_summary(duration, example_count, failure_count, pending_count)
-        end
-      end
-
-      def dump_failures
-        failing_examples.each_with_index do |failure, index|
-          formatter.dump_failure index + 1, failure
-        end
-      end
+    protected
+    def new_progress_formatter
+      new_formatter = ::RSpec::Core::Formatters::ProgressFormatter.new($stdout)
+      new_formatter.instance_variable_set(:@failed_examples, failed_examples)
+      new_formatter.instance_variable_set(:@pending_examples, pending_examples)
+      new_formatter
     end
   end
 end

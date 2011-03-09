@@ -1,4 +1,4 @@
-module Specjour::Rspec
+module Specjour::RSpec
   class MarshalableException
     attr_accessor :message, :backtrace, :class_name
 

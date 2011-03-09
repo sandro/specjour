@@ -4,7 +4,12 @@ module RailsAndActiveRecordDefined
   def self.extended(base)
     base.class_eval do
       before do
-        Object.const_set(:Rails, Module.new)
+        rails = Module.new do
+          def self.version
+            "3.0.0"
+          end
+        end
+        Object.const_set(:Rails, rails)
         Object.const_set(:ActiveRecord, Module.new)
         ActiveRecord.const_set(:Base, Class.new)
       end

@@ -99,7 +99,7 @@ module Specjour
     end
 
     def rspec_report
-      @rspec_report ||= Rspec::FinalReport.new
+      @rspec_report ||= RSpec::FinalReport.new
     end
 
     def cucumber_report
