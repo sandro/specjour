@@ -10,7 +10,6 @@ module Specjour
       require 'specjour/cucumber/main_ext'
       require 'specjour/cucumber/runner'
 
-      CUCUMBER_09x = ::Cucumber::VERSION =~ /0\.9\.\d/
       ::Cucumber::Cli::Options.class_eval { def print_profile_information; end }
     rescue LoadError
     end
