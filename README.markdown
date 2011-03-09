@@ -104,18 +104,32 @@ By default, the dispatcher looks for managers matching the project's directory n
 
 ## Compatibility
 
-* RSpec 1.3.x
-* RSpec 2.0.0
-* Cucumber 0.8.5
-* Cucumber 0.9.2
+* RSpec 2
+* Cucumber 0.9+
 * Rails 2
 * Rails 3
+
+## Hacking on Specjour
+If you want to hack on specjour, here is how to test your changes:
+
+    source .dev
+    rake # run the test suite sanely
+    specjour # run the test suite with specjour
+    cd sample
+    specjour # run the cucumber test suite with specjour
+
+Then if all is good, go to another app and test your changes on your test suite:
+
+    gem build specjour.gemspec
+    cd /path/to/your/project
+    gem install -l /path/to/specjour/latest.gem
+    specjour
 
 ## Thanks
 
 * shayarnett - Cucumber support, pairing and other various patches
 * voxdolo - Endless support, alpha testing, various patches
-* leshill - Made rsync daemon configurable
+* l4rk and leshill - Removed Jeweler, added support for RSpec 2 and Cucumber 0.9+
 * testjour - Ripped off your name
 * parallel\_tests - Made my test suite twice as fast
 
