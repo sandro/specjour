@@ -14,7 +14,7 @@ module Specjour
         Rake::Task["environment"].clear
       end
     rescue LoadError
-      $stderr.puts "DbScrub failed to load properly, that's okay though"
+      Specjour.logger.debug "Failed to load Rails rake tasks"
     end
 
     extend self

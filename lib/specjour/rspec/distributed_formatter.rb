@@ -38,8 +38,8 @@ module Specjour::RSpec
     protected
 
     def marshalable_execution_result(execution_result)
-      if exception = execution_result[:exception_encountered]
-        execution_result[:exception_encountered] = MarshalableException.new(exception)
+      if exception = execution_result[:exception]
+        execution_result[:exception] = MarshalableException.new(exception)
       end
       execution_result
     end
