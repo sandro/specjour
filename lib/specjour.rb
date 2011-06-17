@@ -28,7 +28,7 @@ module Specjour
   autoload :Cucumber, 'specjour/cucumber'
   autoload :RSpec, 'specjour/rspec'
 
-  VERSION = "0.4.0"
+  VERSION = "0.4.1"
   HOOKS_PATH = "./.specjour/hooks.rb"
 
   def self.interrupted?
