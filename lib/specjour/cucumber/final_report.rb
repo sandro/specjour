@@ -47,6 +47,7 @@ module Specjour
     class FinalReport
       include ::Cucumber::Formatter::Console
       def initialize
+        @io = $stdout
         @features = []
         @summarizer = Summarizer.new
       end
