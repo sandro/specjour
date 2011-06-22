@@ -26,6 +26,14 @@ module Specjour
       @prepare ||= default_prepare
     end
 
+		# This block is run before singular tests are being run.
+		# This is important for example if there is left over cache data from the 
+		# single worker, like Fixtures that need to be reloaded everytime if using 
+		# transactional fixtures.
+		def before_test
+			@before_test ||= Proc.new {} 
+		end	
+
     def reset
       @before_fork = nil
       @after_fork = nil
