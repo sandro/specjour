@@ -100,6 +100,7 @@ module Specjour
     end
 
     def run_spec(spec)
+			Fixtures.reset_cache if defined?(Fixtures)
       Specjour::RSpec::Runner.run(spec, connection)
     end
 
