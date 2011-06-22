@@ -39,6 +39,7 @@ module Specjour
 
       while test = connection.next_test
         print_status(test)
+				Configuration.before_test.call
         time = Benchmark.realtime { run_test test }
         profile(test, time)
         run_times[test_type(test)] += time

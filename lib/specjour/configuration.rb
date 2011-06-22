@@ -2,7 +2,7 @@ module Specjour
   module Configuration
     extend self
 
-    attr_writer :before_fork, :after_fork, :prepare
+    attr_writer :before_fork, :after_fork, :prepare, :before_test
 
     # This block is run by each worker the manager forks.
     # The Rails plugin uses this block to clear the databases defined in
@@ -25,6 +25,14 @@ module Specjour
     def prepare
       @prepare ||= default_prepare
     end
+
+		# This block is run before singular tests are being run.
+		# This is important for example if there is left over cache data from the 
+		# single worker, like Fixtures that need to be reloaded everytime if using 
+		# transactional fixtures.
+		def before_test
+			@before_test ||= Proc.new {} 
+		end	
 
     def reset
       @before_fork = nil
