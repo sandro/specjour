@@ -62,7 +62,7 @@ module Specjour
   def self.trap_interrupt
     Signal.trap('INT') do
       self.interrupted = true
-      exit 1
+      abort("\n")
     end
   end
 
