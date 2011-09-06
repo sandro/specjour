@@ -36,9 +36,11 @@ module Specjour
   end
 
   def self.interrupted=(bool)
-    Cucumber.wants_to_quit
-    RSpec.wants_to_quit
     @interrupted = bool
+    if bool
+      Cucumber.wants_to_quit
+      RSpec.wants_to_quit
+    end
   end
 
   def self.logger
