@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency('dnssd', ['= 1.3.4'])
   s.add_runtime_dependency('thor', ['>= 0.14.0'])
-  s.add_development_dependency('rspec', ['>= 2.5.0'])
+  s.add_development_dependency('rspec', ['>= 2.6.0'])
   s.add_development_dependency('rr', ['>= 0.10.11'])
   s.add_development_dependency('cucumber', ['>= 0.9.0'])
   s.add_development_dependency('yard', ['>= 0.5.3'])
