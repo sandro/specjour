@@ -1,6 +1,27 @@
 History
 =======
 
+0.5.0 / (not released)
+----------------------
+
+* [changed] Printer uses UNIX select instead of GServer (threads)
+* [removed] RSpec < 2.5 compatibility
+* [added] Memory utilizing forks. No longer forking and execing means workers
+  start running tests faster.
+* [added] Configuration.after_load hook run after loading the environment
+* [fixed] Database creation when the app depends on a database upon environment
+  load (something as simple as a scope would cause this dependency). As long as
+  the regular test environment can be loaded, missing a database in a worker
+  environment shouldn't raise an exception, instead the db should be created.
+
+0.4.1 / 2011-06-17
+------------------
+
+l4rk and leshill
+
+* [fixed] Cucumber failure reports not displayed
+
+
 0.4.0 / 2011-03-09
 ------------------
 
