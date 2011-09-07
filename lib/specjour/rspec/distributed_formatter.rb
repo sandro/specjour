@@ -31,7 +31,7 @@ module Specjour::RSpec
     end
 
     def close
-      @examples = []
+      examples.clear
       super
     end
 

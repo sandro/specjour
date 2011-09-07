@@ -70,20 +70,6 @@ module Specjour
       puts Specjour::VERSION
     end
 
-    desc "work", "INTERNAL USE ONLY", :hide => true
-    method_option :project_path, :required => true
-    method_option :printer_uri, :required => true
-    method_option :number, :type => :numeric, :required => true
-    method_option :preload_spec
-    method_option :preload_feature
-    method_option :task, :required => true
-    method_option :quiet, :type => :boolean
-    def work
-      handle_logging
-      append_to_program_name "work"
-      Specjour::Worker.new(args).start
-    end
-
     protected
 
     def append_to_program_name(command)

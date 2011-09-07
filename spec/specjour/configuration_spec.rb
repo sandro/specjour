@@ -31,13 +31,6 @@ describe Specjour::Configuration do
 
   describe "#before_fork" do
     context "default proc" do
-      context "ActiveRecord defined" do
-        extend RailsAndActiveRecordDefined
-        it "disconnects from the database" do
-          mock(ActiveRecord::Base).remove_connection
-          subject.before_fork.call
-        end
-      end
 
       context "bundler installed" do
         before do
@@ -91,6 +84,25 @@ describe Specjour::Configuration do
       it "scrubs the db" do
         mock(Specjour::DbScrub).scrub
         subject.after_fork.call
+      end
+    end
+  end
+
+  describe "#after_load" do
+    context "default proc" do
+      context "ActiveRecord defined" do
+        extend RailsAndActiveRecordDefined
+        it "disconnects from the database" do
+          mock(ActiveRecord::Base).remove_connection
+          subject.after_load.call
+        end
+      end
+    end
+
+    context "custom proc" do
+      it "runs block" do
+        subject.after_load = lambda { :custom_before }
+        subject.after_load.call.should == :custom_before
       end
     end
   end

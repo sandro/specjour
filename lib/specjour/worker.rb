@@ -6,15 +6,13 @@ module Specjour
     include Protocol
     include SocketHelper
     attr_accessor :printer_uri
-    attr_reader :project_path, :number, :preload_spec, :preload_feature, :task
+    attr_reader :project_path, :number, :task
 
     def initialize(options = {})
       ARGV.replace []
       $stdout = StringIO.new if options[:quiet]
       @project_path = options[:project_path]
       @number = options[:number].to_i
-      @preload_spec = options[:preload_spec]
-      @preload_feature = options[:preload_feature]
       @task = options[:task]
       self.printer_uri = options[:printer_uri]
       set_env_variables
@@ -27,13 +25,10 @@ module Specjour
     end
 
     def prepare
-      load_app
       Configuration.prepare.call
-      Kernel.exit!
     end
 
     def run_tests
-      load_app
       Configuration.after_fork.call
       run_times = Hash.new(0)
 
@@ -46,26 +41,14 @@ module Specjour
 
       send_run_times(run_times)
       connection.send_message(:done)
+    ensure
       connection.disconnect
-    end
-
-    def start
-      send task
     end
 
     protected
 
     def connection
       @connection ||= printer_connection
-    end
-
-    def load_app
-      RSpec::Preloader.load(preload_spec) if preload_spec
-      Cucumber::Preloader.load(preload_feature) if preload_feature
-    rescue StandardError => exception
-      $stderr.puts "Caught exception: #{exception.class} #{exception.message}"
-      Specjour.logger.debug exception.backtrace.join("\n")
-      $stderr.puts "Proceeding... you may need to re-run the dispatcher."
     end
 
     def printer_connection

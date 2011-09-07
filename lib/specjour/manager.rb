@@ -24,7 +24,6 @@ module Specjour
       @worker_task = options[:worker_task]
       @registered_projects = options[:registered_projects]
       @worker_pids = []
-      at_exit { kill_worker_processes }
     end
 
     def available_for?(project_name)
@@ -58,10 +57,25 @@ module Specjour
     end
 
     def dispatch_workers
-      worker_pids.clear
-      (1..worker_size).each do |index|
-        worker_pids << fork do
-          exec "specjour work #{worker_options(index)}"
+      fork do
+        begin
+          load_app
+          Configuration.after_load.call
+          (1..worker_size).each do |index|
+            worker_pids << fork do
+              Worker.new(
+                :number => index,
+                :project_path => project_path,
+                :printer_uri => dispatcher_uri.to_s,
+                :quiet => quiet?
+              ).send(worker_task)
+              exit!
+            end
+          end
+          Process.waitall
+          exit!
+        ensure
+          kill_worker_processes
         end
       end
       Process.waitall
@@ -93,8 +107,6 @@ module Specjour
 
     def start
       drb_start
-      puts "Workers ready: #{worker_size}."
-      puts "Listening for #{registered_projects.join(', ')}"
       bonjour_announce
       DRb.thread.join
     end
@@ -112,6 +124,8 @@ module Specjour
     protected
 
     def bonjour_announce
+      puts "Workers ready: #{worker_size}."
+      puts "Listening for #{registered_projects.join(', ')}"
       unless quiet?
         bonjour_service.register "specjour_manager_#{object_id}", "_#{drb_uri.scheme}._tcp", nil, drb_uri.port
       end
@@ -124,6 +138,11 @@ module Specjour
     def cmd(command)
       puts command
       system command
+    end
+
+    def load_app
+      RSpec::Preloader.load(preload_spec) if preload_spec
+      Cucumber::Preloader.load(preload_feature) if preload_feature
     end
 
     def execute_before_fork
@@ -142,15 +161,6 @@ module Specjour
       stop_bonjour
       block.call
       bonjour_announce
-    end
-
-    def worker_options(index)
-      exec_options = "--project-path #{project_path} --printer-uri #{dispatcher_uri} --number #{index} --task #{worker_task}"
-      exec_options << " --preload-spec #{preload_spec}" if preload_spec
-      exec_options << " --preload-feature #{preload_feature}" if preload_feature
-      exec_options << " --log" if Specjour.log?
-      exec_options << " --quiet" if quiet?
-      exec_options
     end
   end
 end

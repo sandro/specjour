@@ -3,6 +3,7 @@ class Specjour::RSpec::Preloader
     $LOAD_PATH.unshift File.join(Dir.pwd, 'spec')
     require spec_file
   ensure
+    ::RSpec.reset
     $LOAD_PATH.shift
   end
 end

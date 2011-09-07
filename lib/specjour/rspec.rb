@@ -11,6 +11,7 @@ module Specjour
     require 'specjour/rspec/shared_example_group_ext'
 
     ::RSpec::Core::Runner.disable_autorun!
+    ::RSpec::Core::Runner.class_eval "def self.trap_interrupt;end"
 
     def self.wants_to_quit
       if defined?(::RSpec) && ::RSpec.respond_to?(:wants_to_quit=)

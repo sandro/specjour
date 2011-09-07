@@ -6,6 +6,7 @@ module Specjour::QuietFork
     @pid = Kernel.fork do
       $stdout = StringIO.new
       block.call
+      exit!
     end
   end
 end

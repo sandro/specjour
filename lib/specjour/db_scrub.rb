@@ -3,6 +3,7 @@ module Specjour
 
     begin
       require 'rake'
+      extend Rake::DSL if defined?(Rake::DSL)
       if defined?(Rails) && Rails.version =~ /^3/
         load 'rails/tasks/misc.rake'
         load 'active_record/railties/databases.rake'
@@ -36,6 +37,7 @@ module Specjour
 
     def connect_to_database
       ActiveRecord::Base.remove_connection
+      ActiveRecord::Base.configurations = Rails.application.config.database_configuration
       ActiveRecord::Base.establish_connection
       connection
     rescue # assume the database doesn't exist
