@@ -2,46 +2,70 @@ module Specjour
   require 'specjour/rspec'
   require 'specjour/cucumber'
 
-  class Printer < GServer
+  class Printer
     include Protocol
     RANDOM_PORT = 0
 
-    def self.start(specs_to_run)
-      new(specs_to_run).start
-    end
+    attr_reader :port
+    attr_accessor :worker_size, :tests_to_run, :completed_workers, :disconnections, :profiler
 
-    attr_accessor :worker_size, :specs_to_run, :completed_workers, :disconnections, :profiler
-
-    def initialize(specs_to_run)
-      super(
-        port = RANDOM_PORT,
-        host = "0.0.0.0",
-        max_connections = 100,
-        stdlog = $stderr,
-        audit = true,
-        debug = true
-      )
+    def initialize(tests_to_run)
+      @host = "0.0.0.0"
+      @server_socket = TCPServer.new(@host, RANDOM_PORT)
+      @port = @server_socket.addr[1]
       @completed_workers = 0
       @disconnections = 0
       @profiler = {}
-      self.specs_to_run = run_order(specs_to_run)
+      self.tests_to_run = run_order(tests_to_run)
+    end
+
+    def start
+      fds = [@server_socket]
+      clients = {}
+      catch(:stop) do
+        while true
+          reads = select(fds).first
+          reads.each do |socket|
+            if socket == @server_socket
+              socket = @server_socket.accept
+              fds << socket
+              clients[socket] = Connection.wrap(socket)
+            elsif socket.eof?
+              fds.delete(socket)
+              socket.close
+              disconnecting
+            else
+              serve(clients[socket])
+            end
+          end
+        end
+      end
+    ensure
+      stopping
+      fds.each {|c| c.close}
     end
 
     def serve(client)
-      client = Connection.wrap client
-      client.each(TERMINATOR) do |data|
-        process load_object(data), client
+      data = load_object(client.gets(TERMINATOR))
+      case data
+      when String
+        $stdout.print data
+        $stdout.flush
+      when Array
+        if data.first == :ready
+          ready(client)
+        else
+          send(data.first, *data[1..-1])
+        end
       end
     end
 
     def ready(client)
-      synchronize do
-        client.print specs_to_run.shift
-        client.flush
-      end
+      client.print tests_to_run.shift
+      client.flush
     end
 
-    def done(client)
+    def done
       self.completed_workers += 1
     end
 
@@ -49,52 +73,34 @@ module Specjour
       reporters.all? {|r| r.exit_status == true}
     end
 
-    def rspec_summary=(client, summary)
+    def rspec_summary=(summary)
       rspec_report.add(summary)
     end
 
-    def cucumber_summary=(client, summary)
+    def cucumber_summary=(summary)
       cucumber_report.add(summary)
     end
 
-    def add_to_profiler(client, args)
+    def add_to_profiler(args)
       test, time = *args
       self.profiler[test] = time
     end
 
     protected
 
-    def disconnecting(client_port)
-      synchronize { self.disconnections += 1 }
+    def disconnecting
+      self.disconnections += 1
       if disconnections == worker_size
-        shutdown
-        stop unless Specjour.interrupted?
+        throw(:stop) unless Specjour.interrupted?
       end
     end
 
-    def log(msg)
-      # noop
-    end
-
-    def error(exception)
-      Specjour.logger.debug "#{exception.inspect}\n#{exception.backtrace.join("\n")}"
-    end
-
-    def process(message, client)
-      if message.is_a?(String)
-        $stdout.print message
-        $stdout.flush
-      elsif message.is_a?(Array)
-        send(message.first, client, *message[1..-1])
-      end
-    end
-
-    def run_order(specs_to_run)
+    def run_order(tests)
       if File.exist?('.specjour/performance')
-        ordered_specs = File.readlines('.specjour/performance').map {|l| l.chop.split(':')[1]}
-        (specs_to_run - ordered_specs) | (ordered_specs & specs_to_run)
+        ordered_tests = File.readlines('.specjour/performance').map {|l| l.chop.split(':')[1]}
+        (tests - ordered_tests) | (ordered_tests & tests)
       else
-        specs_to_run
+        tests
       end
     end
 
@@ -126,10 +132,6 @@ module Specjour
 
     def summarize_reports
       reporters.each {|r| r.summarize}
-    end
-
-    def synchronize(&block)
-      @connectionsMutex.synchronize &block
     end
 
     def warn_if_workers_deserted

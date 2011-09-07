@@ -23,7 +23,7 @@ module Specjour
       gather_managers
       rsync_daemon.start
       dispatch_work
-      printer.join if dispatching_tests?
+      printer.start if dispatching_tests?
       wait_on_managers
       exit printer.exit_status
     end
@@ -129,7 +129,7 @@ module Specjour
     end
 
     def printer
-      @printer ||= Printer.start(all_tests)
+      @printer ||= Printer.new(all_tests)
     end
 
     def project_alias
