@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Specjour::RsyncDaemon do
   subject do
-    Specjour::RsyncDaemon.new('/tmp/seasonal', 'seasonal')
+    Specjour::RsyncDaemon.new('/tmp/seasonal', 'seasonal', 8989)
   end
 
   before do

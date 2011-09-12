@@ -10,6 +10,10 @@ module Specjour
       method_option :alias, :aliases => "-a", :desc => "Project name advertised to listeners"
     end
 
+    def self.rsync_port_option
+      method_option :rsync_port, :type => :numeric, :default => 8989, :desc => "Port to use for rsync daemon"
+    end
+
     def self.start(original_args=ARGV, config={})
       real_tasks = all_tasks.keys | HELP_MAPPINGS
       unless real_tasks.include? original_args.first
@@ -29,6 +33,7 @@ module Specjour
       Advertise availability to run tests for the current directory.
     D
     worker_option
+    rsync_port_option
     method_option :projects, :aliases => "-p", :type => :array, :desc => "Projects supported by this listener"
     def listen
       handle_logging
@@ -41,6 +46,7 @@ module Specjour
     desc "dispatch [PROJECT_PATH]", "Run tests in the current directory"
     worker_option
     dispatcher_option
+    rsync_port_option
     def dispatch(path = Dir.pwd)
       handle_logging
       handle_workers
@@ -56,6 +62,7 @@ module Specjour
     D
     worker_option
     dispatcher_option
+    rsync_port_option
     def prepare(path = Dir.pwd)
       handle_logging
       handle_workers

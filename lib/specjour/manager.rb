@@ -8,7 +8,7 @@ module Specjour
     include SocketHelper
 
     attr_accessor :project_name, :preload_spec, :preload_feature, :worker_task, :pid
-    attr_reader :worker_size, :dispatcher_uri, :registered_projects, :worker_pids, :options
+    attr_reader :worker_size, :dispatcher_uri, :registered_projects, :worker_pids, :options, :rsync_port
 
     def self.start_quietly(options)
       manager = new options.merge(:quiet => true)
@@ -23,6 +23,7 @@ module Specjour
       @worker_size = options[:worker_size]
       @worker_task = options[:worker_task]
       @registered_projects = options[:registered_projects]
+      @rsync_port = options[:rsync_port]
       @worker_pids = []
       at_exit { kill_worker_processes }
     end
@@ -104,7 +105,7 @@ module Specjour
     end
 
     def sync
-      unless cmd "rsync -aL --delete --port=8989 #{dispatcher_uri.host}::#{project_name} #{project_path}"
+      unless cmd "rsync -aL --delete --port=#{rsync_port} #{dispatcher_uri.host}::#{project_name} #{project_path}"
         raise Error, "Rsync Failed."
       end
     end
