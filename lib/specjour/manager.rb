@@ -7,7 +7,7 @@ module Specjour
     include Fork
 
     attr_accessor :test_paths, :project_name, :worker_task, :pid
-    attr_reader :worker_size, :dispatcher_uri, :registered_projects, :loader_pid, :options
+    attr_reader :worker_size, :dispatcher_uri, :registered_projects, :loader_pid, :options, :rsync_port
 
     def self.start_quietly(options)
       manager = new options.merge(:quiet => true)
@@ -21,6 +21,7 @@ module Specjour
       @worker_size = options[:worker_size]
       @worker_task = options[:worker_task]
       @registered_projects = options[:registered_projects]
+      @rsync_port = options[:rsync_port]
       at_exit { kill_loader_process }
     end
 
@@ -110,7 +111,7 @@ module Specjour
     end
 
     def sync
-      cmd "rsync -aL --delete --ignore-errors --port=8989 #{dispatcher_uri.host}::#{project_name} #{project_path}"
+      cmd "rsync -aL --delete --ignore-errors --port=#{rsync_port} #{dispatcher_uri.host}::#{project_name} #{project_path}"
       puts "rsync complete"
     end
 

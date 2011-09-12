@@ -2,6 +2,18 @@ module Specjour
   require 'thor'
   class CLI < Thor
 
+    def self.worker_option
+      method_option :workers, :aliases => "-w", :type => :numeric, :desc => "Number of concurent processes to run. Defaults to your system's available cores."
+    end
+
+    def self.dispatcher_option
+      method_option :alias, :aliases => "-a", :desc => "Project name advertised to listeners"
+    end
+
+    def self.rsync_port_option
+      method_option :rsync_port, :type => :numeric, :default => 23456, :desc => "Port to use for rsync daemon"
+    end
+
     # allow specjour to be called with path arguments
     def self.start(original_args=ARGV, config={})
       real_tasks = all_tasks.keys | @map.keys
@@ -9,14 +21,6 @@ module Specjour
         original_args.unshift default_task
       end
       super(original_args)
-    end
-
-    def self.worker_option
-      method_option :workers, :aliases => "-w", :type => :numeric, :desc => "Number of concurrent processes to run. Defaults to your system's available cores."
-    end
-
-    def self.dispatcher_option
-      method_option :alias, :aliases => "-a", :desc => "Project name advertised to listeners"
     end
 
     default_task :dispatch
@@ -28,6 +32,7 @@ module Specjour
       Advertise availability to run tests for the current directory.
     DESC
     worker_option
+    rsync_port_option
     method_option :projects, :aliases => "-p", :type => :array, :desc => "Projects supported by this listener"
     def listen
       handle_logging
@@ -54,6 +59,7 @@ module Specjour
     desc "dispatch [test_paths]", "Send tests to a listener"
     worker_option
     dispatcher_option
+    rsync_port_option
     long_desc <<-DESC
       This is run when you simply type `specjour`.
       By default, it will run the specs and features found in the current directory.
@@ -78,6 +84,7 @@ module Specjour
     DESC
     worker_option
     dispatcher_option
+    rsync_port_option
     def prepare(path = Dir.pwd)
       handle_logging
       handle_workers

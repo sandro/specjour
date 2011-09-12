@@ -9,11 +9,12 @@ module Specjour
     CONFIG_FILE_NAME = "rsyncd.conf"
     PID_FILE_NAME = "rsyncd.pid"
 
-    attr_reader :project_path, :project_name
+    attr_reader :project_path, :project_name, :port
 
-    def initialize(project_path, project_name)
+    def initialize(project_path, project_name, port)
       @project_path = project_path
       @project_name = project_name
+      @port = port
     end
 
     def config_directory
@@ -52,7 +53,7 @@ module Specjour
     protected
 
     def command
-      ["rsync", "--daemon", "--config=#{config_file}", "--port=8989"]
+      ["rsync", "--daemon", "--config=#{config_file}", "--port=#{port}"]
     end
 
     def check_config_version
@@ -92,7 +93,7 @@ remove it, and re-run the dispatcher to generate the new config file.
 # $ #{(command | ['--no-detach']).join(' ')}
 #
 # Rsync with the following command:
-# $ rsync -a --port=8989 #{hostname}::#{project_name} /tmp/#{project_name}
+# $ rsync -a --port=#{port} #{hostname}::#{project_name} /tmp/#{project_name}
 #
 use chroot = no
 timeout = 20

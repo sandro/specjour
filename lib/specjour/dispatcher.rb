@@ -4,7 +4,7 @@ module Specjour
     Thread.abort_on_exception = true
     include SocketHelper
 
-    attr_reader :project_alias, :managers, :manager_threads, :hosts, :options, :drb_connection_errors, :test_paths
+    attr_reader :project_alias, :managers, :manager_threads, :hosts, :options, :drb_connection_errors, :test_paths, :rsync_port
     attr_accessor :worker_size, :project_path
 
     def initialize(options = {})
@@ -15,6 +15,7 @@ module Specjour
       @worker_size = 0
       @managers = []
       @drb_connection_errors = Hash.new(0)
+      @rsync_port = options[:rsync_port]
       reset_manager_threads
     end
 
@@ -72,7 +73,7 @@ module Specjour
 
     def fork_local_manager
       puts "No listeners found on this machine, starting one..."
-      manager_options = {:worker_size => options[:worker_size], :registered_projects => [project_alias]}
+      manager_options = {:worker_size => options[:worker_size], :registered_projects => [project_alias], :rsync_port => rsync_port}
       manager = Manager.start_quietly manager_options
       fetch_manager(manager.drb_uri)
       at_exit do
@@ -141,7 +142,7 @@ module Specjour
     end
 
     def rsync_daemon
-      @rsync_daemon ||= RsyncDaemon.new(project_path, project_name)
+      @rsync_daemon ||= RsyncDaemon.new(project_path, project_name, rsync_port)
     end
 
     def set_up_manager(manager)
