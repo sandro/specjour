@@ -1,7 +1,7 @@
 module Specjour
   module CPU
     def self.cores
-      case RUBY_PLATFORM
+      case platform
       when /darwin/
         command('hostinfo') =~ /^(\d+).+physically/
         $1.to_i
@@ -14,6 +14,10 @@ module Specjour
 
     def self.command(cmd)
       %x(#{cmd})
+    end
+
+    def self.platform
+      RUBY_PLATFORM
     end
   end
 end

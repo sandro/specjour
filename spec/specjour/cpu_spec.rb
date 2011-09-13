@@ -18,6 +18,7 @@ Load average: 0.09, Mach factor: 1.90
     end
 
     before do
+      stub(Specjour::CPU).platform.returns('darwin')
       stub(Specjour::CPU).command.returns(hostinfo)
     end
 
