@@ -35,6 +35,12 @@ describe Specjour::RsyncDaemon do
       mock.proxy(Kernel).at_exit.yields(subject)
       subject.start
     end
+
+    it "allows setting a custom port" do
+      mock(subject).port
+      mock(Dir).chdir(subject.project_path).yields
+      subject.start
+    end
   end
 
   describe "#stop" do
