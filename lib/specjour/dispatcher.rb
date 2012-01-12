@@ -109,7 +109,7 @@ module Specjour
 
     def gather_remote_managers
       browser = DNSSD::Service.new
-      Timeout.timeout(3) do
+      Timeout.timeout(0.5) do
         browser.browse '_druby._tcp' do |reply|
           if reply.flags.add?
             resolve_reply(reply)
