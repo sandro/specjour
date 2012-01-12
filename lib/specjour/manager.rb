@@ -58,22 +58,22 @@ module Specjour
 
     def dispatch_workers
       fork do
+        at_exit { exit! }
         begin
           load_app
           Configuration.after_load.call
           (1..worker_size).each do |index|
             worker_pids << fork do
+              at_exit { exit! }
               Worker.new(
                 :number => index,
                 :project_path => project_path,
                 :printer_uri => dispatcher_uri.to_s,
                 :quiet => quiet?
               ).send(worker_task)
-              exit!
             end
           end
           Process.waitall
-          exit!
         ensure
           kill_worker_processes
         end
