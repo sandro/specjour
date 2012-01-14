@@ -11,5 +11,9 @@ module Specjour::RSpec
     def class
       @class ||= OpenStruct.new :name => class_name
     end
+
+    def pending_fixed?
+      false
+    end
   end
 end

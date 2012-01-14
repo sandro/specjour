@@ -42,11 +42,11 @@ module Specjour::RSpec
     end
 
     def pending_examples
-      examples.select {|e| e.execution_result[:status] == :pending}
+      examples.select {|e| e.execution_result[:status] == 'pending'}
     end
 
     def failed_examples
-      examples.select {|e| e.execution_result[:status] == :failed}
+      examples.select {|e| e.execution_result[:status] == 'failed'}
     end
 
     def formatter
