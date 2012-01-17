@@ -4,9 +4,9 @@ module Specjour::QuietFork
 
   def self.fork(&block)
     @pid = Kernel.fork do
+      at_exit { exit! }
       $stdout = StringIO.new
       block.call
-      exit!
     end
   end
 end
