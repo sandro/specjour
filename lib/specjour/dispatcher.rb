@@ -101,10 +101,10 @@ module Specjour
     end
 
     def gather_managers
-      puts "Looking for managers..."
+      puts "Looking for listeners..."
       gather_remote_managers
       fork_local_manager if local_manager_needed?
-      abort "No managers found" if managers.size.zero?
+      abort "No listeners found" if managers.size.zero?
     end
 
     def gather_remote_managers
