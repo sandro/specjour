@@ -3,7 +3,7 @@ module Specjour
   class CLI < Thor
 
     def self.worker_option
-      method_option :workers, :aliases => "-w", :type => :numeric, :desc => "Number of concurent processes to run. Defaults to your system's available cores."
+      method_option :workers, :aliases => "-w", :type => :numeric, :desc => "Number of concurrent processes to run. Defaults to your system's available cores."
     end
 
     def self.dispatcher_option
