@@ -141,8 +141,10 @@ module Specjour
     end
 
     def load_app
-      RSpec::Preloader.load(preload_spec) if preload_spec
-      Cucumber::Preloader.load(preload_feature) if preload_feature
+      in_project do
+        RSpec::Preloader.load(preload_spec) if preload_spec
+        Cucumber::Preloader.load(preload_feature) if preload_feature
+      end
     end
 
     def execute_before_fork
