@@ -151,9 +151,15 @@ module Specjour
       bonjour_announce
     end
 
-    def with_clean_env(&block)
+    def with_clean_env
       if defined?(Bundler)
-        Bundler.with_clean_env &block
+        Bundler.with_clean_env do
+          if opts = ENV['RUBYOPT'].split(" ")
+            opts.delete_if {|opt| opt =~ /bundler/}
+            ENV['RUBYOPT'] = opts.join(" ")
+          end
+          yield
+        end
       else
         block.call
       end
