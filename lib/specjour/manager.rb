@@ -23,6 +23,7 @@ module Specjour
       @worker_size = options[:worker_size]
       @worker_task = options[:worker_task]
       @registered_projects = options[:registered_projects]
+      at_exit { kill_loader_process }
     end
 
     def available_for?(project_name)
