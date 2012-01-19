@@ -6,17 +6,14 @@ module Specjour
     include Protocol
     include SocketHelper
     attr_accessor :printer_uri
-    attr_reader :project_path, :number, :task
+    attr_reader :number
 
     def initialize(options = {})
       ARGV.replace []
       $stdout = StringIO.new if options[:quiet]
-      @project_path = options[:project_path]
       @number = options[:number].to_i
-      @task = options[:task]
       self.printer_uri = options[:printer_uri]
       set_env_variables
-      Dir.chdir(project_path)
       Specjour.load_custom_hooks
     end
 

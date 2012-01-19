@@ -167,7 +167,6 @@ module Specjour
       at_exit do
         begin
           manager.interrupted = Specjour.interrupted?
-          manager.kill_worker_processes
         rescue DRb::DRbConnError
         end
       end

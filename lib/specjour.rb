@@ -17,6 +17,7 @@ module Specjour
   autoload :Connection, 'specjour/connection'
   autoload :DbScrub, 'specjour/db_scrub'
   autoload :Dispatcher, 'specjour/dispatcher'
+  autoload :Loader, 'specjour/loader'
   autoload :Manager, 'specjour/manager'
   autoload :Printer, 'specjour/printer'
   autoload :Protocol, 'specjour/protocol'

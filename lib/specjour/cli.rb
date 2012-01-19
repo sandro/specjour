@@ -38,6 +38,21 @@ module Specjour
       Specjour::Manager.new(args).start
     end
 
+    desc "load", "load the app, then fork workers"#, :hide => true
+    worker_option
+    method_option :printer_uri, :required => true
+    method_option :project_path, :required => true
+    method_option :task, :required => true
+    method_option :preload_spec
+    method_option :preload_feature
+    method_option :quiet, :type => :boolean, :default => false
+    def load
+      handle_logging
+      handle_workers
+      append_to_program_name "load"
+      Specjour::Loader.new(args).start
+    end
+
     desc "dispatch [PROJECT_PATH]", "Run tests in the current directory"
     worker_option
     dispatcher_option

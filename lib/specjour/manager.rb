@@ -8,7 +8,7 @@ module Specjour
     include SocketHelper
 
     attr_accessor :project_name, :preload_spec, :preload_feature, :worker_task, :pid
-    attr_reader :worker_size, :dispatcher_uri, :registered_projects, :worker_pids, :options
+    attr_reader :worker_size, :dispatcher_uri, :registered_projects, :load_pid, :options
 
     def self.start_quietly(options)
       manager = new options.merge(:quiet => true)
@@ -23,7 +23,6 @@ module Specjour
       @worker_size = options[:worker_size]
       @worker_task = options[:worker_task]
       @registered_projects = options[:registered_projects]
-      @worker_pids = []
     end
 
     def available_for?(project_name)
@@ -38,8 +37,10 @@ module Specjour
     def dispatch
       suspend_bonjour do
         sync
-        execute_before_fork
-        dispatch_workers
+        with_clean_env do
+          execute_before_fork
+          dispatch_loader
+        end
       end
     end
 
@@ -56,29 +57,19 @@ module Specjour
       end
     end
 
-    def dispatch_workers
-      fork do
-        at_exit { exit! }
-        begin
-          load_app
-          Configuration.after_load.call
-          (1..worker_size).each do |index|
-            worker_pids << fork do
-              at_exit { exit! }
-              Worker.new(
-                :number => index,
-                :project_path => project_path,
-                :printer_uri => dispatcher_uri.to_s,
-                :quiet => quiet?
-              ).send(worker_task)
-            end
-          end
-          Process.waitall
-        ensure
-          kill_worker_processes
-        end
+    def dispatch_loader
+      @loader_pid = fork do
+        # at_exit { exit! }
+        exec_cmd = "specjour load --printer-uri #{dispatcher_uri} --workers #{worker_size} --task #{worker_task} --project-path #{project_path}"
+        exec_cmd << " --preload-spec #{preload_spec}" if preload_spec
+        exec_cmd << " --preload-feature #{preload_feature}" if preload_feature
+        exec_cmd << " --log" if Specjour.log?
+        exec_cmd << " --quiet" if quiet?
+        exec exec_cmd
       end
       Process.waitall
+    ensure
+      kill_loader_process
     end
 
     def in_project(&block)
@@ -87,13 +78,14 @@ module Specjour
 
     def interrupted=(bool)
       Specjour.interrupted = bool
+      kill_loader_process
     end
 
-    def kill_worker_processes
+    def kill_loader_process
       if Specjour.interrupted?
-        Process.kill('INT', *worker_pids) rescue Errno::ESRCH
+        Process.kill('INT', loader_pid) rescue Errno::ESRCH
       else
-        Process.kill('TERM', *worker_pids) rescue Errno::ESRCH
+        Process.kill('TERM', loader_pid) rescue Errno::ESRCH
       end
     end
 
@@ -140,13 +132,6 @@ module Specjour
       system command
     end
 
-    def load_app
-      in_project do
-        RSpec::Preloader.load(preload_spec) if preload_spec
-        Cucumber::Preloader.load(preload_feature) if preload_feature
-      end
-    end
-
     def execute_before_fork
       in_project do
         Specjour.load_custom_hooks
@@ -163,6 +148,14 @@ module Specjour
       stop_bonjour
       block.call
       bonjour_announce
+    end
+
+    def with_clean_env(&block)
+      if defined?(Bundler)
+        Bundler.with_clean_env &block
+      else
+        block.call
+      end
     end
   end
 end
