@@ -61,11 +61,15 @@ module Specjour
     def dispatch_loader
       @loader_pid = fork do
         # at_exit { exit! }
-        exec_cmd = "specjour load --printer-uri #{dispatcher_uri} --workers #{worker_size} --task #{worker_task} --project-path #{project_path}"
+        exec_cmd = "load --printer-uri #{dispatcher_uri} --workers #{worker_size} --task #{worker_task} --project-path #{project_path}"
         exec_cmd << " --preload-spec #{preload_spec}" if preload_spec
         exec_cmd << " --preload-feature #{preload_feature}" if preload_feature
         exec_cmd << " --log" if Specjour.log?
         exec_cmd << " --quiet" if quiet?
+        exec_ruby = "Specjour::CLI.start(#{exec_cmd.split(' ').inspect})"
+        load_path = ''
+        $LOAD_PATH.each {|p| load_path << "-I#{p} "}
+        exec_cmd = "ruby #{load_path} -rspecjour -e '#{exec_ruby}'"
         exec exec_cmd
       end
       Process.waitall
