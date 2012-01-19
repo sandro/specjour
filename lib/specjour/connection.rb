@@ -26,7 +26,7 @@ module Specjour
     end
 
     def disconnect
-      socket.close
+      socket.close unless socket.closed?
     end
 
     def socket
@@ -78,7 +78,7 @@ module Specjour
 
     def will_reconnect(&block)
       block.call
-    rescue SystemCallError => error
+    rescue SystemCallError, IOError => error
       unless Specjour.interrupted?
         reconnect
         retry
