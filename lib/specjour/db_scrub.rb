@@ -25,12 +25,8 @@ module Specjour
 
     def scrub
       connect_to_database
-      if pending_migrations?
-        puts "Migrating schema for database #{ENV['TEST_ENV_NUMBER']}..."
-        schema_load_task.invoke
-      else
-        purge_tables
-      end
+      puts "Resetting database #{ENV['TEST_ENV_NUMBER']}…"
+      schema_load_task.invoke
     end
 
     protected
@@ -46,14 +42,6 @@ module Specjour
 
     def connection
       ActiveRecord::Base.connection
-    end
-
-    def purge_tables
-      connection.disable_referential_integrity do
-        tables_to_purge.each do |table|
-          connection.delete "delete from #{table}"
-        end
-      end
     end
 
     def pending_migrations?
