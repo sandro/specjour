@@ -68,7 +68,7 @@ module Specjour
         exec_cmd << " --quiet" if quiet?
         exec_ruby = "Specjour::CLI.start(#{exec_cmd.split(' ').inspect})"
         load_path = ''
-        $LOAD_PATH.each {|p| load_path << "-I#{p} "}
+        $LOAD_PATH.each {|p| load_path << "-I#{p} " if p =~ /specjour/}
         exec_cmd = "ruby #{load_path} -rspecjour -e '#{exec_ruby}'"
         exec exec_cmd
       end
