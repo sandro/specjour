@@ -42,11 +42,11 @@ module Specjour::RSpec
     end
 
     def pending_examples
-      ::RSpec.world.find(examples, :execution_result => { :status => 'pending' })
+      examples.select { |e| e.metadata.any_apply?(:execution_result => {:status => 'pending'}) }
     end
 
     def failed_examples
-      ::RSpec.world.find(examples, :execution_result => { :status => 'failed' })
+      examples.select { |e| e.metadata.any_apply?(:execution_result => {:status => 'failed'}) }
     end
 
     def formatter

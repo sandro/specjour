@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Specjour::RsyncDaemon do
   subject do
-    Specjour::RsyncDaemon.new('/tmp/seasonal', 'seasonal')
+    Specjour::RsyncDaemon.new('/tmp/seasonal', 'seasonal', 8989)
   end
 
   before do
@@ -33,6 +33,12 @@ describe Specjour::RsyncDaemon do
     it "stops at_exit" do
       mock(subject).stop
       mock.proxy(Kernel).at_exit.yields(subject)
+      subject.start
+    end
+
+    it "allows setting a custom port" do
+      mock(subject).port
+      mock(Dir).chdir(subject.project_path).yields
       subject.start
     end
   end

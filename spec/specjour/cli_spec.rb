@@ -32,6 +32,11 @@ describe Specjour::CLI do
       Specjour::CLI.start %w(listen --projects one two three)
     end
 
+    it "accepts a port for rsync" do
+      manager_receives_options("rsync_port" => 9999)
+      Specjour::CLI.start %w(listen --rsync-port 9999)
+    end
+
     it "listens to the current path by default" do
       manager_receives_options("registered_projects" => %w(foo-bar))
       Specjour::CLI.start %w(listen)
@@ -60,6 +65,11 @@ describe Specjour::CLI do
     it "accepts a project alias" do
       dispatcher_receives_options("project_alias" => "eh")
       Specjour::CLI.start %w(dispatch --alias eh)
+    end
+
+    it "accepts a port for rsync" do
+      dispatcher_receives_options("rsync_port" => 9999)
+      Specjour::CLI.start %w(dispatch --rsync-port 9999)
     end
   end
 
@@ -100,6 +110,11 @@ describe Specjour::CLI do
     it "sets the worker task to 'prepare'" do
       dispatcher_receives_options("worker_task" => "prepare")
       Specjour::CLI.start %w(prepare)
+    end
+
+    it "accepts a port for rsync" do
+      dispatcher_receives_options("rsync_port" => 9999)
+      Specjour::CLI.start %w(prepare --rsync-port 9999)
     end
   end
 end
