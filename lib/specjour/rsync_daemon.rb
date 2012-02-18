@@ -5,7 +5,7 @@ module Specjour
 
     # Corresponds to the version of specjour that changed the configuration
     # file.
-    CONFIG_VERSION = "0.3.0.rc8".freeze
+    CONFIG_VERSION = "0.5.0".freeze
     CONFIG_FILE_NAME = "rsyncd.conf"
     PID_FILE_NAME = "rsyncd.pid"
 
@@ -101,7 +101,8 @@ pid file = ./.specjour/#{PID_FILE_NAME}
 
 [#{project_name}]
   path = .
-  exclude = .git* .specjour/rsync* doc tmp/* log
+  include = tmp/cache/
+  exclude = .git* .specjour/rsync* doc/* tmp/* log/*
       CONFIG
     end
   end
