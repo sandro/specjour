@@ -108,16 +108,18 @@ module Specjour
     end
 
     def gather_remote_managers
-      browser = DNSSD::Service.new
-      Timeout.timeout(3) do
-        browser.browse '_druby._tcp' do |reply|
-          if reply.flags.add?
-            resolve_reply(reply)
-          end
-          browser.stop unless reply.flags.more_coming?
+      replies = []
+      Timeout.timeout(1) do
+        DNSSD.browse!('_druby._tcp') do |reply|
+          replies << reply if reply.flags.add?
+          break unless reply.flags.more_coming?
         end
+        raise Timeout::Error
       end
       rescue Timeout::Error
+        if replies.any?
+          replies.each {|r| resolve_reply(r)}
+        end
     end
 
     def local_manager_needed?
@@ -145,12 +147,16 @@ module Specjour
     end
 
     def resolve_reply(reply)
-      DNSSD.resolve!(reply) do |resolved|
+      DNSSD.resolve!(reply.name, reply.type, reply.domain, flags=0, reply.interface) do |resolved|
         Specjour.logger.debug "Bonjour discovered #{resolved.target}"
-        resolved_ip = ip_from_hostname(resolved.target)
-        uri = URI::Generic.build :scheme => reply.service_name, :host => resolved_ip, :port => resolved.port
-        fetch_manager(uri)
-        resolved.service.stop if resolved.service.started?
+        if resolved.text_record && resolved.text_record['version'] == Specjour::VERSION
+          resolved_ip = ip_from_hostname(resolved.target)
+          uri = URI::Generic.build :scheme => reply.service_name, :host => resolved_ip, :port => resolved.port
+          fetch_manager(uri)
+        else
+          puts "Found #{resolved.target} but its version doesn't match v#{Specjour::VERSION}. Skipping..."
+        end
+        break unless resolved.flags.more_coming?
       end
     end
 

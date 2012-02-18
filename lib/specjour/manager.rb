@@ -105,6 +105,7 @@ module Specjour
     def start
       drb_start
       bonjour_announce
+      at_exit { stop_bonjour }
       DRb.thread.join
     end
 
@@ -121,10 +122,13 @@ module Specjour
     protected
 
     def bonjour_announce
-      puts "Workers ready: #{worker_size}."
-      puts "Listening for #{registered_projects.join(', ')}"
+      projects = registered_projects.join(", ")
+      puts "Workers ready: #{worker_size}"
+      puts "Listening for #{projects}"
       unless quiet?
-        bonjour_service.register "specjour_manager_#{object_id}", "_#{drb_uri.scheme}._tcp", nil, drb_uri.port
+        text = DNSSD::TextRecord.new
+        text['version'] = Specjour::VERSION
+        bonjour_service.register "specjour_manager_#{projects}_#{Process.pid}", "_#{drb_uri.scheme}._tcp", domain=nil, drb_uri.port, host=nil, text
       end
     end
 
@@ -145,7 +149,7 @@ module Specjour
     end
 
     def stop_bonjour
-      bonjour_service.stop
+      bonjour_service.stop if bonjour_service && !bonjour_service.stopped?
       @bonjour_service = nil
     end
 
