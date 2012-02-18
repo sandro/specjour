@@ -11,6 +11,10 @@ Feature: Failing sample
     When I do something bad
     Then fail
 
+  Scenario: Exceptions
+    When I do something that raises an exception
+    Then I will never pass
+
   Scenario Outline: Passing wins
     When I do something good with <thing>
     Then fail

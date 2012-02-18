@@ -7,6 +7,10 @@ end
 When /^I do something bad$/ do
 end
 
+When /^I do something that raises an exception$/ do
+  raise StandardError
+end
+
 When /^I do something good with (.+)$/ do |thing|
 end
 
@@ -23,4 +27,8 @@ end
 
 Then /^fail$/ do
   false.should == true
+end
+
+Then /^I will never pass$/ do
+  true.should be_true
 end
