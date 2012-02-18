@@ -25,17 +25,18 @@ module Specjour
       catch(:stop) do
         while true
           reads = select(fds).first
-          reads.each do |socket|
-            if socket == @server_socket
-              socket = @server_socket.accept
-              fds << socket
-              clients[socket] = Connection.wrap(socket)
-            elsif socket.eof?
-              fds.delete(socket)
-              socket.close
+          reads.each do |socket_being_read|
+            if socket_being_read == @server_socket
+              client_socket = @server_socket.accept
+              fds << client_socket
+              clients[client_socket] = Connection.wrap(client_socket)
+            elsif socket_being_read.eof?
+              socket_being_read.close
+              fds.delete(socket_being_read)
+              clients.delete(socket_being_read)
               disconnecting
             else
-              serve(clients[socket])
+              serve(clients[socket_being_read])
             end
           end
         end
