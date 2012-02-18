@@ -26,10 +26,10 @@ Gem::Specification.new do |s|
 
   s.files = Dir.glob('lib/**/*') + %w(MIT_LICENSE README.markdown History.markdown Rakefile bin/specjour)
 
-  s.add_runtime_dependency('dnssd', ['= 1.3.4'])
+  s.add_runtime_dependency('dnssd', ['= 2.0.0'])
   s.add_runtime_dependency('thor', ['>= 0.14.0'])
-  s.add_development_dependency('rspec', ['>= 2.6.0'])
-  s.add_development_dependency('rr', ['>= 0.10.11'])
-  s.add_development_dependency('cucumber', ['>= 0.9.0'])
-  s.add_development_dependency('yard', ['>= 0.5.3'])
+  s.add_development_dependency('rspec', ['>= 2.8.0'])
+  s.add_development_dependency('rr', ['>= 1.0.4'])
+  s.add_development_dependency('cucumber', ['>= 1.1.4'])
+  s.add_development_dependency('yard', ['>= 0.7.2'])
 end
