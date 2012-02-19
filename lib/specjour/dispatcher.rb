@@ -85,7 +85,7 @@ module Specjour
     rescue DRb::DRbConnError => e
       drb_connection_errors[uri] += 1
       Specjour.logger.debug "#{e.message}: couldn't connect to manager at #{uri}"
-      retry if drb_connection_errors[uri] < 5
+      sleep(0.1) && retry if drb_connection_errors[uri] < 5
     end
 
     def fork_local_manager
