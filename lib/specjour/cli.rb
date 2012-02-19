@@ -2,6 +2,15 @@ module Specjour
   require 'thor'
   class CLI < Thor
 
+    # allow specjour to be called with path arguments
+    def self.start(original_args=ARGV, config={})
+      real_tasks = all_tasks.keys | @map.keys
+      unless real_tasks.include? original_args.first
+        original_args.unshift default_task
+      end
+      super(original_args)
+    end
+
     def self.worker_option
       method_option :workers, :aliases => "-w", :type => :numeric, :desc => "Number of concurrent processes to run. Defaults to your system's available cores."
     end
@@ -10,24 +19,14 @@ module Specjour
       method_option :alias, :aliases => "-a", :desc => "Project name advertised to listeners"
     end
 
-    def self.start(original_args=ARGV, config={})
-      real_tasks = all_tasks.keys | HELP_MAPPINGS
-      unless real_tasks.include? original_args.first
-        original_args.unshift default_task
-      end
-      super(original_args)
-    end
-
-
     default_task :dispatch
 
     class_option :log, :aliases => "-l", :type => :boolean, :desc => "Print debug messages to $stderr"
 
-
-    desc "listen", "Wait for incoming tests"
-    long_desc <<-D
+    desc "listen", "Listen for incoming tests to run"
+    long_desc <<-DESC
       Advertise availability to run tests for the current directory.
-    D
+    DESC
     worker_option
     method_option :projects, :aliases => "-p", :type => :array, :desc => "Projects supported by this listener"
     def listen
@@ -38,13 +37,12 @@ module Specjour
       Specjour::Manager.new(args).start
     end
 
-    desc "load", "load the app, then fork workers"#, :hide => true
+    desc "load", "load the app, then fork workers", :hide => true
     worker_option
     method_option :printer_uri, :required => true
     method_option :project_path, :required => true
     method_option :task, :required => true
-    method_option :preload_spec
-    method_option :preload_feature
+    method_option :test_paths, :type => :array, :default => []
     method_option :quiet, :type => :boolean, :default => false
     def load
       handle_logging
@@ -53,33 +51,45 @@ module Specjour
       Specjour::Loader.new(args).start
     end
 
-    desc "dispatch [PROJECT_PATH]", "Run tests in the current directory"
+    desc "dispatch [test_paths]", "Send tests to a listener"
     worker_option
     dispatcher_option
-    def dispatch(path = Dir.pwd)
+    long_desc <<-DESC
+      This is run when you simply type `specjour`.
+      By default, it will run the specs and features found in the current directory.
+      If you like, you can run a subset of tests by specifying the folder containing the tests.\n
+      Examples\n
+      `specjour dispatch spec`\n
+      `specjour dispatch features`\n
+      `specjour dispatch spec/models features/sign_up.feature`\n
+    DESC
+    def dispatch(*paths)
       handle_logging
       handle_workers
-      handle_dispatcher(path)
+      handle_dispatcher(paths)
       append_to_program_name "dispatch"
       Specjour::Dispatcher.new(args).start
     end
 
-    desc "prepare [PROJECT_PATH]", "Prepare all listening workers"
-    long_desc <<-D
+    desc "prepare [PROJECT_PATH]", "Run the prepare task on all listening workers"
+    long_desc <<-DESC
       Run the Specjour::Configuration.prepare block on all listening workers.
-      Defaults to dropping and schema loading the database.
-    D
+      Defaults to dropping the database, then loading the schema.
+    DESC
     worker_option
     dispatcher_option
     def prepare(path = Dir.pwd)
       handle_logging
       handle_workers
-      handle_dispatcher(path)
+      args[:project_path] = path
+      args[:project_alias] = args.delete(:alias)
+      args[:test_paths] = []
       args[:worker_task] = 'prepare'
       append_to_program_name "prepare"
       Specjour::Dispatcher.new(args).start
     end
 
+    map %w(-v --version) => :version
     desc "version", "Show the current version"
     def version
       puts Specjour::VERSION
@@ -103,9 +113,15 @@ module Specjour
       args[:worker_size] = options["workers"] || CPU.cores
     end
 
-    def handle_dispatcher(path)
-      args[:project_path] = path
+    def handle_dispatcher(paths)
+      if paths.empty?
+        args[:project_path] = Dir.pwd
+      else
+        args[:project_path] = File.expand_path(paths.first.sub(/(spec|features).*$/, ''))
+      end
+      args[:test_paths] = paths
       args[:project_alias] = args.delete(:alias)
+      raise ArgumentError, "Cannot dispatch line numbers" if paths.any? {|p| p =~ /:\d+/}
     end
   end
 end

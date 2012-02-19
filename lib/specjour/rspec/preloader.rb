@@ -1,9 +1,15 @@
 class Specjour::RSpec::Preloader
-  def self.load(spec_file)
-    $LOAD_PATH.unshift File.join(Dir.pwd, 'spec')
-    require spec_file
+  def self.load(paths=[])
+    require './spec/spec_helper'
+    load_spec_files paths
   ensure
     ::RSpec.reset
-    $LOAD_PATH.shift
+  end
+
+  def self.load_spec_files(paths)
+    options = ::RSpec::Core::ConfigurationOptions.new(paths)
+    options.parse_options
+    options.configure ::RSpec.configuration
+    ::RSpec.configuration.load_spec_files
   end
 end

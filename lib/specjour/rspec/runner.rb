@@ -4,6 +4,10 @@ module Specjour::RSpec::Runner
     args = ['--format=Specjour::RSpec::DistributedFormatter', spec]
     ::RSpec::Core::Runner.run args, $stderr, output
   ensure
-    ::RSpec.configuration.formatters.clear
+    ::RSpec.configuration.filter_manager = ::RSpec::Core::FilterManager.new
+    ::RSpec.world.filtered_examples.clear
+    ::RSpec.world.inclusion_filter.clear
+    ::RSpec.world.exclusion_filter.clear
+    ::RSpec.world.send(:instance_variable_set, :@line_numbers, nil)
   end
 end

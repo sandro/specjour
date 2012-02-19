@@ -4,22 +4,22 @@ module Specjour
     include Protocol
     RANDOM_PORT = 0
 
-    attr_reader :port
-    attr_accessor :worker_size, :tests_to_run, :completed_workers, :disconnections, :profiler
+    attr_reader :port, :clients
+    attr_accessor :tests_to_run, :example_size, :examples_complete, :profiler
 
-    def initialize(tests_to_run)
+    def initialize
       @host = "0.0.0.0"
       @server_socket = TCPServer.new(@host, RANDOM_PORT)
       @port = @server_socket.addr[1]
-      @completed_workers = 0
-      @disconnections = 0
       @profiler = {}
-      self.tests_to_run = run_order(tests_to_run)
+      @clients = {}
+      @tests_to_run = []
+      @example_size = 0
+      self.examples_complete = 0
     end
 
     def start
       fds = [@server_socket]
-      clients = {}
       catch(:stop) do
         while true
           reads = select(fds).first
@@ -44,6 +44,12 @@ module Specjour
       fds.each {|c| c.close}
     end
 
+    def exit_status
+      reporters.all? {|r| r.exit_status == true}
+    end
+
+    protected
+
     def serve(client)
       data = load_object(client.gets(TERMINATOR))
       case data
@@ -60,33 +66,31 @@ module Specjour
       client.flush
     end
 
-    def done
-      self.completed_workers += 1
+    def done(client)
+      self.examples_complete += 1
     end
 
-    def exit_status
-      reporters.all? {|r| r.exit_status == true}
+    def tests=(client, tests)
+      self.example_size += tests.size
+      self.tests_to_run = run_order(tests_to_run + tests)
     end
 
-    def rspec_summary=(summary)
+    def rspec_summary=(client, summary)
       rspec_report.add(summary)
     end
 
-    def cucumber_summary=(summary)
+    def cucumber_summary=(client, summary)
       cucumber_report.add(summary)
     end
 
-    def add_to_profiler(args)
+    def add_to_profiler(client, args)
       test, time = *args
       self.profiler[test] = time
     end
 
-    protected
-
     def disconnecting
-      self.disconnections += 1
-      if disconnections == worker_size
-        throw(:stop) unless Specjour.interrupted?
+      if (examples_complete == example_size || clients.empty?)
+        throw(:stop)
       end
     end
 
@@ -121,25 +125,21 @@ module Specjour
 
     def stopping
       summarize_reports
-      warn_if_workers_deserted
       record_performance unless Specjour.interrupted?
+      print_missing_tests if tests_to_run.any?
     end
 
     def summarize_reports
       reporters.each {|r| r.summarize}
     end
 
-    def warn_if_workers_deserted
-      if disconnections != completed_workers && !Specjour.interrupted?
-        puts
-        puts workers_deserted_message
-      end
+    def print_missing_tests
+      puts "*" * 60
+      puts "Oops! The following tests were not run:"
+      puts "*" * 60
+      puts tests_to_run
+      puts "*" * 60
     end
 
-    def workers_deserted_message
-      data = "* ERROR: NOT ALL WORKERS COMPLETED PROPERLY *"
-      filler = "*" * data.size
-      [filler, data, filler].join "\n"
-    end
   end
 end

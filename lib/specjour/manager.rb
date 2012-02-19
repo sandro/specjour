@@ -4,14 +4,15 @@ module Specjour
 
     include DRbUndumped
     include SocketHelper
+    include Fork
 
-    attr_accessor :project_name, :preload_spec, :preload_feature, :worker_task, :pid
-    attr_reader :worker_size, :dispatcher_uri, :registered_projects, :load_pid, :options
+    attr_accessor :test_paths, :project_name, :worker_task, :pid
+    attr_reader :worker_size, :dispatcher_uri, :registered_projects, :loader_pid, :options
 
     def self.start_quietly(options)
       manager = new options.merge(:quiet => true)
       manager.drb_uri
-      manager.pid = QuietFork.fork { manager.start }
+      manager.pid = Fork.fork_quietly { manager.start }
       manager
     end
 
@@ -57,10 +58,8 @@ module Specjour
 
     def dispatch_loader
       @loader_pid = fork do
-        # at_exit { exit! }
         exec_cmd = "load --printer-uri #{dispatcher_uri} --workers #{worker_size} --task #{worker_task} --project-path #{project_path}"
-        exec_cmd << " --preload-spec #{preload_spec}" if preload_spec
-        exec_cmd << " --preload-feature #{preload_feature}" if preload_feature
+        exec_cmd << " --test-paths #{test_paths.join(" ")}" if test_paths.any?
         exec_cmd << " --log" if Specjour.log?
         exec_cmd << " --quiet" if quiet?
         exec_ruby = "Specjour::CLI.start(#{exec_cmd.split(' ').inspect})"

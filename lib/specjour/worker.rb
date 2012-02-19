@@ -32,10 +32,10 @@ module Specjour
         time = Benchmark.realtime { run_test test }
         profile(test, time)
         run_times[test_type(test)] += time
+        connection.send_message(:done)
       end
 
       send_run_times(run_times)
-      connection.send_message(:done)
     ensure
       connection.disconnect
     end

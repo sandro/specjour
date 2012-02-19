@@ -26,7 +26,7 @@ module Specjour
     end
 
     def disconnect
-      socket.close unless socket.closed?
+      socket.close unless socket && socket.closed?
     end
 
     def socket
@@ -34,9 +34,8 @@ module Specjour
     end
 
     def timeout(&block)
-      Timeout.timeout(2, &block)
+      Timeout.timeout(0.5, &block)
     rescue Timeout::Error
-      raise Error, "Connection to dispatcher timed out", []
     end
 
     def next_test

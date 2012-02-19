@@ -4,18 +4,18 @@ module Specjour
     Thread.abort_on_exception = true
     include SocketHelper
 
-    attr_reader :project_alias, :managers, :manager_threads, :hosts, :options, :all_tests, :drb_connection_errors
+    attr_reader :project_alias, :managers, :manager_threads, :hosts, :options, :drb_connection_errors, :test_paths
     attr_accessor :worker_size, :project_path
 
     def initialize(options = {})
       Specjour.load_custom_hooks
       @options = options
-      @project_path = File.expand_path options[:project_path]
+      @project_path = options[:project_path]
+      @test_paths = options[:test_paths]
       @worker_size = 0
       @managers = []
       @drb_connection_errors = Hash.new(0)
-      find_tests
-      clear_manager_threads
+      reset_manager_threads
     end
 
     def start
@@ -29,23 +29,6 @@ module Specjour
     end
 
     protected
-
-    def find_tests
-      if project_path.match(/(.+)\/((spec|features)(?:\/\w+)*)$/)
-        self.project_path = $1
-        @all_tests = $3 == 'spec' ? all_specs($2) : all_features($2)
-      else
-        @all_tests = all_specs | all_features
-      end
-    end
-
-    def all_specs(tests_path = 'spec')
-      Dir[File.join(".", tests_path, "**/*_spec.rb")].sort
-    end
-
-    def all_features(tests_path = 'features')
-      Dir[File.join(".", tests_path, "**/*.feature")].sort
-    end
 
     def add_manager(manager)
       set_up_manager(manager)
@@ -69,7 +52,6 @@ module Specjour
       managers.each do |manager|
         puts "#{manager.hostname} (#{manager.worker_size})"
       end
-      printer.worker_size = worker_size
       command_managers(true) { |m| m.dispatch rescue DRb::DRbConnError }
     end
 
@@ -129,7 +111,7 @@ module Specjour
     end
 
     def printer
-      @printer ||= Printer.new(all_tests)
+      @printer ||= Printer.new
     end
 
     def project_alias
@@ -140,7 +122,7 @@ module Specjour
       @project_name ||= File.basename(project_path)
     end
 
-    def clear_manager_threads
+    def reset_manager_threads
       @manager_threads = []
     end
 
@@ -165,8 +147,7 @@ module Specjour
     def set_up_manager(manager)
       manager.project_name = project_name
       manager.dispatcher_uri = dispatcher_uri
-      manager.preload_spec = all_tests.detect {|f| f =~ /_spec\.rb$/}
-      manager.preload_feature = all_tests.detect {|f| f =~ /\.feature$/}
+      manager.test_paths = test_paths
       manager.worker_task = worker_task
       at_exit do
         begin
@@ -178,7 +159,7 @@ module Specjour
 
     def wait_on_managers
       manager_threads.each {|t| t.join; t.exit}
-      clear_manager_threads
+      reset_manager_threads
     end
 
     def worker_task

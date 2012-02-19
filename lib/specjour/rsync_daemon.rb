@@ -35,11 +35,11 @@ module Specjour
     end
 
     def start
+      Kernel.at_exit { stop }
       write_config
       Dir.chdir(project_path) do
         Kernel.system *command
       end
-      Kernel.at_exit { stop }
     end
 
     def stop
