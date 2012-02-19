@@ -115,8 +115,8 @@ module Specjour
 
     def connection
       @connection ||= begin
-        printer_connection
         at_exit { connection.disconnect }
+        printer_connection
       end
     end
 
