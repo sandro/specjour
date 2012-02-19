@@ -51,11 +51,7 @@ module Specjour
         $stdout.print data
         $stdout.flush
       when Array
-        if data.first == :ready
-          ready(client)
-        else
-          send(data.first, *data[1..-1])
-        end
+        send data.first, *(data[1..-1].unshift(client))
       end
     end
 
