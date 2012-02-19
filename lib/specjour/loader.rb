@@ -88,6 +88,8 @@ module Specjour
     def share_examples
       RSpec::Preloader.load spec_files
       connection.send_message :tests=, filtered_examples
+    ensure
+      ::RSpec.reset
     end
 
     def share_features

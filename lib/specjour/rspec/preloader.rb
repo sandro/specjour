@@ -2,8 +2,6 @@ class Specjour::RSpec::Preloader
   def self.load(paths=[])
     require './spec/spec_helper'
     load_spec_files paths
-  ensure
-    ::RSpec.reset
   end
 
   def self.load_spec_files(paths)
