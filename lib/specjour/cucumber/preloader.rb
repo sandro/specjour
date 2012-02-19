@@ -1,7 +1,8 @@
 module Specjour
   module Cucumber
     module Preloader
-      def self.load(feature_file)
+      def self.load
+        require 'cucumber' unless defined?(::Cucumber::Cli)
         configuration = ::Cucumber::Cli::Configuration.new
         configuration.parse! []
         runtime = ::Cucumber::Runtime.new(configuration)
