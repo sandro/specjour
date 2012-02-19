@@ -1,6 +1,4 @@
 module Specjour
-  require 'specjour/rspec'
-  require 'specjour/cucumber'
 
   class Worker
     include Protocol
@@ -76,11 +74,11 @@ module Specjour
     end
 
     def run_feature(feature)
-      Specjour::Cucumber::Runner.run(feature, connection)
+      Cucumber::Runner.run(feature, connection)
     end
 
     def run_spec(spec)
-      Specjour::RSpec::Runner.run(spec, connection)
+      RSpec::Runner.run(spec, connection)
     end
 
     def send_run_times(run_times)

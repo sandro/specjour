@@ -16,10 +16,5 @@ module Specjour
 
     class << self; attr_accessor :runtime; end
 
-    def self.wants_to_quit
-      if defined?(::Cucumber) && ::Cucumber.respond_to?(:wants_to_quit=)
-        ::Cucumber.wants_to_quit = true
-      end
-    end
   end
 end

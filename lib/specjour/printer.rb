@@ -1,6 +1,4 @@
 module Specjour
-  require 'specjour/rspec'
-  require 'specjour/cucumber'
 
   class Printer
     include Protocol

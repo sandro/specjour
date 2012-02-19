@@ -39,8 +39,15 @@ module Specjour
   def self.interrupted=(bool)
     @interrupted = bool
     if bool
-      Cucumber.wants_to_quit
-      RSpec.wants_to_quit
+      will_quit(:RSpec)
+      will_quit(:Cucumber)
+    end
+  end
+
+  def self.will_quit(framework)
+    if Object.const_defined?(framework)
+      framework = Object.const_get(framework)
+      framework.wants_to_quit = true if framework.respond_to?(:wants_to_quit=)
     end
   end
 

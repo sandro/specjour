@@ -1,8 +1,6 @@
 module Specjour
   class Manager
     require 'dnssd'
-    require 'specjour/rspec'
-    require 'specjour/cucumber'
 
     include DRbUndumped
     include SocketHelper
