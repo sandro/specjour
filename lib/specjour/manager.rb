@@ -165,7 +165,7 @@ module Specjour
           yield
         end
       else
-        block.call
+        yield
       end
     end
   end
