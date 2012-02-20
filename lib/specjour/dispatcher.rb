@@ -37,11 +37,10 @@ module Specjour
       self.worker_size += manager.worker_size
     end
 
-    def command_managers(async = false, &block)
+    def command_managers(&block)
       managers.each do |manager|
         manager_threads << Thread.new(manager, &block)
       end
-      wait_on_managers unless async
     end
 
     def dispatcher_uri
@@ -53,7 +52,7 @@ module Specjour
       managers.each do |manager|
         puts "#{manager.hostname} (#{manager.worker_size})"
       end
-      command_managers(true) { |m| m.dispatch rescue DRb::DRbConnError }
+      command_managers { |m| m.dispatch rescue DRb::DRbConnError }
     end
 
     def dispatching_tests?
