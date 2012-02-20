@@ -5,14 +5,28 @@ History
 ----------------------
 
 * [changed] Printer uses UNIX select instead of GServer (threads)
-* [removed] RSpec < 2.5 compatibility
+* [changed] Database is always dropped and reloaded using schema.rb or
+  structure.sql
+* [removed] RSpec < 2.8 compatibility
 * [added] Memory utilizing forks. No longer forking and execing means workers
   start running tests faster.
-* [added] Configuration.after_load hook run after loading the environment
+* [added] Configuration.after_load hook; runs after loading the environment
+* [added] Configurable rsync port
+* [added] Specs distributed by example, not file! Means better
+  distribution/fast spec suites.
+* [added] Rails compiled asset directory (tmp/cache) to the rsync inclusion
+  list. Workers won't have to compile assets during integration tests.
+* [fixed] SQL structure files can be used to build the database.
+* [fixed] Long timeout while waiting for bonjour requests. The bonjour code has
+  been rewritten.
+* [fixed] Load specjour in its own environment when running bundle exec specjour
+* [fixed] Forks running their parent's exit handlers.
 * [fixed] Database creation when the app depends on a database upon environment
   load (something as simple as a scope would cause this dependency). As long as
-  the regular test environment can be loaded, missing a database in a worker
-  environment shouldn't raise an exception, instead the db should be created.
+  the regular test environment can be loaded, a worker without a database
+  shouldn't raise an exception, instead the db should be created.
+
+[Full Changelog](https://github.com/sandro/specjour/compare/v0.4.1...0.5.0)
 
 0.4.1 / 2011-06-17
 ------------------
