@@ -96,7 +96,7 @@ module Specjour
 
     def run_order(tests)
       if File.exist?('.specjour/performance')
-        ordered_tests = File.readlines('.specjour/performance').map {|l| l.chop.split(':')[1]}
+        ordered_tests = File.readlines('.specjour/performance').map {|l| l.chop.split(':', 2)[1]}
         (tests - ordered_tests) | (ordered_tests & tests)
       else
         tests
