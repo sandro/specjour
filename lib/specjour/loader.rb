@@ -35,12 +35,6 @@ module Specjour
       kill_worker_processes
     end
 
-    protected
-
-    def spec_paths
-      @spec_paths ||= test_paths.select {|p| p =~ /spec.*$/}
-    end
-
     def spec_files
       @spec_files ||= file_collector(spec_paths) do |path|
         if path == project_path
@@ -51,10 +45,6 @@ module Specjour
       end
     end
 
-    def feature_paths
-      @feature_paths ||= test_paths.select {|p| p =~ /features.*$/}
-    end
-
     def feature_files
       @feature_files ||= file_collector(feature_paths) do |path|
         if path == project_path
@@ -63,6 +53,16 @@ module Specjour
           Dir["#{path}/**/*.feature"]
         end
       end
+    end
+
+    protected
+
+    def spec_paths
+      @spec_paths ||= test_paths.select {|p| p =~ /spec.*$/}
+    end
+
+    def feature_paths
+      @feature_paths ||= test_paths.select {|p| p =~ /features.*$/}
     end
 
     def file_collector(paths, &globber)

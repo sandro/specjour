@@ -1,8 +1,44 @@
 require 'spec_helper'
 
 describe Specjour::Printer do
-  subject do
-    Specjour::Printer.new []
+
+  describe "#tests=" do
+    before do
+      stub(File).exists? { false }
+    end
+    it "sets the example size to the tests size" do
+      subject.send(:tests=, nil, [1,2])
+      subject.example_size.should == 2
+    end
+
+    it "accumulates features" do
+      subject.send(:tests=, nil, ["one.feature", "two.feature"])
+      subject.tests_to_run.should =~ ["one.feature", "two.feature"]
+    end
+
+    it "accumlates specs" do
+      subject.send(:tests=, nil, ["one_spec.rb", "two_spec.rb"])
+      subject.tests_to_run.should =~ ["one_spec.rb", "two_spec.rb"]
+    end
+
+    it "accumulates both features and specs" do
+      subject.send(:tests=, nil, ["one.feature", "two.feature"])
+      subject.send(:tests=, nil, ["one_spec.rb", "two_spec.rb"])
+      subject.tests_to_run.should =~ ["one.feature", "two.feature", "one_spec.rb", "two_spec.rb"]
+    end
+
+    it "disregards duplicates" do
+      subject.send(:tests=, nil, ["one_spec.rb", "two_spec.rb"])
+      subject.send(:tests=, nil, ["one_spec.rb", "two_spec.rb"])
+      subject.tests_to_run.should =~ ["one_spec.rb", "two_spec.rb"]
+      p subject.tests_to_run
+    end
+
+    it "doesn't increment example_size with duplicates" do
+      subject.send(:tests=, nil, ["one_spec.rb", "two_spec.rb"])
+      subject.send(:tests=, nil, ["one_spec.rb", "two_spec.rb"])
+      subject.example_size.should == 2
+    end
   end
 
   describe "#exit_status" do

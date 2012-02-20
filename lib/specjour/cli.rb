@@ -88,7 +88,7 @@ module Specjour
     def prepare(path = Dir.pwd)
       handle_logging
       handle_workers
-      args[:project_path] = path
+      args[:project_path] = File.expand_path(path)
       args[:project_alias] = args.delete(:alias)
       args[:test_paths] = []
       args[:worker_task] = 'prepare'

@@ -71,8 +71,8 @@ module Specjour
     end
 
     def tests=(client, tests)
-      self.example_size += tests.size
-      self.tests_to_run = run_order(tests_to_run + tests)
+      self.tests_to_run = run_order(tests_to_run | tests)
+      self.example_size = tests_to_run.size
     end
 
     def rspec_summary=(client, summary)
