@@ -5,15 +5,10 @@ module Specjour
     begin
       require 'rake'
       extend Rake::DSL if defined?(Rake::DSL)
-      if defined?(Rails) && Rails.version =~ /^3/
+      if defined?(Rails)
         Rake::Task.define_task(:environment) { }
         load 'rails/tasks/misc.rake'
         load 'active_record/railties/databases.rake'
-      else
-        load 'tasks/misc.rake'
-        load 'tasks/databases.rake'
-        Rake::Task["db:structure:dump"].clear
-        Rake::Task["environment"].clear
       end
     rescue LoadError
       Specjour.logger.debug "Failed to load Rails rake tasks"
