@@ -1,5 +1,4 @@
-require 'rubygems'
-require 'rake'
+require 'bundler/gem_tasks'
 
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec)
@@ -19,12 +18,12 @@ end
 
 desc "tag, push gem, push to github"
 task :prerelease do
-  version = `cat VERSION`.strip
+  require 'specjour'
   command = %(
-    git tag v#{version} &&
+    git tag v#{Specjour::VERSION} &&
     rake build &&
     git push &&
-    gem push pkg/specjour-#{version}.gem &&
+    gem push pkg/specjour-#{Specjour::VERSION}.gem &&
     git push --tags
   )
   puts command
