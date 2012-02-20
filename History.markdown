@@ -26,7 +26,7 @@ History
   the regular test environment can be loaded, a worker without a database
   shouldn't raise an exception, instead the db should be created.
 
-[Full Changelog](https://github.com/sandro/specjour/compare/v0.4.1...0.5.0)
+[Full Changelog](https://github.com/sandro/specjour/compare/v0.4.1...v0.5.0)
 
 0.4.1 / 2011-06-17
 ------------------
