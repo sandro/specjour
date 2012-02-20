@@ -1,7 +1,7 @@
 History
 =======
 
-0.5.0 / (not released)
+0.5.0 / 2012-02-20
 ----------------------
 
 * [changed] Printer uses UNIX select instead of GServer (threads)
