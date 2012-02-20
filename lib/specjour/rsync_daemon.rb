@@ -40,6 +40,7 @@ module Specjour
       write_config
       Dir.chdir(project_path) do
         Kernel.system *command
+        sleep 0.1
       end
     end
 
