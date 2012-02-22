@@ -73,6 +73,7 @@ module Specjour
       puts "No listeners found on this machine, starting one..."
       manager_options = {:worker_size => options[:worker_size], :registered_projects => [project_alias], :rsync_port => rsync_port}
       manager = Manager.start_quietly manager_options
+      Process.detach manager.pid
       fetch_manager(manager.drb_uri)
       at_exit do
         unless Specjour.interrupted?
