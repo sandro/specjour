@@ -2,6 +2,7 @@ module Specjour
   module Cucumber
     module Preloader
       def self.load
+        $stdout.puts "Loading Cucumber Environment"
         require 'cucumber' unless defined?(::Cucumber::Cli)
         configuration = ::Cucumber::Cli::Configuration.new
         configuration.parse! []
