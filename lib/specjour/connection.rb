@@ -26,7 +26,7 @@ module Specjour
     end
 
     def disconnect
-      socket.close unless socket && socket.closed?
+      socket.close if socket && !socket.closed?
     end
 
     def socket
