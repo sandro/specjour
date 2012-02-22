@@ -16,7 +16,7 @@ module Specjour
       @managers = []
       @drb_connection_errors = Hash.new(0)
       @rsync_port = options[:rsync_port]
-      reset_manager_threads
+      @manager_threads = []
     end
 
     def start
@@ -25,7 +25,6 @@ module Specjour
       rsync_daemon.start
       dispatch_work
       printer.start if dispatching_tests?
-      wait_on_managers
       exit printer.exit_status
     end
 
@@ -122,10 +121,6 @@ module Specjour
       @project_name ||= File.basename(project_path)
     end
 
-    def reset_manager_threads
-      @manager_threads = []
-    end
-
     def resolve_reply(reply)
       DNSSD.resolve!(reply.name, reply.type, reply.domain, flags=0, reply.interface) do |resolved|
         Specjour.logger.debug "Bonjour discovered #{resolved.target}"
@@ -155,11 +150,6 @@ module Specjour
         rescue DRb::DRbConnError
         end
       end
-    end
-
-    def wait_on_managers
-      manager_threads.each {|t| t.join; t.exit}
-      reset_manager_threads
     end
 
     def worker_task
