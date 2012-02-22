@@ -89,7 +89,7 @@ module Specjour
     end
 
     def disconnecting
-      if (examples_complete == example_size || clients.empty?)
+      if (examples_complete == example_size) || clients.empty?
         throw(:stop)
       end
     end
