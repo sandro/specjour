@@ -3,7 +3,7 @@ module Specjour
     include Protocol
     extend Forwardable
 
-    attr_reader :uri
+    attr_reader :uri, :retries
     attr_writer :socket
 
     def_delegators :socket, :flush, :close, :closed?, :gets, :each
@@ -17,6 +17,7 @@ module Specjour
 
     def initialize(uri)
       @uri = uri
+      @retries = 0
     end
 
     alias to_str to_s
@@ -33,11 +34,6 @@ module Specjour
       @socket ||= connect
     end
 
-    def timeout(&block)
-      Timeout.timeout(0.5, &block)
-    rescue Timeout::Error
-    end
-
     def next_test
       will_reconnect do
         send_message(:ready)
@@ -52,12 +48,16 @@ module Specjour
     end
 
     def puts(arg='')
-      print(arg << "\n")
+      will_reconnect do
+        print(arg << "\n")
+      end
     end
 
     def send_message(method_name, *args)
-      print([method_name, *args])
-      flush
+      will_reconnect do
+        print([method_name, *args])
+        flush
+      end
     end
 
     protected
@@ -65,8 +65,6 @@ module Specjour
     def connect_socket
       @socket = TCPSocket.open(uri.host, uri.port)
     rescue Errno::ECONNREFUSED => error
-      Specjour.logger.debug "Could not connect to #{uri.to_s}\n#{error.inspect}"
-      sleep 0.1
       retry
     end
 
@@ -75,12 +73,18 @@ module Specjour
       connect
     end
 
+    def timeout(&block)
+      Timeout.timeout(0.1, &block)
+    rescue Timeout::Error
+    end
+
     def will_reconnect(&block)
       block.call
     rescue SystemCallError, IOError => error
       unless Specjour.interrupted?
+        @retries += 1
         reconnect
-        retry
+        retry if retries <= 5
       end
     end
   end
