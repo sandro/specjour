@@ -1,8 +1,16 @@
 History
 =======
 
-0.5.1 / 2012-02-21
-------------------
+0.5.2 / 2012-02-21
+---------------------------
+* [fixed] Binary path used by Loader
+* [fixed] Specjour prepare wouldn't wait for managers to complete
+* [fixed] Slower machines adding completed tests back to suite
+
+[Full Changelog](https://github.com/sandro/specjour/compare/v0.5.1...v0.5.2)
+
+0.5.1 / 2012-02-21 - yanked
+---------------------------
 * [fixed] Dispatcher hanging after printing the report
 * [added] More verbosity during startup
 
