@@ -16,6 +16,7 @@ module Specjour
 
     # allow specjour to be called with path arguments
     def self.start(original_args=ARGV, config={})
+      Specjour.trap_interrupt
       real_tasks = all_tasks.keys | @map.keys
       unless real_tasks.include? original_args.first
         original_args.unshift default_task
