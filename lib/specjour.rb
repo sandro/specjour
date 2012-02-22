@@ -29,8 +29,13 @@ module Specjour
   autoload :Cucumber, 'specjour/cucumber'
   autoload :RSpec, 'specjour/rspec'
 
-  VERSION = "0.5.0"
-  HOOKS_PATH = "./.specjour/hooks.rb"
+  VERSION ||= "0.5.0"
+  HOOKS_PATH ||= "./.specjour/hooks.rb"
+  PROGRAM_NAME ||= $PROGRAM_NAME # keep a reference of the original program name
+
+  GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
+
+  class Error < StandardError; end
 
   def self.interrupted?
     @interrupted
@@ -75,12 +80,4 @@ module Specjour
       abort("\n")
     end
   end
-
-  Error = Class.new(StandardError)
-  PROGRAM_NAME = $PROGRAM_NAME # keep a reference of the original program name
-
-  GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
-
-  trap_interrupt
-
 end
