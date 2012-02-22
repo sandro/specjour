@@ -1,6 +1,13 @@
 History
 =======
 
+0.5.1 / 2012-02-21
+------------------
+* [fixed] Dispatcher hanging after printing the report
+* [added] More verbosity during startup
+
+[Full Changelog](https://github.com/sandro/specjour/compare/v0.5.0...v0.5.1)
+
 0.5.0 / 2012-02-20
 ----------------------
 
