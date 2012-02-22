@@ -23,7 +23,7 @@ module Specjour
       Configuration.after_load.call
       (1..worker_size).each do |index|
         worker_pids << fork do
-          w = Worker.new(
+          Worker.new(
             :number => index,
             :printer_uri => printer_uri,
             :quiet => quiet
