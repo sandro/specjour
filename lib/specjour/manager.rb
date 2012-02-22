@@ -22,7 +22,6 @@ module Specjour
       @worker_task = options[:worker_task]
       @registered_projects = options[:registered_projects]
       @rsync_port = options[:rsync_port]
-      at_exit { kill_loader_process }
     end
 
     def available_for?(project_name)
