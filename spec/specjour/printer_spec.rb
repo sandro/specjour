@@ -21,17 +21,10 @@ describe Specjour::Printer do
       subject.tests_to_run.should =~ ["one_spec.rb", "two_spec.rb"]
     end
 
-    it "accumulates both features and specs" do
-      subject.send(:tests=, nil, ["one.feature", "two.feature"])
-      subject.send(:tests=, nil, ["one_spec.rb", "two_spec.rb"])
-      subject.tests_to_run.should =~ ["one.feature", "two.feature", "one_spec.rb", "two_spec.rb"]
-    end
-
     it "disregards duplicates" do
       subject.send(:tests=, nil, ["one_spec.rb", "two_spec.rb"])
       subject.send(:tests=, nil, ["one_spec.rb", "two_spec.rb"])
       subject.tests_to_run.should =~ ["one_spec.rb", "two_spec.rb"]
-      p subject.tests_to_run
     end
 
     it "doesn't increment example_size with duplicates" do

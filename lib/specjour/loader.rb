@@ -81,20 +81,14 @@ module Specjour
     end
 
     def load_app
-      share_examples if spec_files.any?
-      share_features if feature_files.any?
+      RSpec::Preloader.load spec_files if spec_files.any?
+      Cucumber::Preloader.load if feature_files.any?
+      register_tests_with_printer
     end
 
-    def share_examples
-      RSpec::Preloader.load spec_files
-      connection.send_message :tests=, filtered_examples
-    ensure
-      ::RSpec.reset
-    end
-
-    def share_features
-      Cucumber::Preloader.load
-      connection.send_message :tests=, feature_files
+    def register_tests_with_printer
+      tests = filtered_examples | feature_files
+      connection.send_message :tests=, tests
     end
 
     def filtered_examples
@@ -118,12 +112,9 @@ module Specjour
     def connection
       @connection ||= begin
         at_exit { connection.disconnect }
-        printer_connection
+        Connection.new URI.parse(printer_uri)
       end
     end
 
-    def printer_connection
-      Connection.new URI.parse(printer_uri)
-    end
   end
 end
