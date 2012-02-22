@@ -68,7 +68,7 @@ module Specjour
       end
       Process.waitall
     ensure
-      kill_loader_process
+      kill_loader_process if loader_pid
     end
 
     def in_project(&block)
@@ -77,7 +77,7 @@ module Specjour
 
     def interrupted=(bool)
       Specjour.interrupted = bool
-      kill_loader_process
+      kill_loader_process if loader_pid
     end
 
     def kill_loader_process
@@ -86,6 +86,7 @@ module Specjour
       else
         Process.kill('TERM', loader_pid) rescue Errno::ESRCH
       end
+      @loader_pid = nil
     end
 
     def pid
