@@ -92,6 +92,7 @@ module Specjour
     end
 
     def filtered_examples
+      return [] unless spec_paths.any?
       ::RSpec.world.example_groups.map do |g|
         g.descendants.map do |gs|
           gs.examples
