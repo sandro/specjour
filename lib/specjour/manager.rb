@@ -62,7 +62,7 @@ module Specjour
         exec_cmd << " --test-paths #{test_paths.join(" ")}" if test_paths.any?
         exec_cmd << " --log" if Specjour.log?
         exec_cmd << " --quiet" if quiet?
-        load_path = $LOAD_PATH.detect {|l| l =~ %r(specjour.*/lib$)}
+        load_path = $LOAD_PATH.detect {|l| l =~ %r(specjour[^/]*/lib$)}
         bin_path = File.expand_path(File.join(load_path, "../bin"))
         Kernel.exec({"RUBYLIB" => load_path}, "#{bin_path}/specjour #{exec_cmd}")
       end
