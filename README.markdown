@@ -36,10 +36,12 @@ Dispatch the tests among the managers you started. Specjour checks the 'spec' an
 The first parameter to the specjour command is a test directory. It defalts to
 the current directory and searches for 'spec' and 'features' paths therein.
 
+    
     $ specjour spec # all rspec tests
     $ specjour spec/models # only model tests
     $ specjour features # only features
     $ specjour ~/my_other_project/features
+
 
 ## Rails
 Each worker should run their specs in an isolated database. Modify the test database name in your `config/database.yml` to include the following environment variable (Influenced by [parallel\_tests](http://github.com/grosser/parallel_tests)):

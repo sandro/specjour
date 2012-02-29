@@ -25,6 +25,7 @@ module Specjour
 
     def run_tests
       Configuration.after_fork.call
+      load_app
       run_times = Hash.new(0)
 
       while test = connection.next_test
