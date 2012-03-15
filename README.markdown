@@ -2,61 +2,56 @@
 
 ## FUCK SETI. Run specs with your spare CPU cycles.
 
-1. Spin up a manager on each machine that can run your specs.
-2. Start a dispatcher in your project directory.
+## Instructions
+
+1. Start a listener on every machine in the network. `# specjour listen`
+2. Start a dispatcher. `# specjour`
 3. Say farewell to your long coffee breaks.
 
 ## Installation
     gem install specjour
 
-## Give it a try
-Running `specjour` starts a dispatcher, a manager, and multiple workers - all
-of the componenets necessary for distributing your test suite.
+### Rails
+Each worker needs an isolated database. Modify the test database name in your
+`config/database.yml` to include the following environment variable (Influenced
+by [parallel\_tests](http://github.com/grosser/parallel_tests)):
 
-_(Read the Rails section first if your project uses Rails)_
+    test:
+      database: project_name_test<%=ENV['TEST_ENV_NUMBER']%>
+
+## Give it a try
+Run `specjour` to start a dispatcher, manager, and multiple workers in the same
+terminal window.
 
     $ cd myproject
     $ specjour
 
 ## Start a manager
-Running `specjour listen` will start a manager which advertises that it's ready
-to run specs. By default, the manager runs tests for the project in the
-current directory and uses your system cores to determine the number of workers
-to start. If your system has two cores, two workers will run tests.
+If you wish to share your computing power with the rest of the computers in your network, run `specjour listen` to start a long running process. The next time you, or any of your co-workers run `specjour`, they'll find your machine.
 
     $ specjour listen
 
 ## Distribute the tests
-Dispatch the tests among the managers you started. Specjour checks the 'spec' and
-'features' directories for tests.
+Dispatch the tests among the managers in the network. Specjour checks the
+'spec' and 'features' directories for tests to send to the listening
+managers.
 
     $ specjour
 
-## Distribute a subset of tests
-The first parameter to the specjour command is a test directory. It defalts to
+## Supplementary
+
+### Distribute a subset of tests
+The first parameter of the specjour command is a test directory. It defalts to
 the current directory and searches for 'spec' and 'features' paths therein.
 
     $ specjour spec # all rspec tests
     $ specjour spec/models # only model tests
-    $ specjour features # only features
-    $ specjour ~/my_other_project/features
+    $ specjour features # all features
 
-## Rails
-Each worker should run their specs in an isolated database. Modify the test database name in your `config/database.yml` to include the following environment variable (Influenced by [parallel\_tests](http://github.com/grosser/parallel_tests)):
-
-    test:
-      database: blog_test<%=ENV['TEST_ENV_NUMBER']%>
-
-Running `specjour prepare` will set up the database for each worker.
-
-### ActiveRecord Hooks
-Specjour contains ActiveRecord hooks that clear database tables before running tests using `DELETE FROM <table_name>;`. Additionally, test databases will be created if they don't exist (i.e. `CREATE DATABASE blog_test8` for the 8th worker) and your schema will be loaded when the database is out of date.
-
-## Custom Hooks
+### Custom Hooks
 Specjour allows you to hook in to the test process on a per-machine and
 per-worker level through the before\_fork and after\_fork configuration blocks.
-If the default ActiveRecord hook doesn't set up the database properly for your
-test suite, override it with a custom after\_fork hook.
+If the default hooks don't work for your project, they can be overridden.
 
     # .specjour/hooks.rb
 
@@ -71,8 +66,8 @@ test suite, override it with a custom after\_fork hook.
     end
 
 A preparation hook is run when `specjour prepare` is invoked. This hook allows
-you to run arbitrary code on all of the listening workers. By default, it drops
-and recreates the ActiveRecord database on all workers.
+you to run arbitrary code on all of the listening workers. By default, it
+recreates the database on all workers.
 
     # .specjour/hooks.rb
 
@@ -81,28 +76,28 @@ and recreates the ActiveRecord database on all workers.
       # custom preparation code
     end
 
-## Customize what gets rsync'd
+### Customize what gets rsync'd
 The standard rsync configuration file may be too broad for your
 project. If you find you're rsyncing gigs of extraneous data from your public
-directory, add an exclusion to your projects rsyncd.conf file.
+directory, add an exclusion to your project's rsyncd.conf file.
 
     $ vi workbeast/.specjour/rsyncd.conf
 
-## Listen for multiple projects
-By default, a manager will listen to the project in the current directory. If you want to listen for multiple projects, use the `--projects` flag.
+### Listen for multiple projects
+By default, a manager will listen to the project in the current directory. If you want to run tests for multiple projects, use the `--projects` flag.
 
-    $ specjour listen --projects bizconf workbeast # run specs for the bizconf and workbeast projects
+    $ specjour listen --projects bizconf workbeast # run tests for the bizconf and workbeast projects
 
-## Give your project an alias
+### Give your project an alias
 By default, the dispatcher looks for managers matching the project's directory name. If you have multiple teams working on different branches of the same project you may want to isolate each specjour cluster. Give your project an alias and only listen for that alias.
 
-    ~/bizconf $ specjour listen -p bizconf_08
-    ~/bizconf $ specjour -a bizconf_08
+    ~/bizconf $ specjour listen --projects bizconf_08
+    ~/bizconf $ specjour --alias bizconf_08
 
-    ~/bizconf $ specjour listen -p bizconf_09
-    ~/bizconf $ specjour -a bizconf_09
+    ~/bizconf $ specjour listen --projects bizconf_09
+    ~/bizconf $ specjour --alias bizconf_09
 
-## Working with git
+### Working with git
 Commit the .specjour directory but ignore the performance file. The performance
 file constantly changes, there's no need to commit it. Specjour uses it in an
 attempt to optimize the run order; ensuring each machine gets at least one
@@ -115,7 +110,6 @@ long-running test.
 
 * RSpec 2
 * Cucumber 0.9+
-* Rails 2
 * Rails 3
 
 ## Hacking on Specjour
@@ -124,8 +118,6 @@ If you want to hack on specjour, here is how to test your changes:
     source .dev
     rake # run the test suite sanely
     specjour # run the test suite with specjour
-    cd sample
-    specjour # run the cucumber test suite with specjour
 
 Then if all is good, go to another app and test your changes on your test suite:
 
@@ -140,7 +132,7 @@ Then if all is good, go to another app and test your changes on your test suite:
 * voxdolo - Endless support, alpha testing, various patches
 * l4rk and leshill - Removed Jeweler, added support for RSpec 2 and Cucumber 0.9+
 * testjour - Ripped off your name
-* parallel\_tests - Made my test suite twice as fast
+* parallel\_tests - Inspiration
 
 ## Note on Patches/Pull Requests
 
