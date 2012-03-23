@@ -3,9 +3,10 @@ module Specjour::RSpec
     attr_reader :examples
     attr_reader :duration
 
-    def initialize
+    def initialize(printer)
       @examples = []
       @duration = 0.0
+      @printer = printer
       ::RSpec.configuration.color_enabled = true
       ::RSpec.configuration.output_stream = $stdout
     end
@@ -18,6 +19,14 @@ module Specjour::RSpec
       end
     end
 
+    def notify_failure(example)
+      @printer.did_fail_test(self, example.location) if example.execution_result[:status] == 'failed'
+    end
+
+    def clear_failure(test)
+      examples.reject! { |example| example.location == test }
+    end
+
     def duration=(value)
       @duration = value.to_f if duration < value.to_f
     end
@@ -27,18 +36,17 @@ module Specjour::RSpec
     end
 
     def metadata_for_examples(metadata_collection)
-      examples.concat(
-        metadata_collection.map do |partial_metadata|
-          example = ::RSpec::Core::Example.allocate
-          example.instance_variable_set(:@example_group_class,
-            OpenStruct.new(:metadata => {}, :ancestors => [])
-          )
-          metadata = ::RSpec::Core::Metadata.new
-          metadata.merge! partial_metadata
-          example.instance_variable_set(:@metadata, metadata)
-          example
-        end
-      )
+      metadata_collection.map do |partial_metadata|
+        example = ::RSpec::Core::Example.allocate
+        example.instance_variable_set(:@example_group_class,
+          OpenStruct.new(:metadata => {}, :ancestors => [])
+        )
+        metadata = ::RSpec::Core::Metadata.new
+        metadata.merge! partial_metadata
+        example.instance_variable_set(:@metadata, metadata)
+        examples << example
+        notify_failure(example)
+      end
     end
 
     def pending_examples

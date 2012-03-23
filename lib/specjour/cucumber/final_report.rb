@@ -46,14 +46,27 @@ module Specjour
 
     class FinalReport
       include ::Cucumber::Formatter::Console
-      def initialize
+      def initialize(printer)
         @io = $stdout
         @features = []
         @summarizer = Summarizer.new
+        @printer = printer
       end
 
       def add(stats)
         @summarizer.add(stats)
+        notify_failure(stats)
+      end
+
+      def notify_failure(stats)
+        failures = stats[:failing_scenarios] || []
+        failures.each do |failure|
+          @printer.did_fail_test(self, failure.file)
+        end
+      end
+
+      def clear_failure(test)
+        @summarizer.failing_scenarios.reject!{ |failure| failure.file == test }
       end
 
       def exit_status
@@ -69,7 +82,10 @@ module Specjour
         if @summarizer.failing_scenarios.any?
           puts "\n\n"
           puts format_string("Failing Scenarios:", :failed)
-          @summarizer.failing_scenarios.each {|f| puts f }
+          @summarizer.failing_scenarios.each do |f|
+            puts format_string("cucumber " + f.file, :failed) +
+                 format_string(" # Scenario: " + f.name, :comment)
+          end
         end
 
         default_format = lambda {|status_count, status| format_string(status_count, status)}

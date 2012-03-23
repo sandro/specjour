@@ -115,7 +115,7 @@ module Specjour
     end
 
     def printer
-      @printer ||= Printer.new
+      @printer ||= Printer.new(@options)
     end
 
     def project_alias

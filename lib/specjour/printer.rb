@@ -7,7 +7,7 @@ module Specjour
     attr_reader :port, :clients
     attr_accessor :tests_to_run, :example_size, :examples_complete, :profiler
 
-    def initialize
+    def initialize(options = {})
       @host = "0.0.0.0"
       @server_socket = TCPServer.new(@host, RANDOM_PORT)
       @port = @server_socket.addr[1]
@@ -15,6 +15,7 @@ module Specjour
       @clients = {}
       @tests_to_run = []
       @example_size = 0
+      @rerun = options[:rerun]
       self.examples_complete = 0
     end
 
@@ -46,6 +47,13 @@ module Specjour
 
     def exit_status
       reporters.all? {|r| r.exit_status == true}
+    end
+
+    def did_fail_test(report, test)
+      if rerun_enabled? && first_rerun?(test)
+        tests_to_run << test
+        report.clear_failure(test)
+      end
     end
 
     protected
@@ -106,11 +114,20 @@ module Specjour
     end
 
     def rspec_report
-      @rspec_report ||= RSpec::FinalReport.new
+      @rspec_report ||= RSpec::FinalReport.new(self)
     end
 
     def cucumber_report
-      @cucumber_report ||= Cucumber::FinalReport.new
+      @cucumber_report ||= Cucumber::FinalReport.new(self)
+    end
+
+    def rerun_enabled?
+      @rerun
+    end
+
+    def first_rerun?(test)
+      @rerunned ||= Set.new
+      @rerunned.add?(test)
     end
 
     def record_performance

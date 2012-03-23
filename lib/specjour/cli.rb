@@ -10,6 +10,10 @@ module Specjour
       method_option :alias, :aliases => "-a", :desc => "Project name advertised to listeners"
     end
 
+    def self.rerun_option
+      method_option :rerun, :aliases => "-r", :type => :boolean, :desc => "Auto rerun failures"
+    end
+
     def self.rsync_port_option
       method_option :rsync_port, :type => :numeric, :default => 23456, :desc => "Port to use for rsync daemon"
     end
@@ -58,6 +62,7 @@ module Specjour
     end
 
     desc "dispatch [test_paths]", "Send tests to a listener"
+    rerun_option
     worker_option
     dispatcher_option
     rsync_port_option
