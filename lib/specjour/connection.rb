@@ -74,7 +74,7 @@ module Specjour
     end
 
     def timeout(&block)
-      Timeout.timeout(0.1, &block)
+      Timeout.timeout(1.0, &block)
     rescue Timeout::Error
     end
 
