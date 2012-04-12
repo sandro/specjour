@@ -1,6 +1,14 @@
 History
 =======
 
+0.5.3 / 2012-04-12
+---------------------------
+* [fixed] Writing to a nil socket; timeout too small (josephlord)
+* [fixed] Eagerly loading Rspec (jgdavey)
+* [fixed] Load path incorrectly matching specjour (jgdavey)
+
+[Full Changelog](https://github.com/sandro/specjour/compare/v0.5.2...v0.5.3)
+
 0.5.2 / 2012-02-21
 ---------------------------
 * [fixed] Binary path used by Loader
