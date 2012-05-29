@@ -87,12 +87,19 @@ module Specjour
     end
 
     def register_tests_with_printer
-      tests = filtered_examples | feature_files
+      tests = rspec_examples | feature_files
       connection.send_message :tests=, tests
     end
 
+    def rspec_examples
+      if spec_files.any?
+        filtered_examples
+      else
+        []
+      end
+    end
+
     def filtered_examples
-      return [] unless spec_paths.any?
       ::RSpec.world.example_groups.map do |g|
         g.descendants.map do |gs|
           gs.examples
