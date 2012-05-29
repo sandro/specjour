@@ -1,7 +1,13 @@
 History
 =======
 
-0.5.3 / 2012-04-12
+0.5.4 / 2012-05-29
+---------------------------
+* [fixed] Not running specs without 'spec/' argument
+
+[Full Changelog](https://github.com/sandro/specjour/compare/v0.5.3...v0.5.4)
+
+0.5.3 / 2012-04-12 - yanked
 ---------------------------
 * [fixed] Writing to a nil socket; timeout too small (josephlord)
 * [fixed] Eagerly loading Rspec (jgdavey)
@@ -33,7 +39,7 @@ History
 * [removed] RSpec < 2.8 compatibility
 * [added] Memory utilizing forks. No longer forking and execing means workers
   start running tests faster.
-* [added] Configuration.after_load hook; runs after loading the environment
+* [added] Configuration.after\_load hook; runs after loading the environment
 * [added] Configurable rsync port
 * [added] Specs distributed by example, not file! Means better
   distribution/fast spec suites.
