@@ -1,6 +1,12 @@
 History
 =======
 
+0.5.5 / 2012-05-31
+---------------------------
+* [fixed] Now compatible with thor 0.15.x
+
+[Full Changelog](https://github.com/sandro/specjour/compare/v0.5.4...v0.5.5)
+
 0.5.4 / 2012-05-29
 ---------------------------
 * [fixed] Not running specs without 'spec/' argument
