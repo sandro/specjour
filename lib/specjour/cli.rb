@@ -38,9 +38,9 @@ module Specjour
     def listen
       handle_logging
       handle_workers
-      args[:registered_projects] = args.delete(:projects) || [File.basename(Dir.pwd)]
+      params[:registered_projects] = params.delete(:projects) || [File.basename(Dir.pwd)]
       append_to_program_name "listen"
-      Specjour::Manager.new(args).start
+      Specjour::Manager.new(params).start
     end
 
     desc "load", "load the app, then fork workers", :hide => true
@@ -54,7 +54,7 @@ module Specjour
       handle_logging
       handle_workers
       append_to_program_name "load"
-      Specjour::Loader.new(args).start
+      Specjour::Loader.new(params).start
     end
 
     desc "dispatch [test_paths]", "Send tests to a listener"
@@ -75,7 +75,7 @@ module Specjour
       handle_workers
       handle_dispatcher(paths)
       append_to_program_name "dispatch"
-      Specjour::Dispatcher.new(args).start
+      Specjour::Dispatcher.new(params).start
     end
 
     desc "prepare [PROJECT_PATH]", "Run the prepare task on all listening workers"
@@ -89,12 +89,12 @@ module Specjour
     def prepare(path = Dir.pwd)
       handle_logging
       handle_workers
-      args[:project_path] = File.expand_path(path)
-      args[:project_alias] = args.delete(:alias)
-      args[:test_paths] = []
-      args[:worker_task] = 'prepare'
+      params[:project_path] = File.expand_path(path)
+      params[:project_alias] = params.delete(:alias)
+      params[:test_paths] = []
+      params[:worker_task] = 'prepare'
       append_to_program_name "prepare"
-      Specjour::Dispatcher.new(args).start
+      Specjour::Dispatcher.new(params).start
     end
 
     map %w(-v --version) => :version
@@ -109,8 +109,8 @@ module Specjour
       $PROGRAM_NAME = "#{$PROGRAM_NAME} #{command}"
     end
 
-    def args
-      @args ||= options.dup
+    def params
+      @params ||= options.dup
     end
 
     def handle_logging
@@ -118,17 +118,17 @@ module Specjour
     end
 
     def handle_workers
-      args[:worker_size] = options["workers"] || CPU.cores
+      params[:worker_size] = options["workers"] || CPU.cores
     end
 
     def handle_dispatcher(paths)
       if paths.empty?
-        args[:project_path] = Dir.pwd
+        params[:project_path] = Dir.pwd
       else
-        args[:project_path] = File.expand_path(paths.first.sub(/(spec|features).*$/, ''))
+        params[:project_path] = File.expand_path(paths.first.sub(/(spec|features).*$/, ''))
       end
-      args[:test_paths] = paths
-      args[:project_alias] = args.delete(:alias)
+      params[:test_paths] = paths
+      params[:project_alias] = params.delete(:alias)
       raise ArgumentError, "Cannot dispatch line numbers" if paths.any? {|p| p =~ /:\d+/}
     end
   end
