@@ -1,5 +1,4 @@
 module Specjour::Cucumber
-  ::Term::ANSIColor.coloring = true
   class DistributedFormatter < ::Cucumber::Formatter::Progress
 
     def initialize(step_mother, io, options)
