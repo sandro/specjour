@@ -102,8 +102,8 @@ module Specjour
         end
         raise Timeout::Error
       end
-      rescue Timeout::Error
-        replies.each {|r| resolve_reply(r)}
+    rescue Timeout::Error
+      replies.each {|r| resolve_reply(r)}
     end
 
     def local_manager_needed?
