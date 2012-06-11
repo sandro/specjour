@@ -127,17 +127,20 @@ module Specjour
     end
 
     def resolve_reply(reply)
-      DNSSD.resolve!(reply.name, reply.type, reply.domain, flags=0, reply.interface) do |resolved|
-        Specjour.logger.debug "Bonjour discovered #{resolved.target}"
-        if resolved.text_record && resolved.text_record['version'] == Specjour::VERSION
-          resolved_ip = ip_from_hostname(resolved.target)
-          uri = URI::Generic.build :scheme => reply.service_name, :host => resolved_ip, :port => resolved.port
-          fetch_manager(uri)
-        else
-          puts "Found #{resolved.target} but its version doesn't match v#{Specjour::VERSION}. Skipping..."
+      Timeout.timeout(1) do
+        DNSSD.resolve!(reply.name, reply.type, reply.domain, flags=0, reply.interface) do |resolved|
+          Specjour.logger.debug "Bonjour discovered #{resolved.target}"
+          if resolved.text_record && resolved.text_record['version'] == Specjour::VERSION
+            resolved_ip = ip_from_hostname(resolved.target)
+            uri = URI::Generic.build :scheme => reply.service_name, :host => resolved_ip, :port => resolved.port
+            fetch_manager(uri)
+          else
+            puts "Found #{resolved.target} but its version doesn't match v#{Specjour::VERSION}. Skipping..."
+          end
+          break unless resolved.flags.more_coming?
         end
-        break unless resolved.flags.more_coming?
       end
+    rescue Timeout::Error
     end
 
     def rsync_daemon
