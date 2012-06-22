@@ -1,6 +1,12 @@
 History
 =======
 
+0.5.6 / 2012-06-22
+---------------------------
+* [fixed] Specjour hang when attempting to resolve a bonjour reply
+* [fixed] Specjour executes loader under current $LOAD\_PATH  
+  Specjour no longer assumes the required gems are available globally. Useful when running specjour under a vendored environment (bundle install --path=vendor).
+
 0.5.5 / 2012-05-31
 ---------------------------
 * [fixed] Now compatible with thor 0.15.x
