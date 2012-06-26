@@ -71,7 +71,7 @@ module Specjour
   end
 
   def self.load_custom_hooks
-    require HOOKS_PATH if File.exists?(HOOKS_PATH)
+    load HOOKS_PATH if File.exists?(HOOKS_PATH)
   end
 
   def self.trap_interrupt

@@ -22,6 +22,7 @@ module Specjour
       @worker_task = options[:worker_task]
       @registered_projects = options[:registered_projects]
       @rsync_port = options[:rsync_port]
+      Specjour.load_custom_hooks
     end
 
     def available_for?(project_name)
@@ -109,7 +110,7 @@ module Specjour
     end
 
     def sync
-      cmd "rsync -aL --delete --ignore-errors --port=#{rsync_port} #{dispatcher_uri.host}::#{project_name} #{project_path}"
+      cmd "rsync #{Specjour::Configuration.rsync_options} --port=#{rsync_port} #{dispatcher_uri.host}::#{project_name} #{project_path}"
       puts "rsync complete"
     end
 

@@ -2,7 +2,7 @@ module Specjour
   module Configuration
     extend self
 
-    attr_writer :before_fork, :after_fork, :after_load, :prepare
+    attr_writer :before_fork, :after_fork, :after_load, :prepare, :rsync_options
 
     # This block is run by each worker before they begin running tests.
     # The default action is to migrate the database, and clear it of any old
@@ -37,6 +37,11 @@ module Specjour
       @after_fork = nil
       @after_load = nil
       @prepare = nil
+      @rsync_options = nil
+    end
+
+    def rsync_options
+      @rsync_options ||= default_rsync_options
     end
 
     def bundle_install
@@ -70,6 +75,10 @@ module Specjour
           DbScrub.scrub
         end
       end
+    end
+
+    def default_rsync_options
+      "-aL --delete --ignore-errors"
     end
 
     protected

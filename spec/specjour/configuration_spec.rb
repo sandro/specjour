@@ -23,9 +23,6 @@ module RailsAndActiveRecordDefined
 end
 
 describe Specjour::Configuration do
-  subject do
-    Specjour::Configuration
-  end
 
   before { subject.reset }
 
@@ -124,6 +121,17 @@ describe Specjour::Configuration do
         mock(Specjour::DbScrub).scrub
         subject.prepare.call
       end
+    end
+  end
+
+  describe "#rsync_options" do
+    it "allows custom rsync_options to be set" do
+      subject.rsync_options = '-a'
+      subject.rsync_options.should == '-a'
+    end
+
+    it "defaults to archive, symbolic links, delete, and ignore errors" do
+      subject.rsync_options.should == "-aL --delete --ignore-errors"
     end
   end
 end
