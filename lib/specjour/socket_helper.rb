@@ -12,6 +12,10 @@ module Specjour
       @hostname ||= Socket.gethostname
     end
 
+    def local_ip
+      @local_ip ||= UDPSocket.open {|s| s.connect('74.125.224.103', 1); s.addr.last }
+    end
+
     def current_uri
       @current_uri ||= new_uri
     end

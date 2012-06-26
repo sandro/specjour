@@ -47,7 +47,7 @@ module Specjour
     end
 
     def dispatcher_uri
-      @dispatcher_uri ||= URI::Generic.build :scheme => "specjour", :host => hostname, :port => printer.port
+      @dispatcher_uri ||= URI::Generic.build :scheme => "specjour", :host => local_ip, :port => printer.port
     end
 
     def dispatch_work
@@ -111,7 +111,7 @@ module Specjour
     end
 
     def no_local_managers?
-      managers.none? {|m| m.hostname == hostname}
+      managers.none? {|m| m.local_ip == local_ip}
     end
 
     def printer
