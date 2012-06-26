@@ -133,7 +133,7 @@ module Specjour
 
     def cmd(command)
       puts command
-      system command
+      system *command.split
     end
 
     def execute_before_fork
@@ -167,5 +167,6 @@ module Specjour
         yield
       end
     end
+
   end
 end
