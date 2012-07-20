@@ -107,6 +107,8 @@ module Specjour
           "#{e.file_path}:#{e.metadata[:line_number]}"
         end
       end.flatten.uniq
+    ensure
+      ::RSpec.reset
     end
 
     def kill_worker_processes
