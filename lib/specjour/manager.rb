@@ -111,7 +111,6 @@ module Specjour
 
     def sync
       cmd "rsync #{Specjour::Configuration.rsync_options} --port=#{rsync_port} #{dispatcher_uri.host}::#{project_name} #{project_path}"
-      puts "rsync complete"
     end
 
     protected
@@ -132,14 +131,17 @@ module Specjour
     end
 
     def cmd(command)
-      puts command
-      system *command.split
+      Specjour.benchmark(command) do
+        system *command.split
+      end
     end
 
     def execute_before_fork
-      in_project do
-        Specjour.load_custom_hooks
-        Configuration.before_fork.call
+      Specjour.benchmark("before_fork") do
+        in_project do
+          Specjour.load_custom_hooks
+          Configuration.before_fork.call
+        end
       end
     end
 

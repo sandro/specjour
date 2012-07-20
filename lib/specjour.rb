@@ -80,4 +80,10 @@ module Specjour
       abort("\n")
     end
   end
+
+  def self.benchmark(msg, &block)
+    print "#{msg}... "
+    time = Benchmark.realtime &block
+    puts "completed in #{time}s"
+  end
 end
