@@ -1,5 +1,6 @@
 module Specjour::RSpec::Runner
-  ::RSpec::Core::Runner::AT_EXIT_HOOK_BACKTRACE_LINE.replace "#{__FILE__}:#{__LINE__ + 3}:in `run'"
+  ::RSpec.configuration.backtrace_clean_patterns << %r(lib/specjour/)
+
   def self.run(spec, output)
     args = ['--format=Specjour::RSpec::DistributedFormatter', spec]
     ::RSpec::Core::Runner.run args, $stderr, output
