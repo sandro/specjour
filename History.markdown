@@ -1,6 +1,12 @@
 History
 =======
 
+0.6.0 / master
+---------------------------
+* [added] Rsync options are now customizable via `Specjour::Configuration.rsync\_options=`  
+  Useful when running on machines that use a combination of vendored gems and gemsets, i.e.  
+  `-aL --delete --ignore-errors --exclude=vendor/ruby --exclude=.bundle`
+
 0.5.6 / 2012-06-22
 ---------------------------
 * [fixed] Specjour hang when attempting to resolve a bonjour reply
