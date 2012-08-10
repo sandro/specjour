@@ -127,8 +127,10 @@ module Specjour
 
     def stopping
       summarize_reports
-      record_performance unless Specjour.interrupted?
-      print_missing_tests if tests_to_run.any?
+      unless Specjour.interrupted?
+        record_performance
+        print_missing_tests if tests_to_run.any?
+      end
     end
 
     def summarize_reports
