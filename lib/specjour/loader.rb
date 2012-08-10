@@ -104,7 +104,11 @@ module Specjour
         g.descendants.map do |gs|
           gs.examples
         end.flatten.map do |e|
-          "#{e.file_path}:#{e.metadata[:line_number]}"
+          meta = e.metadata
+          if e.example_group.metadata[:shared_group_name]
+            meta = e.metadata[:example_group]
+          end
+          "#{meta[:file_path]}:#{meta[:line_number]}"
         end
       end.flatten.uniq
     ensure
