@@ -57,7 +57,7 @@ module Specjour
     end
 
     def print_time_for(test, time)
-      printf "[#{ENV['TEST_ENV_NUMBER']}] Finished #{test} in %.4f\n", time
+      printf "[#{ENV['TEST_ENV_NUMBER']}] Finished #{test} in %.2fs\n", time
     end
 
     def profile(test, time)
