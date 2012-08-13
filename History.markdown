@@ -1,6 +1,15 @@
 History
 =======
 
+0.6.1 / 2012-08-13
+---------------------------
+* [fixed] No longer prints tests that have yet to run when interrupting the
+  process with CTRL-C
+* [fixed] Use the correct file location for shared examples. As in, actually
+  run them.
+
+[Full Changelog](https://github.com/sandro/specjour/compare/v0.6.0...v0.6.1)
+
 0.6.0 / 2012-07-19
 ---------------------------
 * [fixed] First RSpec test to load would run twice
@@ -9,11 +18,15 @@ History
   `-aL --delete --ignore-errors --exclude=vendor/ruby --exclude=.bundle`
 * [added] Benchmark times for various system status messages
 
+[Full Changelog](https://github.com/sandro/specjour/compare/v0.5.6...v0.6.0)
+
 0.5.6 / 2012-06-22
 ---------------------------
 * [fixed] Specjour hang when attempting to resolve a bonjour reply
 * [fixed] Specjour executes loader under current $LOAD\_PATH  
   Specjour no longer assumes the required gems are available globally. Useful when running specjour under a vendored environment (bundle install --path=vendor).
+
+[Full Changelog](https://github.com/sandro/specjour/compare/v0.5.5...v0.5.6)
 
 0.5.5 / 2012-05-31
 ---------------------------
