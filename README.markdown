@@ -112,6 +112,11 @@ long-running test.
 * Cucumber 0.9+
 * Rails 3
 
+## Support
+
+* [Github Wiki](https://github.com/sandro/specjour/wiki/)
+* [Github Issues](https://github.com/sandro/specjour/issues)
+
 ## Hacking on Specjour
 If you want to hack on specjour, here is how to test your changes:
 
