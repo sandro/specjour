@@ -100,17 +100,21 @@ module Specjour
     end
 
     def filtered_examples
-      ::RSpec.world.example_groups.map do |g|
+      examples = ::RSpec.world.example_groups.map do |g|
         g.descendants.map do |gs|
           gs.examples
-        end.flatten.map do |e|
-          meta = e.metadata
-          if e.example_group.metadata[:shared_group_name]
-            meta = e.metadata[:example_group]
-          end
-          "#{meta[:file_path]}:#{meta[:line_number]}"
         end
-      end.flatten.uniq
+      end.flatten
+      locations = examples.map do |e|
+        meta = e.metadata
+        shared_group = e.example_group.ancestors.detect do |group|
+          group.metadata[:shared_group_name]
+        end
+        if shared_group
+          meta = shared_group.metadata[:example_group]
+        end
+        meta[:location]
+      end.uniq
     ensure
       ::RSpec.reset
     end
