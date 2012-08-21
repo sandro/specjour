@@ -1,6 +1,12 @@
 History
 =======
 
+0.6.2 / 2012-08-20
+---------------------------
+* [fixed] File location for contexts within shared examples
+
+[Full Changelog](https://github.com/sandro/specjour/compare/v0.6.1...v0.6.2)
+
 0.6.1 / 2012-08-13
 ---------------------------
 * [fixed] No longer prints tests that have yet to run when interrupting the
