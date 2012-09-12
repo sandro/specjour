@@ -1,6 +1,12 @@
 History
 =======
 
+0.6.3 / 2012-09-12
+---------------------------
+* [fixed] Observe filtered examples set in the RSpec configuration object
+
+[Full Changelog](https://github.com/sandro/specjour/compare/v0.6.2...v0.6.3)
+
 0.6.2 / 2012-08-20
 ---------------------------
 * [fixed] File location for contexts within shared examples
