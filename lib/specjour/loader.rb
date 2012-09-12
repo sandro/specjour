@@ -101,9 +101,7 @@ module Specjour
 
     def filtered_examples
       examples = ::RSpec.world.example_groups.map do |g|
-        g.descendants.map do |gs|
-          gs.examples
-        end
+        g.descendant_filtered_examples
       end.flatten
       locations = examples.map do |e|
         meta = e.metadata
@@ -114,7 +112,7 @@ module Specjour
           meta = shared_group.metadata[:example_group]
         end
         meta[:location]
-      end.uniq
+      end
     ensure
       ::RSpec.reset
     end
