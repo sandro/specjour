@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'rspec/core/formatters/progress_formatter'
 
 module RailsAndActiveRecordDefined
   def self.extended(base)
@@ -21,6 +22,8 @@ module RailsAndActiveRecordDefined
     end
   end
 end
+
+CustomFormatter = Class.new
 
 describe Specjour::Configuration do
 
@@ -132,6 +135,17 @@ describe Specjour::Configuration do
 
     it "defaults to archive, symbolic links, delete, and ignore errors" do
       subject.rsync_options.should == "-aL --delete --ignore-errors"
+    end
+  end
+
+  describe "#rspec_formatter" do
+    it "allows custom rsync_options to be set" do
+      subject.rspec_formatter = lambda { CustomFormatter }
+      subject.rspec_formatter.call.should == CustomFormatter
+    end
+
+    it "defaults to the progress formatter" do
+      subject.rspec_formatter.call.should == ::RSpec::Core::Formatters::ProgressFormatter
     end
   end
 end

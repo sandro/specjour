@@ -1,5 +1,5 @@
 module Specjour::RSpec
-  class DistributedFormatter < ::RSpec::Core::Formatters::ProgressFormatter
+  class DistributedFormatter < Specjour::Configuration.rspec_formatter.call
 
     def metadata_for_examples
       examples.map do |example|

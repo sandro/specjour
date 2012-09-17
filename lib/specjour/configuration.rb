@@ -2,7 +2,7 @@ module Specjour
   module Configuration
     extend self
 
-    attr_writer :before_fork, :after_fork, :after_load, :prepare, :rsync_options
+    attr_writer :before_fork, :after_fork, :after_load, :prepare, :rspec_formatter, :rsync_options
 
     # This block is run by each worker before they begin running tests.
     # The default action is to migrate the database, and clear it of any old
@@ -38,6 +38,11 @@ module Specjour
       @after_load = nil
       @prepare = nil
       @rsync_options = nil
+      @rspec_formatter = nil
+    end
+
+    def rspec_formatter
+      @rspec_formatter ||= default_rspec_formatter
     end
 
     def rsync_options
@@ -74,6 +79,12 @@ module Specjour
           DbScrub.drop
           DbScrub.scrub
         end
+      end
+    end
+
+    def default_rspec_formatter
+      lambda do
+        ::RSpec::Core::Formatters::ProgressFormatter
       end
     end
 
