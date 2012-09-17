@@ -85,7 +85,7 @@ module Specjour
       if Specjour.interrupted?
         Process.kill('INT', loader_pid) rescue Errno::ESRCH
       else
-        Process.kill('TERM', loader_pid) rescue Errno::ESRCH
+        Process.kill('KILL', loader_pid) rescue Errno::ESRCH
       end
       @loader_pid = nil
     end

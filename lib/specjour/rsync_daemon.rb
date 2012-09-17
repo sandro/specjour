@@ -46,7 +46,7 @@ module Specjour
 
     def stop
       if pid
-        Process.kill("TERM", pid)
+        Process.kill("KILL", pid)
         FileUtils.rm(pid_file)
       end
     end

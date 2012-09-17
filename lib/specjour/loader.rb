@@ -121,7 +121,7 @@ module Specjour
       if Specjour.interrupted?
         Process.kill('INT', *worker_pids) rescue Errno::ESRCH
       else
-        Process.kill('TERM', *worker_pids) rescue Errno::ESRCH
+        Process.kill('KILL', *worker_pids) rescue Errno::ESRCH
       end
     end
 

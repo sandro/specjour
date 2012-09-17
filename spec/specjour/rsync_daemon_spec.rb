@@ -51,8 +51,8 @@ describe Specjour::RsyncDaemon do
         stub(FileUtils).rm
       end
 
-      it "kills the pid with TERM" do
-        mock(Process).kill('TERM', subject.pid)
+      it "kills the pid with KILL" do
+        mock(Process).kill('KILL', subject.pid)
         subject.stop
       end
 
