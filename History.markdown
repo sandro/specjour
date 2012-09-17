@@ -1,6 +1,13 @@
 History
 =======
 
+0.6.4 / 2012-09-17
+---------------------------
+* [added] RSpec formatter configurable via `Specjour::Configuration.rspec\_formatter`
+* [changed] Always send KILL signal when terminating processes
+
+[Full Changelog](https://github.com/sandro/specjour/compare/v0.6.3...v0.6.4)
+
 0.6.3 / 2012-09-12
 ---------------------------
 * [fixed] Observe filtered examples set in the RSpec configuration object
