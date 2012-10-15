@@ -91,7 +91,7 @@ module Specjour
     end
 
     def disconnecting
-      if (examples_complete == example_size) || clients.empty?
+      if clients.empty?
         throw(:stop)
       end
     end
@@ -129,12 +129,16 @@ module Specjour
       summarize_reports
       unless Specjour.interrupted?
         record_performance
-        print_missing_tests if tests_to_run.any?
+        print_missing_tests if missing_tests?
       end
     end
 
     def summarize_reports
       reporters.each {|r| r.summarize}
+    end
+
+    def missing_tests?
+      tests_to_run.any? || examples_complete != example_size
     end
 
     def print_missing_tests
