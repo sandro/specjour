@@ -118,11 +118,7 @@ module Specjour
     end
 
     def kill_worker_processes
-      if Specjour.interrupted?
-        Process.kill('INT', *worker_pids) rescue Errno::ESRCH
-      else
-        Process.kill('KILL', *worker_pids) rescue Errno::ESRCH
-      end
+      Process.kill('KILL', *worker_pids) rescue Errno::ESRCH
     end
 
     def connection

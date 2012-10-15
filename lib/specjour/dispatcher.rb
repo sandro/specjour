@@ -81,7 +81,7 @@ module Specjour
       fetch_manager(manager.drb_uri)
       at_exit do
         unless Specjour.interrupted?
-          Process.kill('KILL', manager.pid) rescue Errno::ESRCH
+          Process.kill('TERM', manager.pid) rescue Errno::ESRCH
         end
       end
     end
