@@ -12,5 +12,6 @@ module Specjour
 
     ::RSpec::Core::Runner.disable_autorun!
     ::RSpec::Core::Runner.class_eval "def self.trap_interrupt;end"
+    ::RSpec.class_eval "def self.reset; world.reset; configuration.reset; end"
   end
 end
