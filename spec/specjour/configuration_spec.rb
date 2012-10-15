@@ -23,7 +23,7 @@ module RailsAndActiveRecordDefined
   end
 end
 
-CustomFormatter = Class.new
+CustomFormatter ||= Class.new
 
 describe Specjour::Configuration do
 
