@@ -1,6 +1,14 @@
 History
 =======
 
+0.6.5 / (master)
+---------------------------
+* [fixed] RSpec 2.11 compatible
+* [fixed] Closing the printer before all clients disconnected threw exceptions
+
+
+[Full Changelog](https://github.com/sandro/specjour/compare/v0.6.4...v0.6.5)
+
 0.6.4 / 2012-09-17
 ---------------------------
 * [added] RSpec formatter configurable via `Specjour::Configuration.rspec\_formatter`
