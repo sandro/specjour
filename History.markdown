@@ -1,11 +1,10 @@
 History
 =======
 
-0.6.5 / (master)
+0.6.5 / 2012-10-17
 ---------------------------
 * [fixed] RSpec 2.11 compatible
-* [fixed] Closing the printer before all clients disconnected threw exceptions
-
+* [fixed] Undefined method errors when printer closes before clients disconnect
 
 [Full Changelog](https://github.com/sandro/specjour/compare/v0.6.4...v0.6.5)
 
