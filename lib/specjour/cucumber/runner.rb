@@ -6,10 +6,8 @@ module Specjour
         if feature
           features = ::Cucumber::Ast::Features.new
           features.add_feature(feature)
-        else 
-          debugger
+          Cucumber.tree_walker.visit_features(features)
         end
-        Cucumber.tree_walker.visit_features(features)
       end
     end
   end
