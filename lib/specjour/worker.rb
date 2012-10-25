@@ -74,7 +74,7 @@ module Specjour
     end
 
     def run_feature(feature)
-      Cucumber::Runner.run(feature, connection)
+      Cucumber::Runner.run(feature)
     end
 
     def run_spec(spec)
