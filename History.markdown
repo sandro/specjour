@@ -1,6 +1,13 @@
 History
 =======
 
+0.6.6 / 2012-11-13
+---------------------------
+* [fixed] Not gathering all listeners (waits a full second for all replies)
+* [fixed] Not killing all child processes
+
+[Full Changelog](https://github.com/sandro/specjour/compare/v0.6.5...v0.6.6)
+
 0.6.5 / 2012-10-17
 ---------------------------
 * [fixed] RSpec 2.11 compatible
