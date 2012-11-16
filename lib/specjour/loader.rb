@@ -82,7 +82,7 @@ module Specjour
 
     def load_app
       RSpec::Preloader.load spec_files if spec_files.any?
-      Cucumber::Preloader.load if feature_files.any?
+      Cucumber::Preloader.load(connection) if feature_files.any?
       register_tests_with_printer
     end
 
