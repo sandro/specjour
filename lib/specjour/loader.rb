@@ -105,7 +105,8 @@ module Specjour
       end.flatten
       locations = examples.map do |e|
         meta = e.metadata
-        shared_group = e.example_group.ancestors.detect do |group|
+        groups = e.example_group.parent_groups + [e.example_group]
+        shared_group = groups.detect do |group|
           group.metadata[:shared_group_name]
         end
         if shared_group
