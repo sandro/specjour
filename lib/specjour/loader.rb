@@ -82,12 +82,12 @@ module Specjour
 
     def load_app
       RSpec::Preloader.load spec_files if spec_files.any?
-      Cucumber::Preloader.load(connection) if feature_files.any?
+      Cucumber::Preloader.load(feature_files, connection) if feature_files.any?
       register_tests_with_printer
     end
 
     def register_tests_with_printer
-      tests = rspec_examples | feature_files
+      tests = rspec_examples | cucumber_scenarios
       connection.send_message :tests=, tests
     end
 
@@ -116,6 +116,22 @@ module Specjour
       end
     ensure
       ::RSpec.reset
+    end
+
+    def cucumber_scenarios
+      if feature_files.any?
+        scenarios
+      else
+        []
+      end
+    end
+
+    def scenarios
+      Cucumber.runtime.send(:features).map do |feature|
+        feature.feature_elements.map do |scenario|
+          "#{feature.file}:#{scenario.instance_variable_get(:@line)}"
+        end
+      end.flatten
     end
 
     def kill_worker_processes

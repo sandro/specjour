@@ -88,7 +88,7 @@ module Specjour
     end
 
     def test_type(test)
-      test =~ /\.feature$/ ? :cucumber : :rspec
+      test =~ /\.feature(:\d+)?$/ ? :cucumber : :rspec
     end
 
     def set_env_variables

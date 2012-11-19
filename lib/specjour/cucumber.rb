@@ -10,7 +10,7 @@ module Specjour
     rescue LoadError
     end
 
-    class << self; attr_accessor :tree_walker, :configuration; end
+    class << self; attr_accessor :runtime; end
 
   end
 end
