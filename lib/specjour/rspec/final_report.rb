@@ -31,7 +31,7 @@ module Specjour::RSpec
         metadata_collection.map do |partial_metadata|
           example = ::RSpec::Core::Example.allocate
           example.instance_variable_set(:@example_group_class,
-            OpenStruct.new(:metadata => {}, :ancestors => [])
+            OpenStruct.new(:metadata => {}, :ancestors => [], :parent_groups => [])
           )
           metadata = ::RSpec::Core::Metadata.new
           metadata.merge! partial_metadata
