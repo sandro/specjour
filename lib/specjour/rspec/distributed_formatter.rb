@@ -41,6 +41,8 @@ module Specjour::RSpec
       if exception = execution_result[:exception]
         execution_result[:exception] = MarshalableException.new(exception)
       end
+      execution_result[:started_at] = Time.at(execution_result[:started_at])
+      execution_result[:finished_at] = Time.at(execution_result[:finished_at])
       execution_result
     end
 
