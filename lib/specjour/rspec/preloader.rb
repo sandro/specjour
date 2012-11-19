@@ -1,7 +1,7 @@
 class Specjour::RSpec::Preloader
   def self.load(paths=[])
     Specjour.benchmark("Loading RSpec environment") do
-      require './spec/spec_helper'
+      require File.expand_path('spec/spec_helper', Dir.pwd)
       load_spec_files paths
     end
   end
