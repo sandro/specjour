@@ -38,9 +38,9 @@ module Specjour
     def spec_files
       @spec_files ||= file_collector(spec_paths) do |path|
         if path == project_path
-          Dir["#{path}/spec/**/*_spec.rb"]
+          Dir["spec/**/*_spec.rb"]
         else
-          Dir["#{path}/**/*_spec.rb"]
+          Dir["**/*_spec.rb"]
         end
       end
     end
@@ -48,9 +48,9 @@ module Specjour
     def feature_files
       @feature_files ||= file_collector(feature_paths) do |path|
         if path == project_path
-          Dir["#{path}/features/**/*.feature"]
+          Dir["features/**/*.feature"]
         else
-          Dir["#{path}/**/*.feature"]
+          Dir["**/*.feature"]
         end
       end
     end
