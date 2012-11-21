@@ -1,6 +1,14 @@
 History
 =======
 
+0.7.0 / 2012-11-21
+---------------------------
+* [added] Cucumber now distributes individual scenarios instead of files
+* [fixed] Cucumber runs more than one feature (pierreozoux)
+* [fixed] RSpec 2.12 compatible
+
+[Full Changelog](https://github.com/sandro/specjour/compare/v0.6.6...v0.7.0)
+
 0.6.6 / 2012-11-13
 ---------------------------
 * [fixed] Not gathering all listeners (waits a full second for all replies)
