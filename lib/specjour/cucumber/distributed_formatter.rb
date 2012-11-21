@@ -25,7 +25,7 @@ module Specjour::Cucumber
           failure.scenario_outline
         end
       end.each do |failure|
-        @failing_scenarios << format_string("cucumber " + failure.file_colon_line[2..-1], :failed) +
+        @failing_scenarios << format_string("cucumber " + failure.file_colon_line, :failed) +
                               format_string(" # Scenario: " + failure.name, :comment)
       end
     end
