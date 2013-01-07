@@ -3,6 +3,9 @@ module Specjour
     module Preloader
       def self.load(paths, output)
         Specjour.benchmark("Loading Cucumber Environment") do
+          if defined?(::Rails) && !ENV['RAILS_ROOT']
+            ENV['RAILS_ROOT'] = Rails.root.to_s # Load the current rails environment if it exists
+          end
           require 'cucumber' unless defined?(::Cucumber::Cli)
           args = paths.unshift '--format', 'Specjour::Cucumber::DistributedFormatter'
           cli = ::Cucumber::Cli::Main.new(args, output)
