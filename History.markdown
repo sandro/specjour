@@ -1,6 +1,12 @@
 History
 =======
 
+0.7.1 / (master)
+---------------------------
+* [fixed] regression when running a subdirectory. Specjour was loading all
+  specs, even those outside of the default spec directory, i.e. a fast\_specs/
+  directory.
+
 0.7.0 / 2012-11-21
 ---------------------------
 * [added] Cucumber now distributes individual scenarios instead of files
