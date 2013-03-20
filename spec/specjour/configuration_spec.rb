@@ -46,6 +46,17 @@ describe Specjour::Configuration do
             mock(subject).system('bundle install')
             subject.before_fork.call
           end
+
+          context "and bundler options set" do
+            before do
+              subject.bundler_options = "--binstubs"
+            end
+
+            it "runs 'bundle install' with the given options" do
+              mock(subject).system('bundle install --binstubs')
+              subject.before_fork.call
+            end
+          end
         end
 
         context "when gems are satisfied" do
@@ -124,6 +135,17 @@ describe Specjour::Configuration do
         mock(Specjour::DbScrub).scrub
         subject.prepare.call
       end
+    end
+  end
+
+  describe "#bundler_options" do
+    it "allows custom bundler_options to be set" do
+      subject.bundler_options = '--binstubs=bin/stubs'
+      subject.bundler_options.should == '--binstubs=bin/stubs'
+    end
+
+    it "defaults to no bundler options" do
+      subject.bundler_options.should == ""
     end
   end
 
