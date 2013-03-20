@@ -17,6 +17,7 @@ tmtags
 coverage
 rdoc
 pkg
+tags
 *.gem
 
 ## PROJECT::SPECIFIC
@@ -24,3 +25,4 @@ pkg
 spec/spec.opts
 .bundle
 Gemfile.lock
+bin/stubs
