@@ -98,11 +98,11 @@ module Specjour
       Timeout.timeout(1) do
         DNSSD.browse!('_druby._tcp') do |reply|
           replies << reply if reply.flags.add?
+          break unless reply.flags.more_coming?
         end
-        raise Timeout::Error
       end
-    rescue Timeout::Error
       replies.each {|r| resolve_reply(r)}
+    rescue Timeout::Error
     end
 
     def local_manager_needed?
