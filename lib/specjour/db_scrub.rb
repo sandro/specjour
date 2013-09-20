@@ -17,15 +17,21 @@ module Specjour
     extend self
 
     def drop
-      if ActiveRecord::Base.connected?
+      begin
         Rake::Task['db:drop'].invoke
+      rescue
+        raise "Failed to drop database #{ENV['TEST_ENV_NUMBER']}"
       end
     end
 
     def scrub
       connect_to_database
       puts "Resetting database #{ENV['TEST_ENV_NUMBER']}"
-      schema_load_task.invoke
+      begin
+        schema_load_task.invoke
+      rescue
+        raise "Failed to invoke task in worker #{ENV['TEST_ENV_NUMBER']}"
+      end
     end
 
     protected
