@@ -55,8 +55,13 @@ module Specjour
     end
 
     def schema_load_task
-      Rake::Task['db:test:load'].invoke if ActiveRecord::Base.schema_format == :ruby
-      Rake::Task['db:test:load_structure'].invoke if ActiveRecord::Base.schema_format == :sql
+      if ActiveRecord::Base.schema_format == :ruby
+        Rake::Task['db:test:load'].invoke
+      elsif ActiveRecord::Base.schema_format == :sql
+        Rake::Task['db:test:load_structure'].invoke
+      else
+        Rake::Task['db:test:prepare'].invoke
+      end
     end
 
     def tables_to_purge
