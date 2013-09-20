@@ -29,6 +29,7 @@ module Specjour
     protected
 
     def connect_to_database
+      ENV['RAILS_ENV'] ||= 'test'
       ActiveRecord::Base.remove_connection
       ActiveRecord::Base.configurations = Rails.application.config.database_configuration
       ActiveRecord::Base.establish_connection
@@ -50,7 +51,7 @@ module Specjour
         when :sql
           Rake::Task['db:test:load_structure']
         when :ruby
-          Rake::Task['db:schema:load[test]']
+          Rake::Task['db:schema:load']
       end
     end
 
