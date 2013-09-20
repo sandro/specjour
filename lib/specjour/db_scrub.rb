@@ -31,8 +31,7 @@ module Specjour
         schema_load_task.invoke
         puts "Database #{ENV['TEST_ENV_NUMBER']} reset"
       rescue
-        myLogger.error("uncaught #{e} exception while handling connection in worker #{ENV['TEST_ENV_NUMBER']}: #{e.message}")
-        myLogger.error("Stack trace: #{backtrace.map {|l| "  #{l}\n"}.join}")
+        raise("Error: `#{e}` in worker #{ENV['TEST_ENV_NUMBER']}: #{e.message}")
       end
     end
 
