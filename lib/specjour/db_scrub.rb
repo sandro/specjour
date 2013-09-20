@@ -17,8 +17,9 @@ module Specjour
     extend self
 
     def drop
-      connect_to_database
-      Rake::Task['db:drop'].invoke
+      if ActiveRecord::Base.connected?
+        Rake::Task['db:drop'].invoke
+      end
     end
 
     def scrub
