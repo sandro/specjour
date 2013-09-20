@@ -31,7 +31,8 @@ module Specjour
         schema_load_task.invoke
         puts "Database #{ENV['TEST_ENV_NUMBER']} reset"
       rescue
-        raise "Failed to invoke task in worker #{ENV['TEST_ENV_NUMBER']}"
+        myLogger.error("uncaught #{e} exception while handling connection in worker #{ENV['TEST_ENV_NUMBER']}: #{e.message}")
+        myLogger.error("Stack trace: #{backtrace.map {|l| "  #{l}\n"}.join}")
       end
     end
 
@@ -55,8 +56,8 @@ module Specjour
     end
 
     def schema_load_task
-      Rake::Task['db:schema:load'].invoke if ActiveRecord::Base.schema_format == :ruby
-      Rake::Task['db:structure:load'].invoke if ActiveRecord::Base.schema_format == :sql
+      Rake::Task['db:test:load'].invoke if ActiveRecord::Base.schema_format == :ruby
+      Rake::Task['db:test:load_structure'].invoke if ActiveRecord::Base.schema_format == :sql
     end
 
     def tables_to_purge
