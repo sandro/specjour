@@ -54,9 +54,8 @@ module Specjour
     end
 
     def schema_load_task
-      # There is a bug in rails, this fixes it according to http://stackoverflow.com/questions/4698467/schema-sql-not-creating-even-after-setting-schema-format-sql
-      Rake::Task['db:test:load'].invoke if ActiveRecord::Base.schema_format == :ruby
-      Rake::Task['db:test:load_structure'].invoke if ActiveRecord::Base.schema_format == :sql
+      Rake::Task['db:schema:load'].invoke if ActiveRecord::Base.schema_format == :ruby
+      Rake::Task['db:structure:load'].invoke if ActiveRecord::Base.schema_format == :sql
     end
 
     def tables_to_purge
