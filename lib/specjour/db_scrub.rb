@@ -28,7 +28,7 @@ module Specjour
 
     protected
 
-    def connect_to_database=
+    def connect_to_database
       ActiveRecord::Base.remove_connection
       ActiveRecord::Base.configurations = Rails.application.config.database_configuration
       ActiveRecord::Base.establish_connection :test
