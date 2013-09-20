@@ -46,7 +46,7 @@ module Specjour
     end
 
     def schema_load_task
-      Rake::Task[{ :sql  => "db:test:load_structure", :ruby => "db:test:prepare" }[ActiveRecord::Base.schema_format]]
+      Rake::Task[{ :sql  => "db:test:load_structure", :ruby => "db:drop db:create db:test:load" }[ActiveRecord::Base.schema_format]]
     end
 
     def tables_to_purge
