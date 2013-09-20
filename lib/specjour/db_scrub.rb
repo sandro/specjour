@@ -29,8 +29,6 @@ module Specjour
     protected
 
     def connect_to_database
-      ENV['RAILS_ENV'] ||= 'test'
-      ENV['SCHEMA'] ||= File.join(ActiveRecord::Tasks::DatabaseTasks.db_dir, 'schema.rb')
       ActiveRecord::Base.remove_connection
       ActiveRecord::Base.configurations = Rails.application.config.database_configuration
       ActiveRecord::Base.establish_connection
