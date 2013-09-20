@@ -22,6 +22,7 @@ module Specjour
   autoload :Manager, 'specjour/manager'
   autoload :Printer, 'specjour/printer'
   autoload :Protocol, 'specjour/protocol'
+  autoload :Railtie, 'specjour/railtie'
   autoload :RsyncDaemon, 'specjour/rsync_daemon'
   autoload :SocketHelper, 'specjour/socket_helper'
   autoload :Worker, 'specjour/worker'
