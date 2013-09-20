@@ -28,11 +28,10 @@ module Specjour
 
     protected
 
-    def connect_to_database
-      ENV['RAILS_ENV'] ||= 'test'
+    def connect_to_database=
       ActiveRecord::Base.remove_connection
       ActiveRecord::Base.configurations = Rails.application.config.database_configuration
-      ActiveRecord::Base.establish_connection :adapter => ActiveRecord::Base.configurations['test'].adapter
+      ActiveRecord::Base.establish_connection :test
       connection
     rescue # assume the database doesn't exist
       Rake::Task['db:create'].invoke
