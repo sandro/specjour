@@ -24,7 +24,6 @@ module Specjour
       connect_to_database
       puts "Resetting database #{ENV['TEST_ENV_NUMBER']}"
       schema_load_task.invoke
-      puts "Database #{ENV['TEST_ENV_NUMBER']} reset"
     end
 
     protected
@@ -47,13 +46,7 @@ module Specjour
     end
 
     def schema_load_task
-      if ActiveRecord::Base.schema_format == :ruby
-        Rake::Task['db:test:load'].invoke
-      elsif ActiveRecord::Base.schema_format == :sql
-        Rake::Task['db:test:load_structure'].invoke
-      else
-        Rake::Task['db:test:prepare'].invoke
-      end
+      Rake::Task[{ :sql  => "db:test:load_structure", :ruby => "db:test:load" }[ActiveRecord::Base.schema_format]].invoke
     end
 
     def tables_to_purge
