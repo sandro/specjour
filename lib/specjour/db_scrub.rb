@@ -56,11 +56,9 @@ module Specjour
 
     def schema_load_task
       if ActiveRecord::Base.schema_format == :sql
-        Rake::Task['db:test:load'].invoke
-      elsif ActiveRecord::Base.schema_format == :ruby
         Rake::Task['db:test:load_structure'].invoke
-      else
-        raise 'Invalid schema format ' + ActiveRecord::Base.schema_format.to_s
+      else # ActiveRecord::Base.schema_format == :ruby
+        Rake::Task['db:test:load'].invoke
       end
     end
 
