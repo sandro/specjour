@@ -17,22 +17,14 @@ module Specjour
     extend self
 
     def drop
-      begin
-        Rake::Task['db:drop'].invoke
-      rescue
-        raise "Failed to drop database #{ENV['TEST_ENV_NUMBER']}"
-      end
+      Rake::Task['db:drop'].invoke
     end
 
     def scrub
       connect_to_database
-      begin
-        puts "Resetting database #{ENV['TEST_ENV_NUMBER']}"
-        schema_load_task.invoke
-        puts "Database #{ENV['TEST_ENV_NUMBER']} reset"
-      rescue => e
-        raise("Error in worker #{ENV['TEST_ENV_NUMBER']}: #{e.message}\nStack trace: #{e.backtrace.map {|l| "  #{l}\n"}.join}")
-      end
+      puts "Resetting database #{ENV['TEST_ENV_NUMBER']}"
+      schema_load_task.invoke
+      puts "Database #{ENV['TEST_ENV_NUMBER']} reset"
     end
 
     protected
