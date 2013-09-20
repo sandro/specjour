@@ -26,9 +26,10 @@ module Specjour
 
     def scrub
       connect_to_database
-      puts "Resetting database #{ENV['TEST_ENV_NUMBER']}"
       begin
+        puts "Resetting database #{ENV['TEST_ENV_NUMBER']}"
         schema_load_task.invoke
+        puts "Database #{ENV['TEST_ENV_NUMBER']} reset"
       rescue
         raise "Failed to invoke task in worker #{ENV['TEST_ENV_NUMBER']}"
       end
