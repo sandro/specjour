@@ -55,8 +55,6 @@ module Specjour
     end
 
     def schema_load_task
-      ENV['RAILS_ENV'] = 'test'
-      ENV['TEST_ENV_NUMBER'] ||= 1
       if ActiveRecord::Base.schema_format == :sql
         Rake::Task['db:test:load_structure'].invoke
       elsif ActiveRecord::Base.schema_format == :ruby
