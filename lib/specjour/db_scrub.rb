@@ -50,7 +50,7 @@ module Specjour
         when :sql
           Rake::Task['db:test:load_structure']
         when :ruby
-          Rake::Task['db:schema:load']
+          Rake::Task['db:schema:load[test]']
       end
     end
 
