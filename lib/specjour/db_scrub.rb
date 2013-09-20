@@ -31,7 +31,7 @@ module Specjour
         schema_load_task.invoke
         puts "Database #{ENV['TEST_ENV_NUMBER']} reset"
       rescue => e
-        raise("Error: `#{e}` in worker #{ENV['TEST_ENV_NUMBER']}: #{e.message}")
+        raise("Error in worker #{ENV['TEST_ENV_NUMBER']}: #{e.message}\nStack trace: #{backtrace.map {|l| "  #{l}\n"}.join}")
       end
     end
 
