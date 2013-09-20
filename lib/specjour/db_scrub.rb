@@ -57,12 +57,14 @@ module Specjour
     def schema_load_task
       ENV['RAILS_ENV'] = 'test'
       ENV['TEST_ENV_NUMBER'] ||= 1
-      if ActiveRecord::Base.schema_format == :ruby
+      if ActiveRecord::Base.schema_format == :sql
+        Rake::Task['db:test:load_structure'].invoke
+      elsif ActiveRecord::Base.schema_format == :ruby
         Rake::Task['db:drop'].invoke
         Rake::Task['db:create'].invoke
         Rake::Task['db:schema_load'].invoke
-      elsif ActiveRecord::Base.schema_format == :sql
-        Rake::Task['db:test:load_structure'].invoke
+      else
+        raise 'Invalid schema format ' + ActiveRecord::Base.schema_format.to_s
       end
     end
 
