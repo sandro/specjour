@@ -30,7 +30,7 @@ module Specjour
         puts "Resetting database #{ENV['TEST_ENV_NUMBER']}"
         schema_load_task.invoke
         puts "Database #{ENV['TEST_ENV_NUMBER']} reset"
-      rescue
+      rescue => e
         raise("Error: `#{e}` in worker #{ENV['TEST_ENV_NUMBER']}: #{e.message}")
       end
     end
