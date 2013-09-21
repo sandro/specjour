@@ -31,6 +31,7 @@ module Specjour
     def connect_to_database
       ActiveRecord::Base.remove_connection
       ActiveRecord::Base.configurations = Rails.application.config.database_configuration
+      ActiveRecord::Tasks::DatabaseTasks.db_dir = Rails.root.join('db')
       ActiveRecord::Base.establish_connection ActiveRecord::Base.configurations['test']
       connection
     rescue # assume the database doesn't exist
