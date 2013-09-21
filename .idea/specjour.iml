@@ -14,6 +14,7 @@
     <orderEntry type="jdk" jdkName="RVM: ruby-2.0.0-p247 [specjour]" jdkType="RUBY_SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="specjour_rails_app" />
+    <orderEntry type="library" scope="PROVIDED" name="builder (v3.2.2, RVM: ruby-2.0.0-p247 [specjour]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bundler (v1.3.5, RVM: ruby-2.0.0-p247 [specjour]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="columnize (v0.3.6, RVM: ruby-2.0.0-p247 [specjour]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="cucumber (v1.3.8, RVM: ruby-2.0.0-p247 [specjour]) [gem]" level="application" />
@@ -26,10 +27,13 @@
     <orderEntry type="library" scope="PROVIDED" name="multi_json (v1.8.0, RVM: ruby-2.0.0-p247 [specjour]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="multi_test (v0.0.2, RVM: ruby-2.0.0-p247 [specjour]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rake (v10.1.0, RVM: ruby-2.0.0-p247 [specjour]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rr (v1.1.2, RVM: ruby-2.0.0-p247 [specjour]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rspec (v2.14.1, RVM: ruby-2.0.0-p247 [specjour]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rspec-core (v2.14.5, RVM: ruby-2.0.0-p247 [specjour]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rspec-expectations (v2.14.2, RVM: ruby-2.0.0-p247 [specjour]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rspec-mocks (v2.14.3, RVM: ruby-2.0.0-p247 [specjour]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="thor (v0.18.1, RVM: ruby-2.0.0-p247 [specjour]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="yard (v0.8.7.2, RVM: ruby-2.0.0-p247 [specjour]) [gem]" level="application" />
   </component>
 </module>
 
