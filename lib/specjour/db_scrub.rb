@@ -31,7 +31,8 @@ module Specjour
     def connect_to_database
       ActiveRecord::Base.remove_connection
       ActiveRecord::Base.configurations = Rails.application.config.database_configuration
-      ActiveRecord::Base.establish_connection
+      ActiveRecord::Tasks::DatabaseTasks.db_dir = Rails.root.join('db')
+      ActiveRecord::Base.establish_connection ActiveRecord::Base.configurations['test']
       connection
     rescue # assume the database doesn't exist
       Rake::Task['db:create'].invoke
@@ -46,7 +47,12 @@ module Specjour
     end
 
     def schema_load_task
-      Rake::Task[{ :sql  => "db:test:load_structure", :ruby => "db:test:load" }[ActiveRecord::Base.schema_format]]
+      case ActiveRecord::Base.schema_format
+        when :sql
+          Rake::Task['db:test:load_structure']
+        when :ruby
+          Rake::Task['db:schema:load']
+      end
     end
 
     def tables_to_purge

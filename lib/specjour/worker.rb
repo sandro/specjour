@@ -93,7 +93,7 @@ module Specjour
 
     def set_env_variables
       ENV['RSPEC_COLOR'] ||= 'true'
-      ENV['TEST_ENV_NUMBER'] ||= number.to_s
+      ENV['TEST_ENV_NUMBER'] ||= @number.to_s
     end
   end
 end
