@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DataSourceManagerImpl" format="xml" hash="1251036568">
-    <data-source source="LOCAL" name="Rails specjour_rails_app: development" uuid="2705c400-c0ec-4795-8755-3c98f7698d17">
+  <component name="DataSourceManagerImpl" format="xml" hash="116269246">
+    <data-source source="LOCAL" name="Rails specjour_rails_app: development" uuid="0648d6c9-ac8c-4b8b-b868-9984abbc4afa">
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/../specjour_rails_app/db/development.sqlite3</jdbc-url>
       <libraries />
     </data-source>
-    <data-source source="LOCAL" name="Rails specjour_rails_app: production" uuid="e95663aa-c1e7-4747-9309-36223b092c35">
+    <data-source source="LOCAL" name="Rails specjour_rails_app: production" uuid="fafa5479-3f28-40b0-981a-0c9815b0fa60">
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/../specjour_rails_app/db/production.sqlite3</jdbc-url>
       <libraries />
