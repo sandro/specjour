@@ -6,6 +6,8 @@ History
 * [fixed] regression when running a subdirectory. Specjour was loading all
   specs, even those outside of the default spec directory, i.e. a fast\_specs/
   directory.
+* [fixed] "file has vanished" bug. The specjour listener can now transition
+  between networks without restarts.
 
 0.7.0 / 2012-11-21
 ---------------------------
