@@ -2,7 +2,7 @@ module Specjour
   module Configuration
     extend self
 
-    attr_writer :before_fork, :after_fork, :after_load, :prepare, :rspec_formatter, :rsync_options
+    attr_writer :before_fork, :after_fork, :after_load, :bundler_options, :prepare, :rspec_formatter, :rsync_options
 
     # This block is run by each worker before they begin running tests.
     # The default action is to migrate the database, and clear it of any old
@@ -24,6 +24,10 @@ module Specjour
       @before_fork ||= default_before_fork
     end
 
+    def bundler_options
+      @bundler_options ||= ''
+    end
+
     # This block is run on all workers when invoking `specjour prepare`
     # Defaults to dropping the worker's database and recreating it. This
     # is especially useful when two teams are sharing workers and writing
@@ -36,6 +40,7 @@ module Specjour
       @before_fork = nil
       @after_fork = nil
       @after_load = nil
+      @bundler_options = nil
       @prepare = nil
       @rsync_options = nil
       @rspec_formatter = nil
@@ -51,7 +56,7 @@ module Specjour
 
     def bundle_install
       if system('which bundle')
-        system('bundle check') || system('bundle install')
+        system('bundle check') || system(bundle_command)
       end
     end
 
@@ -93,6 +98,10 @@ module Specjour
     end
 
     protected
+
+    def bundle_command
+      "bundle install #{bundler_options}".strip
+    end
 
     def rails_with_ar?
       defined?(Rails) && defined?(ActiveRecord::Base)
