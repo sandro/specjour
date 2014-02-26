@@ -3,6 +3,7 @@ History
 
 0.7.1 / (master)
 ---------------------------
+* [fixed] printer exit_status returns false if there are no reporters
 * [fixed] regression when running a subdirectory. Specjour was loading all
   specs, even those outside of the default spec directory, i.e. a fast\_specs/
   directory.
