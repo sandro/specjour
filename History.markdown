@@ -3,12 +3,15 @@ History
 
 0.7.1 / (master)
 ---------------------------
-* [fixed] printer exit_status returns false if there are no reporters
+* [fixed] printer exit\_status returns false if there are no reporters
 * [fixed] regression when running a subdirectory. Specjour was loading all
   specs, even those outside of the default spec directory, i.e. a fast\_specs/
   directory.
 * [fixed] "file has vanished" bug. The specjour listener can now transition
   between networks without restarts.
+* [fixed] before(:all). Specjour now distributes before(:all) as a group.
+  Previously, each example would be distributed alone, effectively turning
+  before(:all) into before(:each).
 
 0.7.0 / 2012-11-21
 ---------------------------
