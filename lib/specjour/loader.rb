@@ -112,9 +112,6 @@ module Specjour
     end
 
     def filtered_examples
-      examples = ::RSpec.world.example_groups.map do |g|
-        g.descendant_filtered_examples
-      end.flatten
       executables = gather_groups(::RSpec.world.example_groups)
       locations = executables.map do |e|
         if e.respond_to?(:examples)
