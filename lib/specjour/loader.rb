@@ -99,20 +99,33 @@ module Specjour
       end
     end
 
+    # recursively gather groups containing a before(:all) hook, and examples
+    def gather_groups(groups)
+      groups.map do |g|
+        before_all_hooks = g.send(:find_hook, :before, :all, nil, nil)
+        if before_all_hooks.any?
+          g
+        else
+          (g.filtered_examples || []) + gather_groups(g.children)
+        end
+      end.flatten
+    end
+
     def filtered_examples
       examples = ::RSpec.world.example_groups.map do |g|
         g.descendant_filtered_examples
       end.flatten
-      locations = examples.map do |e|
-        meta = e.metadata
-        groups = e.example_group.parent_groups + [e.example_group]
-        shared_group = groups.detect do |group|
-          group.metadata[:shared_group_name]
+      executables = gather_groups(::RSpec.world.example_groups)
+      locations = executables.map do |e|
+        if e.respond_to?(:examples)
+          e.metadata[:example_group][:location]
+        else
+          if e.example_group.metadata[:shared_group_name]
+            e.metadata[:example_group][:location]
+          else
+            e.metadata[:location]
+          end
         end
-        if shared_group
-          meta = shared_group.metadata[:example_group]
-        end
-        meta[:location]
       end
     ensure
       ::RSpec.reset
