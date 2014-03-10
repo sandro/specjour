@@ -1,8 +1,8 @@
 module Specjour::Cucumber
   class DistributedFormatter < ::Cucumber::Formatter::Progress
 
-    def initialize(step_mother, io, options)
-      @step_mother = step_mother
+    def initialize(runtime, io, options)
+      @runtime = runtime
       @io = io
       @options = options
       @failing_scenarios = []
@@ -11,12 +11,12 @@ module Specjour::Cucumber
 
     def after_features(features)
       print_summary
-      step_mother.scenarios.clear
-      step_mother.steps.clear
+      @runtime.scenarios.clear
+      @runtime.steps.clear
     end
 
     def prepare_failures
-      step_mother.scenarios(:failed).select do |s|
+      @runtime.scenarios(:failed).select do |s|
         s.is_a?(Cucumber::Ast::Scenario) || s.is_a?(Cucumber::Ast::OutlineTable::ExampleRow)
       end.map do |failure|
         if failure.is_a?(Cucumber::Ast::Scenario)
@@ -49,7 +49,7 @@ module Specjour::Cucumber
     end
 
     def prepare_steps(type)
-      prepare_elements(step_mother.steps(type), type, 'steps')
+      prepare_elements(@runtime.steps(type), type, 'steps')
     end
 
     def print_exception(e, status, indent)
@@ -71,7 +71,7 @@ module Specjour::Cucumber
       [:scenarios, :steps].each do |type|
         hash[type] = {}
         OUTCOMES.each do |outcome|
-          hash[type][outcome] = step_mother.send(type, outcome).size
+          hash[type][outcome] = @runtime.send(type, outcome).size
         end
       end
       hash.merge!(:failing_scenarios => @failing_scenarios, :step_summary => @step_summary)
