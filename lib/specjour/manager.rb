@@ -122,7 +122,7 @@ module Specjour
       unless quiet?
         text = DNSSD::TextRecord.new
         text['version'] = Specjour::VERSION
-        bonjour_service.register "specjour_manager_#{projects}_#{Process.pid}", "_#{drb_uri.scheme}._tcp", domain=nil, drb_uri.port, host=nil, text
+        bonjour_service.register "#{projects}@#{hostname.tr(".","-")}", "_specjour._tcp", domain=nil, drb_uri.port, host=nil, text
       end
     end
 

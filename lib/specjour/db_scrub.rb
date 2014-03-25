@@ -1,6 +1,7 @@
 # encoding: utf-8
 module Specjour
   module DbScrub
+    extend Logger
 
     begin
       require 'rake'
@@ -11,7 +12,7 @@ module Specjour
         load 'active_record/railties/databases.rake'
       end
     rescue LoadError
-      Specjour.logger.debug "Failed to load Rails rake tasks"
+      log "Failed to load Rails rake tasks"
     end
 
     extend self

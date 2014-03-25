@@ -1,14 +1,9 @@
 module Specjour
   module Cucumber
-    begin
-      require 'cucumber/formatter/progress'
-
-      require 'specjour/cucumber/distributed_formatter'
-      require 'specjour/cucumber/final_report'
-      require 'specjour/cucumber/preloader'
-      require 'specjour/cucumber/runner'
-    rescue LoadError
-    end
+    autoload :Preloader, 'specjour/cucumber/preloader'
+    autoload :Runner, 'specjour/cucumber/runner'
+    autoload :FinalReport, 'specjour/cucumber/final_report'
+    autoload :DistributedFormatter, 'specjour/cucumber/distributed_formatter'
 
     class << self; attr_accessor :runtime; end
 

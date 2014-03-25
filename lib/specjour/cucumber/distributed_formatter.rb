@@ -1,3 +1,9 @@
+begin
+  require 'cucumber/formatter/progress'
+rescue LoadError
+  puts caller(1..5)
+  puts "LOAD ERROR"
+end
 module Specjour::Cucumber
   class DistributedFormatter < ::Cucumber::Formatter::Progress
 

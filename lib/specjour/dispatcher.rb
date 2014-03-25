@@ -3,6 +3,7 @@ module Specjour
     require 'dnssd'
     Thread.abort_on_exception = true
     include SocketHelper
+    include Logger
 
     attr_reader :project_alias, :managers, :manager_threads, :hosts, :options, :drb_connection_errors, :test_paths, :rsync_port
     attr_accessor :worker_size, :project_path
@@ -69,7 +70,7 @@ module Specjour
       end
     rescue DRb::DRbConnError => e
       drb_connection_errors[uri] += 1
-      Specjour.logger.debug "#{e.message}: couldn't connect to manager at #{uri}"
+      log "#{e.message}: couldn't connect to manager at #{uri}"
       sleep(0.1) && retry if drb_connection_errors[uri] < 5
     end
 
@@ -96,11 +97,12 @@ module Specjour
     def gather_remote_managers
       replies = []
       Timeout.timeout(1) do
-        DNSSD.browse!('_druby._tcp') do |reply|
+        DNSSD.browse('_specjour._tcp') do |reply|
           replies << reply if reply.flags.add?
           break unless reply.flags.more_coming?
         end
       end
+      puts replies.size
       replies.each {|r| resolve_reply(r)}
     rescue Timeout::Error
     end
@@ -126,20 +128,18 @@ module Specjour
     end
 
     def resolve_reply(reply)
-      Timeout.timeout(1) do
-        DNSSD.resolve!(reply.name, reply.type, reply.domain, flags=0, reply.interface) do |resolved|
-          Specjour.logger.debug "Bonjour discovered #{resolved.target}"
-          if resolved.text_record && resolved.text_record['version'] == Specjour::VERSION
-            resolved_ip = ip_from_hostname(resolved.target)
-            uri = URI::Generic.build :scheme => reply.service_name, :host => resolved_ip, :port => resolved.port
-            fetch_manager(uri)
-          else
-            puts "Found #{resolved.target} but its version doesn't match v#{Specjour::VERSION}. Skipping..."
-          end
-          break unless resolved.flags.more_coming?
+      DNSSD.resolve(reply.name, reply.type, reply.domain, flags=0, reply.interface) do |resolved|
+        log "Bonjour discovered #{resolved.target}"
+        if resolved.text_record && resolved.text_record['version'] == Specjour::VERSION
+          resolved_ip = ip_from_hostname(resolved.target)
+          p reply.service_name
+          uri = URI::Generic.build :scheme => "druby", :host => resolved_ip, :port => resolved.port
+          fetch_manager(uri)
+        else
+          puts "Found #{resolved.target} but its version doesn't match v#{Specjour::VERSION}. Skipping..."
         end
+        break unless resolved.flags.more_coming?
       end
-    rescue Timeout::Error
     end
 
     def rsync_daemon

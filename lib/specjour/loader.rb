@@ -46,6 +46,7 @@ module Specjour
     end
 
     def feature_files
+      binding.pry
       @feature_files ||= file_collector(feature_paths) do |path|
         if path == project_path
           Dir["#{path}/features/**/*.feature"]
@@ -82,6 +83,8 @@ module Specjour
 
     def load_app
       RSpec::Preloader.load spec_files if spec_files.any?
+
+      $stderr.puts ['feature files', feature_files].inspect
       Cucumber::Preloader.load(feature_files, connection) if feature_files.any?
       register_tests_with_printer
     end
@@ -125,7 +128,11 @@ module Specjour
         end
       end
     ensure
+      shared_groups = ::RSpec.world.shared_example_groups.dup
       ::RSpec.reset
+      shared_groups.each do |k,v|
+        ::RSpec.world.shared_example_groups[k] = v
+      end
     end
 
     def cucumber_scenarios

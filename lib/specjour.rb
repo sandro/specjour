@@ -18,6 +18,7 @@ module Specjour
   autoload :DbScrub, 'specjour/db_scrub'
   autoload :Dispatcher, 'specjour/dispatcher'
   autoload :Fork, 'specjour/fork'
+  autoload :Logger, 'specjour/logger'
   autoload :Loader, 'specjour/loader'
   autoload :Manager, 'specjour/manager'
   autoload :Printer, 'specjour/printer'
@@ -60,14 +61,14 @@ module Specjour
     @logger ||= new_logger
   end
 
-  def self.new_logger(level = Logger::UNKNOWN)
-    @logger = Logger.new $stderr
+  def self.new_logger(level = ::Logger::UNKNOWN)
+    @logger = ::Logger.new $stderr
     @logger.level = level
     @logger
   end
 
   def self.log?
-    logger.level != Logger::UNKNOWN
+    logger.level != ::Logger::UNKNOWN
   end
 
   def self.load_custom_hooks
