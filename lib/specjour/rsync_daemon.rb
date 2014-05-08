@@ -45,8 +45,9 @@ module Specjour
     end
 
     def stop
-      if pid
-        Process.kill("KILL", pid)
+      if process_id = pid
+        log("#{self.class.name} Shutting down")
+        Process.kill("KILL", process_id)
         FileUtils.rm(pid_file)
       end
     end

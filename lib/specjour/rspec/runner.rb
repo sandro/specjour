@@ -14,7 +14,7 @@ module Specjour::RSpec::Runner
   end
 
   def self.run(spec, output)
-    args = ['--format=Specjour::RSpec::DistributedFormatter', spec]
+    args = ['--format=json', spec]
     options = ::RSpec::Core::ConfigurationOptions.new(args)
     options.parse_options
     ::RSpec::Core::CommandLine.new(options).run($stderr, output)

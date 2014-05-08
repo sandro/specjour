@@ -1,21 +1,49 @@
 module Specjour
-
   class Printer
-    include Protocol
-    RANDOM_PORT = 0
+    require 'dnssd'
 
-    attr_reader :port, :clients
-    attr_accessor :tests_to_run, :example_size, :examples_complete, :profiler
+    include Logger
+    include SocketHelper
 
-    def initialize
+    attr_reader :host, :port, :clients
+    attr_accessor :tests_to_run, :test_paths, :example_size, :examples_complete, :profiler, :machines
+
+    COMMANDS = %w(
+      done
+      greet
+      next_test
+      ready
+      register_tests
+    )
+
+    def initialize(options={})
+      @options = options
       @host = "0.0.0.0"
-      @server_socket = TCPServer.new(@host, RANDOM_PORT)
+      @server_socket = TCPServer.new(@host, Specjour.configuration.printer_port)
       @port = @server_socket.addr[1]
       @profiler = {}
       @clients = {}
       @tests_to_run = []
+      @test_paths = options[:test_paths]
       @example_size = 0
+      @machines = []
+      @formatter = Specjour.configuration.formatter
       self.examples_complete = 0
+    end
+
+    def announce
+      text = DNSSD::TextRecord.new
+      text['version'] = Specjour::VERSION
+      projects = []
+      DNSSD.register "#{projects.join(",")}@#{hostname}".tr(".","-"), "_specjour._tcp", domain=nil, Specjour.configuration.printer_port, text
+    end
+
+    def start_rsync
+      rsync_daemon.start
+    end
+
+    def rsync_daemon
+      @rsync_daemon ||= RsyncDaemon.new(project_path, project_name, Specjour.configuration.rsync_port)
     end
 
     def start
@@ -25,15 +53,18 @@ module Specjour
           reads = select(fds).first
           reads.each do |socket_being_read|
             if socket_being_read == @server_socket
+              log "adding connection"
               client_socket = @server_socket.accept
               fds << client_socket
               clients[client_socket] = Connection.wrap(client_socket)
             elsif socket_being_read.eof?
+              log "closing connection"
               socket_being_read.close
               fds.delete(socket_being_read)
               clients.delete(socket_being_read)
-              disconnecting
+              # disconnecting
             else
+              log "serving"
               serve(clients[socket_being_read])
             end
           end
@@ -48,34 +79,73 @@ module Specjour
       reporters.all? {|r| r.exit_status == true} && !reporters.empty?
     end
 
+    def uri
+      @uri ||= URI::Generic.build host: host, port: port
+    end
+
     protected
 
     def serve(client)
-      data = load_object(client.gets(TERMINATOR))
-      case data
-      when String
-        $stdout.print data
-        $stdout.flush
-      when Array
-        send data.first, *(data[1..-1].unshift(client))
+      data = client.recv_data
+      if COMMANDS.include?(data['command'])
+        client.send_data send(data['command'], *data['args'])
       end
+      # case data
+      # when String
+      #   $stdout.print data
+      #   $stdout.flush
+      # when Array
+      #   send data.first, *(data[1..-1].unshift(client))
+      # end
     end
 
-    def ready(client)
-      client.print tests_to_run.shift
-      client.flush
-    end
-
-    def done(client)
+    def done
       self.examples_complete += 1
     end
 
-    def tests=(client, tests)
+    def next_test
+      log "Printer test size: #{tests_to_run.size}"
+      tests_to_run.shift
+    end
+
+    def ready
+      { project_name: project_name, test_paths: test_paths }
+    end
+
+    def greet(message)
+      { received: message }
+    end
+
+    def register_tests(tests)
       if tests_to_run.empty?
         self.tests_to_run = run_order(tests)
         self.example_size = tests_to_run.size
+        true
       end
     end
+
+    def project_path
+      Dir.pwd
+    end
+
+    def options
+      {}
+    end
+
+    def project_name
+      options[:project_alias] || File.basename(project_path)
+    end
+
+    def machines=(client, machines)
+      @machines = machines
+    end
+
+    # def tests=(client, tests)
+    #   if tests_to_run.empty?
+    #     self.tests_to_run = run_order(tests)
+    #     self.example_size = tests_to_run.size
+    #   end
+    # end
 
     def rspec_summary=(client, summary)
       rspec_report.add(summary)

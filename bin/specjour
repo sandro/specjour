@@ -2,4 +2,4 @@
 require 'specjour'
 
 $PROGRAM_NAME = File.basename(__FILE__)
-Specjour::CLI.start
+Specjour::CLI.new.start

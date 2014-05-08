@@ -1,8 +1,7 @@
-require 'drb'
+require 'tmpdir'
 
 autoload :URI, 'uri'
 autoload :Forwardable, 'forwardable'
-autoload :GServer, 'gserver'
 autoload :Timeout, 'timeout'
 autoload :Benchmark, 'benchmark'
 autoload :Logger, 'logger'
@@ -18,13 +17,17 @@ module Specjour
   autoload :DbScrub, 'specjour/db_scrub'
   autoload :Dispatcher, 'specjour/dispatcher'
   autoload :Fork, 'specjour/fork'
+  autoload :Formatter, 'specjour/formatter'
+  autoload :Listener, 'specjour/listener'
   autoload :Logger, 'specjour/logger'
   autoload :Loader, 'specjour/loader'
   autoload :Manager, 'specjour/manager'
+  autoload :Plugin, 'specjour/plugin'
   autoload :Printer, 'specjour/printer'
   autoload :Protocol, 'specjour/protocol'
   autoload :RsyncDaemon, 'specjour/rsync_daemon'
   autoload :SocketHelper, 'specjour/socket_helper'
+  autoload :Tester, 'specjour/tester'
   autoload :Worker, 'specjour/worker'
 
   autoload :Cucumber, 'specjour/cucumber'
@@ -38,6 +41,22 @@ module Specjour
 
   class Error < StandardError; end
 
+  def self.benchmark(msg, &block)
+    print "#{msg}... "
+    time = Benchmark.realtime &block
+    puts "completed in #{time}s"
+  end
+
+  def self.configuration(configuration=nil)
+    if configuration
+      @configuration = configuration
+    elsif !instance_variable_defined?(:@configuration)
+      @configuration = Configuration.new
+    else
+      @configuration
+    end
+  end
+
   def self.interrupted?
     @interrupted
   end
@@ -50,11 +69,19 @@ module Specjour
     end
   end
 
-  def self.will_quit(framework)
-    if Object.const_defined?(framework)
-      framework = Object.const_get(framework)
-      framework.wants_to_quit = true if framework.respond_to?(:wants_to_quit=)
+  def self.load_custom_hooks
+    load HOOKS_PATH if File.exists?(HOOKS_PATH)
+  end
+
+  def self.load_plugins
+    $LOAD_PATH.each do |load_path|
+      file = File.expand_path("specjour_plugin.rb", load_path)
+      require file if File.exists?(file)
     end
+  end
+
+  def self.log?
+    logger.level != ::Logger::UNKNOWN
   end
 
   def self.logger
@@ -67,12 +94,8 @@ module Specjour
     @logger
   end
 
-  def self.log?
-    logger.level != ::Logger::UNKNOWN
-  end
-
-  def self.load_custom_hooks
-    load HOOKS_PATH if File.exists?(HOOKS_PATH)
+  def self.plugin_manager
+    @plugin_manager ||= Specjour::Plugin::Manager.new
   end
 
   def self.trap_interrupt
@@ -82,9 +105,13 @@ module Specjour
     end
   end
 
-  def self.benchmark(msg, &block)
-    print "#{msg}... "
-    time = Benchmark.realtime &block
-    puts "completed in #{time}s"
+  def self.will_quit(framework)
+    if Object.const_defined?(framework)
+      framework = Object.const_get(framework)
+      framework.wants_to_quit = true if framework.respond_to?(:wants_to_quit=)
+    end
   end
+
+  load_custom_hooks
+  load_plugins
 end

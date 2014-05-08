@@ -1,0 +1,31 @@
+rails plugin
+  loader
+    sets test mode
+    loads rails application
+    compiles assets??
+  worker
+    loads application envionment
+    destroys old databases
+    creates new databases
+
+rspec plugin
+  loads spec/spec_helper unless RSpec is defined
+  executes a test loading strategy (test examples vs test files)
+  is presented with the test to run, returns true if the test should be run
+  takes care of its own formatter
+
+minitest plugin
+  loads minitest environment
+
+testunit plugin
+
+cucumber plugin
+
+sinatra plugin
+
+
+rails
+  rspec
+  cucumber
+
+

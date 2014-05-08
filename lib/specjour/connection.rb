@@ -1,5 +1,6 @@
 module Specjour
   class Connection
+    include Logger
     include Protocol
     extend Forwardable
 
@@ -30,47 +31,56 @@ module Specjour
       socket.close if socket && !socket.closed?
     end
 
+    def host
+      uri.host
+    end
+
+    def port
+      uri.port
+    end
+
     def socket
       @socket ||= connect
     end
 
+    def done
+      send_command("done")
+    end
+
+    def greet(msg)
+      send_command("greet", msg)
+    end
+
     def next_test
-      will_reconnect do
-        send_message(:ready)
-        load_object socket.gets(TERMINATOR)
-      end
+      send_command("next_test")
     end
 
-    def print(arg)
-      will_reconnect do
-        socket.print dump_object(arg)
-      end
+    def ready
+      send_command("ready")
     end
 
-    def puts(arg='')
-      will_reconnect do
-        print(arg << "\n")
-      end
+    def reconnect
+      socket.close unless socket.closed?
+      connect
     end
 
-    def send_message(method_name, *args)
+    def register_tests(tests)
+      send_command("register_tests", tests)
+    end
+
+    def send_command(method_name, *args)
       will_reconnect do
-        print([method_name, *args])
-        flush
+        send_data command: method_name, args: args
+        recv_data
       end
     end
 
     protected
 
     def connect_socket
-      @socket = TCPSocket.open(uri.host, uri.port)
+      @socket = TCPSocket.open(host, port)
     rescue Errno::ECONNREFUSED => error
       retry
-    end
-
-    def reconnect
-      socket.close unless socket.closed?
-      connect
     end
 
     def timeout(&block)

@@ -1,24 +1,22 @@
 # encoding: utf-8
 module Specjour
-  module DbScrub
-    extend Logger
+  class DbScrubber
+    include Logger
 
-    begin
-      require 'rake'
-      extend Rake::DSL if defined?(Rake::DSL)
-      if defined?(Rails)
-        Rake::Task.define_task(:environment) { }
-        load 'rails/tasks/misc.rake'
-        load 'active_record/railties/databases.rake'
-      end
-    rescue LoadError
-      log "Failed to load Rails rake tasks"
+    def initialize
+      load_tasks
     end
 
-    extend self
+    def disconnect_database
+      ActiveRecord::Base.remove_connection
+    end
 
     def drop
       Rake::Task['db:drop'].invoke
+    end
+
+    def load_tasks
+      Rails.application.load_tasks
     end
 
     def scrub
@@ -30,7 +28,7 @@ module Specjour
     protected
 
     def connect_to_database
-      ActiveRecord::Base.remove_connection
+      disconnect_database
       ActiveRecord::Base.configurations = Rails.application.config.database_configuration
       ActiveRecord::Base.establish_connection
       connection
