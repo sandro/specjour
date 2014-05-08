@@ -18,6 +18,7 @@ coverage
 rdoc
 pkg
 *.gem
+/tags
 
 ## PROJECT::SPECIFIC
 .specjour
