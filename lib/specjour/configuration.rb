@@ -1,105 +1,61 @@
 module Specjour
-  module Configuration
-    extend self
+  class Configuration
+    attr_accessor :options
 
-    attr_writer :before_fork, :after_fork, :after_load, :prepare, :rspec_formatter, :rsync_options
+    DEFAULT_BACKTRACE_EXCLUSION = Regexp.union([
+      "/lib/specjour/",
+      /lib\/rspec\/(core|expectations|matchers|mocks)/,
+      "/gems/",
+      "spec/spec_helper.rb",
+      "spec/rails_helper.rb",
+      "bin/"
+    ]).freeze
 
-    # This block is run by each worker before they begin running tests.
-    # The default action is to migrate the database, and clear it of any old
-    # data.
-    def after_fork
-      @after_fork ||= default_after_fork
-    end
+    DEFAULT_OPTIONS = {
+      backtrace_exclusion_pattern: DEFAULT_BACKTRACE_EXCLUSION,
+      formatter: Formatter.new,
+      full_backtrace: false,
+      printer_port: nil,
+      printer_uri: nil,
+      project_aliases: [],
+      project_name: nil,
+      project_path: nil,
+      remote_job: nil,
+      rsync_options: "-aL --delete --ignore-errors",
+      rsync_port: 23456,
+      test_paths: nil,
+      tmp_path: "/tmp",
+      worker_size: lambda { Specjour.configuration.remote_job ? CPU.half_cores : CPU.cores },
+      worker_number: 0
+    }.freeze
 
-    # This block is run after the manager loads the app into memory, but before
-    # forking new worker processes. The default action is to disconnect from
-    # the ActiveRecord database.
-    def after_load
-      @after_load ||= default_after_load
-    end
-
-    # This block is run by the manager before forking workers. The default
-    # action is to run bundle install.
-    def before_fork
-      @before_fork ||= default_before_fork
-    end
-
-    # This block is run on all workers when invoking `specjour prepare`
-    # Defaults to dropping the worker's database and recreating it. This
-    # is especially useful when two teams are sharing workers and writing
-    # migrations at around the same time causing databases to get out of sync.
-    def prepare
-      @prepare ||= default_prepare
-    end
-
-    def reset
-      @before_fork = nil
-      @after_fork = nil
-      @after_load = nil
-      @prepare = nil
-      @rsync_options = nil
-      @rspec_formatter = nil
-    end
-
-    def rspec_formatter
-      @rspec_formatter ||= default_rspec_formatter
-    end
-
-    def rsync_options
-      @rsync_options ||= default_rsync_options
-    end
-
-    def bundle_install
-      if system('which bundle')
-        system('bundle check') || system('bundle install')
-      end
-    end
-
-    def default_before_fork
-      lambda do
-        bundle_install
-      end
-    end
-
-    def default_after_fork
-      lambda do
-        DbScrub.scrub if rails_with_ar?
-      end
-    end
-
-    def default_after_load
-      lambda do
-        ActiveRecord::Base.remove_connection if rails_with_ar?
-      end
-    end
-
-    def default_prepare
-      lambda do
-        if rails_with_ar?
-          DbScrub.drop
-          DbScrub.scrub
+    def self.make_option(name)
+      define_method(name) do
+        option = @options[name]
+        if option.respond_to?(:call)
+          option.call()
+        else
+          option
         end
       end
-    end
 
-    def default_rspec_formatter
-      lambda do
-        ::RSpec::Core::Formatters::ProgressFormatter
+      define_method("#{name}=") do |value|
+        @options[name] = value
       end
     end
 
-    def default_rsync_options
-      "-aL --delete --ignore-errors"
+    DEFAULT_OPTIONS.each do |k,v|
+      make_option(k)
     end
 
-    protected
-
-    def rails_with_ar?
-      defined?(Rails) && defined?(ActiveRecord::Base)
+    def initialize(options={})
+      @original_options = options
+      set_options
     end
 
-    def system(cmd)
-      Kernel.system("#{cmd} > /dev/null")
+    def set_options
+      @options = DEFAULT_OPTIONS.merge @original_options
     end
+
   end
 end

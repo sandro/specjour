@@ -10,7 +10,7 @@ module Specjour::Fork
       at_exit { exit! }
       begin
         yield
-      rescue StandardError => e
+      rescue Exception => e
         $stderr.puts "#{e.class} #{e.message}", e.backtrace
       end
     end

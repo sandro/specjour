@@ -2,4 +2,6 @@
 require 'specjour'
 
 $PROGRAM_NAME = File.basename(__FILE__)
-Specjour::CLI.start
+Specjour.load_plugins
+Specjour.load_custom_hooks
+Specjour::CLI.new.start

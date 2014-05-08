@@ -1,28 +1,33 @@
-require 'drb'
+require 'tmpdir'
 
 autoload :URI, 'uri'
 autoload :Forwardable, 'forwardable'
-autoload :GServer, 'gserver'
 autoload :Timeout, 'timeout'
 autoload :Benchmark, 'benchmark'
 autoload :Logger, 'logger'
 autoload :Socket, 'socket'
 autoload :StringIO, 'stringio'
 autoload :OpenStruct, 'ostruct'
+autoload :Pathname, 'pathname'
 
 module Specjour
   autoload :CLI, 'specjour/cli'
+  autoload :Colors, 'specjour/colors'
   autoload :CPU, 'specjour/cpu'
   autoload :Configuration, 'specjour/configuration'
   autoload :Connection, 'specjour/connection'
   autoload :DbScrub, 'specjour/db_scrub'
   autoload :Dispatcher, 'specjour/dispatcher'
   autoload :Fork, 'specjour/fork'
+  autoload :Formatter, 'specjour/formatter'
+  autoload :Listener, 'specjour/listener'
   autoload :Logger, 'specjour/logger'
   autoload :Loader, 'specjour/loader'
   autoload :Manager, 'specjour/manager'
+  autoload :Plugin, 'specjour/plugin'
   autoload :Printer, 'specjour/printer'
   autoload :Protocol, 'specjour/protocol'
+  autoload :RspecFormatter, "specjour/rspec_formatter"
   autoload :RsyncDaemon, 'specjour/rsync_daemon'
   autoload :SocketHelper, 'specjour/socket_helper'
   autoload :Worker, 'specjour/worker'
@@ -30,13 +35,32 @@ module Specjour
   autoload :Cucumber, 'specjour/cucumber'
   autoload :RSpec, 'specjour/rspec'
 
-  VERSION ||= "0.7.0"
+  VERSION ||= "2.0.0.rc1"
   HOOKS_PATH ||= "./.specjour/hooks.rb"
   PROGRAM_NAME ||= $PROGRAM_NAME # keep a reference of the original program name
+  Time = Time.dup
 
   GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
 
   class Error < StandardError; end
+
+  def self.benchmark(msg)
+    $stderr.print "#{msg}... "
+    start_time = Time.now
+    yield
+  ensure
+    $stderr.puts "completed in #{Time.now - start_time}s"
+  end
+
+  def self.configuration(provided_config=nil)
+    if provided_config
+      @configuration = provided_config
+    elsif !instance_variable_defined?(:@configuration)
+      @configuration = Configuration.new
+    else
+      @configuration
+    end
+  end
 
   def self.interrupted?
     @interrupted
@@ -44,16 +68,16 @@ module Specjour
 
   def self.interrupted=(bool)
     @interrupted = bool
-    if bool
-      will_quit(:RSpec)
-      will_quit(:Cucumber)
-    end
   end
 
-  def self.will_quit(framework)
-    if Object.const_defined?(framework)
-      framework = Object.const_get(framework)
-      framework.wants_to_quit = true if framework.respond_to?(:wants_to_quit=)
+  def self.load_custom_hooks
+    load HOOKS_PATH if File.exists?(HOOKS_PATH)
+  end
+
+  def self.load_plugins
+    $LOAD_PATH.each do |load_path|
+      file = File.expand_path("specjour_plugin.rb", load_path)
+      require file if File.exists?(file)
     end
   end
 
@@ -61,30 +85,31 @@ module Specjour
     @logger ||= new_logger
   end
 
-  def self.new_logger(level = ::Logger::UNKNOWN)
-    @logger = ::Logger.new $stderr
+  def self.new_logger(level = ::Logger::UNKNOWN, output=nil)
+    @logger = ::Logger.new output || $stderr
     @logger.level = level
+    @logger.formatter = lambda do |severity, datetime, progname, message|
+      "[#{severity} #{datetime.strftime("%I:%M:%S")}] #{progname}: #{message}\n"
+    end
     @logger
   end
 
-  def self.log?
-    logger.level != ::Logger::UNKNOWN
-  end
-
-  def self.load_custom_hooks
-    load HOOKS_PATH if File.exists?(HOOKS_PATH)
+  def self.plugin_manager
+    @plugin_manager ||= Specjour::Plugin::Manager.new
   end
 
   def self.trap_interrupt
     Signal.trap('INT') do
       self.interrupted = true
-      abort("\n")
+      plugin_manager.send_task(:interrupted!)
     end
   end
 
-  def self.benchmark(msg, &block)
-    print "#{msg}... "
-    time = Benchmark.realtime &block
-    puts "completed in #{time}s"
+  def self.trap_interrupt_with_exit
+    trap_interrupt
+    old_int = Signal.trap("INT") do
+      old_int.call()
+      abort("ABORTING\n")
+    end
   end
 end

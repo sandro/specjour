@@ -2,6 +2,7 @@ module Specjour
   class RsyncDaemon
     require 'fileutils'
     include SocketHelper
+    include Logger
 
     # Corresponds to the version of specjour that changed the configuration
     # file.
@@ -40,13 +41,15 @@ module Specjour
       write_config
       Dir.chdir(project_path) do
         Kernel.system *command
+        rsync_pid = $?.pid
         sleep 0.1
       end
     end
 
     def stop
-      if pid
-        Process.kill("KILL", pid)
+      if process_id = pid
+        log("#{self.class.name} Shutting down")
+        Process.kill("KILL", process_id) rescue nil
         FileUtils.rm(pid_file)
       end
     end
@@ -94,7 +97,7 @@ remove it, and re-run the dispatcher to generate the new config file.
 # $ #{(command | ['--no-detach']).join(' ')}
 #
 # Rsync with the following command:
-# $ rsync -a --port=#{port} #{hostname}::#{project_name} /tmp/#{project_name}
+# $ rsync -a --port=#{port} #{hostname}::#{project_name} #{Specjour.configuration.tmp_path}/#{project_name}
 #
 use chroot = no
 timeout = 20

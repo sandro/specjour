@@ -1,167 +1,86 @@
 module Specjour
+  require 'specjour/worker'
   class Loader
-    include Protocol
-    include Fork
+    include Logger
+    include SocketHelper
 
-    attr_reader :test_paths, :printer_uri, :project_path, :task, :worker_size, :worker_pids, :quiet
+    attr_reader \
+      :options,
+      :quiet,
+      :task,
+      :worker_pids
 
     def initialize(options = {})
       @options = options
-      @printer_uri = options[:printer_uri]
-      @test_paths = options[:test_paths]
-      @worker_size = options[:worker_size]
       @task = options[:task]
       @quiet = options[:quiet]
-      @project_path = options[:project_path]
       @worker_pids = []
-      Dir.chdir project_path
-      Specjour.load_custom_hooks
     end
 
     def start
-      load_app
-      Configuration.after_load.call
-      (1..worker_size).each do |index|
+      Process.setsid
+      $PROGRAM_NAME = "specjour loader"
+      set_up
+      sync
+      Specjour.plugin_manager.send_task(:load_application)
+      Specjour.plugin_manager.send_task(:register_tests_with_printer)
+      fork_workers
+      wait_srv
+    rescue StandardError, ScriptError => e
+      $stderr.puts "RESCUED #{e.class} '#{e.message}'"
+      $stderr.puts e.backtrace
+      $stderr.puts "\n\n"
+      connection.error(e)
+    ensure
+      remove_connection
+      log "Loader killing group #{Process.getsid}"
+    end
+
+    def fork_workers
+      Specjour.plugin_manager.send_task(:before_worker_fork)
+      (1..Specjour.configuration.worker_size).each do |index|
         worker_pids << fork do
-          Worker.new(
+          remove_connection
+          Specjour.plugin_manager.send_task(:remove_connection)
+          $PROGRAM_NAME = "specjour worker"
+          worker = Worker.new(
             :number => index,
-            :printer_uri => printer_uri,
             :quiet => quiet
-          ).send(task)
-        end
-      end
-      Process.waitall
-    ensure
-      kill_worker_processes
-    end
-
-    def spec_files
-      @spec_files ||= file_collector(spec_paths) do |path|
-        if path == project_path
-          Dir["#{path}/spec/**/*_spec.rb"]
-        else
-          Dir["#{path}/**/*_spec.rb"]
+          )
+          Specjour.plugin_manager.send_task(:after_worker_fork)
+          worker.send(task)
         end
       end
     end
 
-    def feature_files
-      binding.pry
-      @feature_files ||= file_collector(feature_paths) do |path|
-        if path == project_path
-          Dir["#{path}/features/**/*.feature"]
-        else
-          Dir["#{path}/**/*.feature"]
+    def wait_srv
+      select [connection.socket]
+      if !connection.socket.eof?
+        signal = connection.get_server_done
+        case signal
+        when "INT"
+          debug "Sending INT to -#{Process.getsid}"
+          Process.kill("INT", -Process.getsid)
         end
       end
     end
 
-    protected
-
-    def spec_paths
-      @spec_paths ||= test_paths.select {|p| p =~ /spec.*$/}
+    def set_up
+      data = connection.ready({hostname: hostname, worker_size: Specjour.configuration.worker_size})
+      Specjour.configuration.project_name = data[:project_name]
+      Specjour.configuration.test_paths = data[:test_paths]
+      Specjour.configuration.project_path = File.expand_path(Specjour.configuration.project_name, Specjour.configuration.tmp_path)
     end
 
-    def feature_paths
-      @feature_paths ||= test_paths.select {|p| p =~ /features.*$/}
+    def sync
+      cmd "rsync #{Specjour.configuration.rsync_options} --port=#{Specjour.configuration.rsync_port} #{connection.host}::#{Specjour.configuration.project_name} #{Specjour.configuration.project_path}"
+      Dir.chdir Specjour.configuration.project_path
     end
 
-    def file_collector(paths, &globber)
-      if spec_paths.empty? && feature_paths.empty?
-        globber[project_path]
-      else
-        paths.map do |path|
-          path = File.expand_path(path, project_path)
-          if File.directory?(path)
-            globber[path]
-          else
-            path
-          end
-        end.flatten.uniq
+    def cmd(command)
+      Specjour.benchmark(command) do
+        system *command.split
       end
     end
-
-    def load_app
-      RSpec::Preloader.load spec_files if spec_files.any?
-
-      $stderr.puts ['feature files', feature_files].inspect
-      Cucumber::Preloader.load(feature_files, connection) if feature_files.any?
-      register_tests_with_printer
-    end
-
-    def register_tests_with_printer
-      tests = rspec_examples | cucumber_scenarios
-      connection.send_message :tests=, tests
-    end
-
-    def rspec_examples
-      if spec_files.any?
-        filtered_examples
-      else
-        []
-      end
-    end
-
-    # recursively gather groups containing a before(:all) hook, and examples
-    def gather_groups(groups)
-      groups.map do |g|
-        before_all_hooks = g.send(:find_hook, :before, :all, nil, nil)
-        if before_all_hooks.any?
-          g
-        else
-          (g.filtered_examples || []) + gather_groups(g.children)
-        end
-      end.flatten
-    end
-
-    def filtered_examples
-      executables = gather_groups(::RSpec.world.example_groups)
-      locations = executables.map do |e|
-        if e.respond_to?(:examples)
-          e.metadata[:example_group][:location]
-        else
-          if e.example_group.metadata[:shared_group_name]
-            e.metadata[:example_group][:location]
-          else
-            e.metadata[:location]
-          end
-        end
-      end
-    ensure
-      shared_groups = ::RSpec.world.shared_example_groups.dup
-      ::RSpec.reset
-      shared_groups.each do |k,v|
-        ::RSpec.world.shared_example_groups[k] = v
-      end
-    end
-
-    def cucumber_scenarios
-      if feature_files.any?
-        scenarios
-      else
-        []
-      end
-    end
-
-    def scenarios
-      Cucumber.runtime.send(:features).map do |feature|
-        feature.feature_elements.map do |scenario|
-          "#{feature.file}:#{scenario.instance_variable_get(:@line)}"
-        end
-      end.flatten
-    end
-
-    def kill_worker_processes
-      signal = Specjour.interrupted? ? 'INT' : 'TERM'
-      Process.kill(signal, *worker_pids) rescue Errno::ESRCH
-    end
-
-    def connection
-      @connection ||= begin
-        at_exit { connection.disconnect }
-        Connection.new URI.parse(printer_uri)
-      end
-    end
-
   end
 end

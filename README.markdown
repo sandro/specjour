@@ -1,6 +1,23 @@
 # Specjour
 
-## FUCK SETI. Run specs with your spare CPU cycles.
+## Notes
+  Listener daemonized or foregrounded
+    forks a loader
+      loader should load, setsid, then exit
+        all workers then have the same sid and gid with no parent pid
+        worker pgid = 100 sid = 100
+          webkit_server
+        worker pgid = 100 sid = 100
+          webkit_server
+
+  performance.txt
+  printing informational messages
+  single specjour command starts daemon
+  interrupts
+  handle no careful_test database
+  bonjour announce project names
+  printer#project_name aliases
+
 
 ## Instructions
 
@@ -20,6 +37,12 @@ by [parallel\_tests](http://github.com/grosser/parallel_tests)):
       database: project_name_test<%=ENV['TEST_ENV_NUMBER']%>
 
 ## Give it a try
+
+  source .dev
+  bin/specjour listen -f -l
+  bin/specjour spec/
+
+
 Run `specjour` to start a dispatcher, manager, and multiple workers in the same
 terminal window.
 

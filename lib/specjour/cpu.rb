@@ -10,6 +10,10 @@ module Specjour
       end
     end
 
+    def self.half_cores
+      cores / 2
+    end
+
     protected
 
     def self.command(cmd)
