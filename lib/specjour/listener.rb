@@ -36,24 +36,26 @@ module Specjour
     def add_printer(params)
       log "Listener adding printer #{params}"
       self.printer = params
-      Specjour.configuration.options[:printer_uri] = params[:uri]
+      Specjour.configuration.printer_uri = params[:uri]
     end
 
     def remove_printer
       self.printer = nil
-      Specjour.configuration.options[:printer_uri] = nil
+      Specjour.configuration.printer_uri = nil
     end
 
     def fork_loader
       Specjour.plugin_manager.send_task(:before_loader_fork)
       fork do
-        Loader.new(printer_uri: connection.uri, task: "run_tests").start
+        loader = Loader.new(task: "run_tests")
+        Specjour.plugin_manager.send_task(:after_loader_fork)
+        loader.start
       end
     end
 
     def gather
       DNSSD.browse!('_specjour._tcp') do |reply|
-        p ['reply', reply.name, reply.service_name, reply.domain,reply.flags]
+        log ['reply', reply.name, reply.service_name, reply.domain,reply.flags]
         if reply.flags.add?
           DNSSD.resolve!(reply.name, reply.type, reply.domain, flags=0, reply.interface) do |resolved|
             log "Bonjour discovered #{resolved.target}"
@@ -67,8 +69,9 @@ module Specjour
             end
           end
           break
-        # else
-        #   remove_printer
+        else
+          log "REMOVING #{reply.name}"
+          remove_printer
         end
       end
     end
@@ -84,12 +87,20 @@ module Specjour
     end
 
     def start
-      unless started?
-        log "Listener starting"
-        write_pid
+      return if started?
+      log "Listener starting"
+      write_pid
+      loop do
+        log "listening..."
         gather
         @loader_pid = fork_loader
         select [connection.socket] # wait until server disconnects
+        Process.waitall
+        Process.kill("TERM", -@loader_pid)
+        # Process.waitall
+        remove_printer
+        remove_connection
+        sleep 1 # let bonjour services stop
       end
     ensure
       shutdown
@@ -99,22 +110,29 @@ module Specjour
       !pid.nil?
     end
 
+    def stop
+      Process.kill("TERM", pid) rescue TypeError
+      remove_pid
+    end
+
     def shutdown
-      log "Shutting down listener, and loader"
-      connection.disconnect
-      remove_printer
-    rescue Exception => e
+      log "Shutting down listener"
+    rescue StandardError, ScriptError => e
       $stderr.puts "RESCUED #{e.message}"
       $stderr.puts e.backtrace
       Process.kill("TERM", @loader_pid) rescue TypeError
     ensure
-      File.unlink pid_file
+      remove_pid
     end
 
     def write_pid
       File.open(pid_file, 'w') do |f|
         f.write Process.pid
       end
+    end
+
+    def remove_pid
+      File.unlink(pid_file) if File.exists?(pid_file)
     end
   end
 end

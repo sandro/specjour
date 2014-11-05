@@ -1,9 +1,21 @@
 module Specjour
   module Plugin
     class Base
+      include SocketHelper
+      include Specjour::Logger
+
       attr_reader :listener, :loader, :worker
 
+      def before_suite
+      end
+
+      def after_suite
+      end
+
       def before_loader_fork
+      end
+
+      def load_application
       end
 
       def after_loader_fork
@@ -13,9 +25,7 @@ module Specjour
       end
 
       def after_worker_fork
-      end
-
-      def load_application
+        remove_connection
       end
 
       def interrupted!

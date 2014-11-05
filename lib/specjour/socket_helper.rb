@@ -4,10 +4,14 @@ module Specjour
 
     def connection
       return @connection if @connection
-      log "connecting"
+      debug "CONNECTING #{self.class.name}"
       @connection = Connection.new Specjour.configuration.printer_uri
       @connection.connect
       @connection
+    end
+
+    def connection?
+      instance_variable_defined? :@connection
     end
 
     def ip_from_hostname(hostname)
@@ -30,6 +34,11 @@ module Specjour
 
     def new_uri
       URI::Generic.build :host => faux_server[2], :port => faux_server[1]
+    end
+
+    def remove_connection
+      connection.disconnect if connection?
+      @connection = nil
     end
 
     protected

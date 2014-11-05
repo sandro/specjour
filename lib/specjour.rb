@@ -8,9 +8,11 @@ autoload :Logger, 'logger'
 autoload :Socket, 'socket'
 autoload :StringIO, 'stringio'
 autoload :OpenStruct, 'ostruct'
+autoload :Pathname, 'pathname'
 
 module Specjour
   autoload :CLI, 'specjour/cli'
+  autoload :Colors, 'specjour/colors'
   autoload :CPU, 'specjour/cpu'
   autoload :Configuration, 'specjour/configuration'
   autoload :Connection, 'specjour/connection'
@@ -36,15 +38,20 @@ module Specjour
   VERSION ||= "0.7.0"
   HOOKS_PATH ||= "./.specjour/hooks.rb"
   PROGRAM_NAME ||= $PROGRAM_NAME # keep a reference of the original program name
+  Time = Time.dup
 
   GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
 
   class Error < StandardError; end
 
-  def self.benchmark(msg, &block)
+  def self.benchmark(msg)
     print "#{msg}... "
-    time = Benchmark.realtime &block
+    return_value = nil
+    time = Benchmark.realtime do
+      return_value = yield
+    end
     puts "completed in #{time}s"
+    return_value
   end
 
   def self.configuration(configuration=nil)
@@ -88,9 +95,12 @@ module Specjour
     @logger ||= new_logger
   end
 
-  def self.new_logger(level = ::Logger::UNKNOWN)
-    @logger = ::Logger.new $stderr
+  def self.new_logger(level = ::Logger::UNKNOWN, output=nil)
+    @logger = ::Logger.new output || $stderr
     @logger.level = level
+    @logger.formatter = lambda do |severity, datetime, progname, message|
+      "[#{severity} #{datetime.strftime("%I:%M:%S")}] #{progname}: #{message}\n"
+    end
     @logger
   end
 

@@ -14,28 +14,44 @@ module Specjour
       next_test
       ready
       register_tests
+      report_test
     )
 
     def initialize(options={})
       @options = options
       @host = "0.0.0.0"
-      @server_socket = TCPServer.new(@host, Specjour.configuration.printer_port)
-      @port = @server_socket.addr[1]
       @profiler = {}
       @clients = {}
       @tests_to_run = []
       @test_paths = options[:test_paths]
       @example_size = 0
       @machines = []
-      @formatter = Specjour.configuration.formatter
+      @bonjour_service = nil
       self.examples_complete = 0
+      set_paths
+    end
+
+    def set_paths
+      paths = test_paths.map {|tp| Pathname.new(File.expand_path(tp, Dir.pwd))}
+      if paths.any?
+        @project_path = Pathname.new(find_project_base_dir(paths.first.dirname.to_s))
+      else
+        @project_path = Pathname.new(Dir.pwd)
+      end
+      @test_paths = paths.map do |p|
+        relative = p.relative_path_from(project_path)
+        if relative != project_path
+          relative
+        end
+      end.compact
+      abort("#{project_path} doesn't exist") unless project_path.exist?
     end
 
     def announce
       text = DNSSD::TextRecord.new
       text['version'] = Specjour::VERSION
       projects = []
-      DNSSD.register "#{projects.join(",")}@#{hostname}".tr(".","-"), "_specjour._tcp", domain=nil, Specjour.configuration.printer_port, text
+      @bonjour_service = DNSSD.register "#{projects.join(",")}@#{hostname}".tr(".","-"), "_specjour._tcp", domain=nil, Specjour.configuration.printer_port, text
     end
 
     def start_rsync
@@ -43,28 +59,30 @@ module Specjour
     end
 
     def rsync_daemon
-      @rsync_daemon ||= RsyncDaemon.new(project_path, project_name, Specjour.configuration.rsync_port)
+      @rsync_daemon ||= RsyncDaemon.new(project_path.to_s, project_name, Specjour.configuration.rsync_port)
     end
 
     def start
+      @server_socket ||= TCPServer.new(@host, Specjour.configuration.printer_port)
+      # @port = @server_socket.addr[1]
       fds = [@server_socket]
       catch(:stop) do
         while true
           reads = select(fds).first
           reads.each do |socket_being_read|
             if socket_being_read == @server_socket
-              log "adding connection"
+              debug "adding connection"
               client_socket = @server_socket.accept
               fds << client_socket
               clients[client_socket] = Connection.wrap(client_socket)
             elsif socket_being_read.eof?
-              log "closing connection"
+              debug "closing connection"
               socket_being_read.close
               fds.delete(socket_being_read)
               clients.delete(socket_being_read)
-              # disconnecting
+              disconnecting
             else
-              log "serving"
+              debug "serving"
               serve(clients[socket_being_read])
             end
           end
@@ -83,12 +101,22 @@ module Specjour
       @uri ||= URI::Generic.build host: host, port: port
     end
 
+    def project_name
+      options[:project_alias] || project_path.basename.to_s
+    end
+
+    def project_path
+      @project_path
+    end
+
     protected
 
     def serve(client)
       data = client.recv_data
       if COMMANDS.include?(data['command'])
         client.send_data send(data['command'], *data['args'])
+      else
+        raise Error.new("COMMAND NOT FOUND: #{data['command']}")
       end
       # case data
       # when String
@@ -104,12 +132,19 @@ module Specjour
     end
 
     def next_test
-      log "Printer test size: #{tests_to_run.size}"
+      log "Printer: test size: #{tests_to_run.size}"
+      if tests_to_run.size == example_size
+        Specjour.configuration.formatter.start_time = Specjour::Time.now
+      end
       tests_to_run.shift
     end
 
     def ready
-      { project_name: project_name, test_paths: test_paths }
+      {
+        project_name: project_name,
+        project_path: project_path.to_s,
+        test_paths: test_paths
+      }
     end
 
     def greet(message)
@@ -124,16 +159,23 @@ module Specjour
       end
     end
 
-    def project_path
-      Dir.pwd
+    def report_test(test)
+      Specjour.configuration.formatter.report_test(test)
+      true
+    end
+
+    def find_project_base_dir(directory)
+      p ['find in', directory]
+      dirs = Dir["#{directory}/Rakefile"]
+      if dirs.any?
+        File.dirname dirs.first
+      else
+        find_project_base_dir(File.dirname(directory))
+      end
     end
 
     def options
       {}
-    end
-
-    def project_name
-      options[:project_alias] || File.basename(project_path)
     end
 
     def machines=(client, machines)
@@ -161,7 +203,8 @@ module Specjour
     end
 
     def disconnecting
-      if clients.empty?
+      # if clients.empty?
+      if example_size == examples_complete
         throw(:stop)
       end
     end
@@ -191,24 +234,17 @@ module Specjour
       end
     end
 
-    def reporters
-      [@rspec_report, @cucumber_report].compact
-    end
-
     def stopping
-      summarize_reports
+      Specjour.configuration.formatter.print_summary
+      @bonjour_service.stop# unless @bonjour_service.stopped?
       unless Specjour.interrupted?
         record_performance
         print_missing_tests if missing_tests?
       end
     end
 
-    def summarize_reports
-      reporters.each {|r| r.summarize}
-    end
-
     def missing_tests?
-      tests_to_run.any? || examples_complete != example_size
+      examples_complete != example_size && tests_to_run.any?
     end
 
     def print_missing_tests

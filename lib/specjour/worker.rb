@@ -12,8 +12,8 @@ module Specjour
       @options = options
       $stdout = StringIO.new if options[:quiet]
       @number = options[:number].to_i
-      set_env_variables
-      Specjour.plugin_manager.send_task(:after_worker_fork)
+      Specjour.configuration.worker_number = number
+      ENV['TEST_ENV_NUMBER'] = Specjour.configuration.worker_number.to_s
     end
 
     def prepare
@@ -23,6 +23,8 @@ module Specjour
     def run_tests
       log "Worker running tests"
       run_times = Hash.new(0)
+
+      Specjour.plugin_manager.send_task(:before_suite)
 
       while test = connection.next_test
         print_status(test)
@@ -34,10 +36,10 @@ module Specjour
         connection.done
       end
 
-      log "WHILE LOOP DONE"
+      Specjour.plugin_manager.send_task(:after_suite)
 
       # send_run_times(run_times)
-    rescue Exception => e
+    rescue StandardError, ScriptError => e
       $stderr.puts "RESCUED #{e.message}"
       $stderr.puts e.backtrace
     ensure
@@ -56,13 +58,13 @@ module Specjour
     # end
 
     def print_status(test)
-      status = "[#{ENV['TEST_ENV_NUMBER']}] Running #{test}"
-      $stdout.puts status
+      status = "[#{number}] Running #{test}"
+      log status
       $PROGRAM_NAME = "specjour#{status}"
     end
 
     def print_time_for(test, time)
-      printf "[#{ENV['TEST_ENV_NUMBER']}] Finished #{test} in %.2fs\n", time
+      printf "[#{number}] Finished #{test} in %.2fs\n", time
     end
 
     # def profile(test, time)
@@ -95,10 +97,5 @@ module Specjour
     # def test_type(test)
     #   test =~ /\.feature(:\d+)?$/ ? :cucumber : :rspec
     # end
-
-    def set_env_variables
-      ENV['RSPEC_COLOR'] ||= 'true'
-      ENV['TEST_ENV_NUMBER'] ||= number.to_s
-    end
   end
 end

@@ -2,23 +2,32 @@ module Specjour
   class Configuration
     attr_accessor :options
 
-    def default_options
-      {
-        printer_port: 34276,
-        printer_uri: nil,
-        project_name: nil,
-        project_path: nil,
-        rsync_options: "-aL --delete --ignore-errors",
-        rsync_port: 23456,
-        test_paths: nil,
-        worker_size: CPU.cores,
-        worker_size: 1
-      }
+    DEFAULT_OPTIONS = {
+      formatter: Formatter.new,
+      printer_port: 34276,
+      printer_uri: nil,
+      project_name: nil,
+      project_path: nil,
+      rsync_options: "-aL --delete --ignore-errors",
+      rsync_port: 23456,
+      test_paths: nil,
+      worker_size: CPU.cores,
+      worker_number: 0
+    }
+
+    DEFAULT_OPTIONS.each do |k,v|
+      define_method(k) do
+        @options[k]
+      end
+
+      define_method("#{k}=") do |value|
+        @options[k] = value
+      end
     end
 
     def initialize(options={})
       @original_options = options
-      @options = default_options.merge options
+      @options = DEFAULT_OPTIONS.merge @original_options
     end
 
     # This block is run by each worker before they begin running tests.
@@ -41,9 +50,9 @@ module Specjour
       bundle_install
     end
 
-    def formatter
-      options[:formatter]
-    end
+    # def formatter
+    #   options[:formatter]
+    # end
 
     def load_application
       if File.exists?("./config/application.rb") && File.exists?("./config/environment.rb")
@@ -65,33 +74,41 @@ module Specjour
       end
     end
 
-    def printer_port
-      options[:printer_port]
-    end
+#     def printer_port
+#       options[:printer_port]
+#     end
 
-    def printer_uri
-      options[:printer_uri]
-    end
+#     def printer_uri
+#       options[:printer_uri]
+#     end
 
-    def project_name
-      options[:project_name]
-    end
+#     def project_name
+#       options[:project_name]
+#     end
 
-    def rsync_options
-      options[:rsync_options]
-    end
+#     def project_path
+#       options[:project_name]
+#     end
 
-    def rsync_port
-      options[:rsync_port]
-    end
+#     def rsync_options
+#       options[:rsync_options]
+#     end
 
-    def test_paths
-      options[:test_paths]
-    end
+#     def rsync_port
+#       options[:rsync_port]
+#     end
 
-    def worker_size
-      options[:worker_size]
-    end
+#     def test_paths
+#       options[:test_paths]
+#     end
+
+#     def worker_number
+#       options[:worker_number]
+#     end
+
+#     def worker_size
+#       options[:worker_size]
+#     end
 
     protected
 

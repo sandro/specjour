@@ -1,6 +1,9 @@
 module Specjour
   require 'optparse'
   class CLI
+    include Logger
+
+    COMMANDS = %w(listen tester ls stop)
 
     attr_accessor :options
 
@@ -12,12 +15,18 @@ module Specjour
       parser.parse!
       case ARGV[0]
       when "listen"
-        listener = Listener.new.start
+        listener = Listener.new
+        listener.daemonize unless options[:foreground]
+        listener.start
       when "tester"
         Tester.new("FOUR").start
       when "ls"
         puts "Plugins:"
         puts Specjour.plugin_manager.plugins
+      when "stop"
+        Listener.new.stop
+      when "help"
+        abort("Commands are: #{COMMANDS.join(" ")}")
       else
         test_paths = ARGV[0..-1]
         printer = Printer.new test_paths: Array(test_paths)
@@ -30,9 +39,22 @@ module Specjour
     def parser
       @parser ||= OptionParser.new do |parser|
         parser.banner = "Usage: specjour [options] [files or directories]\n\n"
-        parser.on("-l", "--log", "Log output to stderr") do |o|
-          options[:log] = o
-          Specjour.new_logger ::Logger::DEBUG
+        parser.on("-l", "--log [FILE]", String, "Log output to stderr") do |option|
+          if Specjour.log?
+            Specjour.new_logger ::Logger::DEBUG, option
+          else
+            Specjour.new_logger ::Logger::INFO, option
+          end
+          log option
+          options[:log] = option
+        end
+        parser.on("-f", "--foreground", "Foreground the listener (development purposes)") do |option|
+          options[:foreground] = option
+        end
+        parser.on("-w", "--workers NUM", Numeric, "Number of workers") do |option|
+          log option
+          options[:workers] = option.to_i
+          Specjour.configuration.worker_size = options[:workers]
         end
       end
     end

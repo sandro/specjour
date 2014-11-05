@@ -132,7 +132,7 @@ module Specjour
         log "Bonjour discovered #{resolved.target}"
         if resolved.text_record && resolved.text_record['version'] == Specjour::VERSION
           resolved_ip = ip_from_hostname(resolved.target)
-          p reply.service_name
+          log reply.service_name
           uri = URI::Generic.build :scheme => "druby", :host => resolved_ip, :port => resolved.port
           fetch_manager(uri)
         else

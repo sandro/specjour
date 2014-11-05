@@ -47,6 +47,10 @@ module Specjour
       send_command("done")
     end
 
+    def report_test(test)
+      send_command("report_test", test)
+    end
+
     def greet(msg)
       send_command("greet", msg)
     end
@@ -84,7 +88,7 @@ module Specjour
     end
 
     def timeout(&block)
-      Timeout.timeout(1.0, &block)
+      Timeout.timeout(0.2, &block)
     rescue Timeout::Error
     end
 

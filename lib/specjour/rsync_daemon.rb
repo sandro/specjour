@@ -2,6 +2,7 @@ module Specjour
   class RsyncDaemon
     require 'fileutils'
     include SocketHelper
+    include Logger
 
     # Corresponds to the version of specjour that changed the configuration
     # file.

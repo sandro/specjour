@@ -1,5 +1,6 @@
 module Specjour::Plugin
   class Manager
+    include Specjour::Logger
     attr_reader :plugins
 
     def initialize
@@ -16,7 +17,9 @@ module Specjour::Plugin
 
     def send_task(task, *args)
       plugins.each do |plugin|
-        break if plugin.__send__(task, *args) == true
+        log "sending task to plugin: #{task}, #{plugin}"
+        plugin.__send__(task, *args)
+        # break if plugin.__send__(task, *args) == true
       end
     end
   end

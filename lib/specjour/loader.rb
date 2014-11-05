@@ -1,4 +1,5 @@
 module Specjour
+  require 'specjour/worker'
   class Loader
     include Logger
     include SocketHelper
@@ -19,36 +20,37 @@ module Specjour
       @task = options[:task]
       @quiet = options[:quiet]
       @worker_pids = []
-      Specjour.plugin_manager.send_task(:after_loader_fork)
     end
 
     def start
       Process.setsid
       set_up
       sync
-      log "plgus"
+      Specjour.load_custom_hooks
       Specjour.plugin_manager.send_task(:load_application)
-      log "after plgus"
       Specjour.plugin_manager.send_task(:register_tests_with_printer)
       fork_workers
-      select [connection.socket] # wait for server to disconnect
-    rescue Exception => e
-      $stderr.puts "RESCUED #{e.message}"
+      # select [connection.socket] # wait for server to disconnect
+      Process.waitall
+    rescue StandardError, ScriptError => e
+      $stderr.puts "RESCUED #{e.class} '#{e.message}'"
       $stderr.puts e.backtrace
+      $stderr.puts "\n\n"
     ensure
       log "Loader killing group #{Process.getpgrp}"
-      Process.kill("KILL", -Process.getpgrp) # kill EVERYTHING!!!
+      Process.kill("TERM", -Process.getpgrp)
     end
 
     def fork_workers
       Specjour.plugin_manager.send_task(:before_worker_fork)
       (1..Specjour.configuration.worker_size).each do |index|
         worker_pids << fork do
-          Worker.new(
+          worker = Worker.new(
             :number => index,
-            :printer_uri => connection.uri,
             :quiet => quiet
-          ).send(task)
+          )
+          Specjour.plugin_manager.send_task(:after_worker_fork)
+          worker.send(task)
         end
       end
     end
@@ -60,8 +62,9 @@ module Specjour
 
     def set_up
       data = connection.ready
-      Specjour.configuration.options[:project_name] = data["project_name"]
-      Specjour.configuration.options[:test_paths] = data["test_paths"]
+      Specjour.configuration.project_name = data["project_name"]
+      Specjour.configuration.project_path = data["project_path"]
+      Specjour.configuration.test_paths = data["test_paths"]
     end
 
     def project_path
