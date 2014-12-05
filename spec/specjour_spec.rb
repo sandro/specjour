@@ -22,17 +22,17 @@ end
 # end
 
 describe Specjour do
-  it "passes" do
-    1.should == 1
-  end
+  # it "passes" do
+  #   1.should == 1
+  # end
 
-  it "pends as an example" do
-    pending
-  end
+  # it "pends as an example" do
+  #   pending
+  # end
 
-  it "fails as an example" do
-    boo
-  end
+  # it "fails as an example" do
+  #   boo
+  # end
 
   # 2.times do |i|
   #   it "[#{i}] registers a unique example" do

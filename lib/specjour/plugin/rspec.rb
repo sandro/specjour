@@ -21,11 +21,13 @@ module Specjour
       end
 
       def after_suite
-        ::RSpec.configuration.run_hook(:after, :suite)
+        # ::RSpec.configuration.run_hook(:after, :suite)
+        ::RSpec.configuration.hooks.run(:after, :suite, ::RSpec::Core::SuiteHookContext.new)
       end
 
       def before_suite
-        ::RSpec.configuration.run_hook(:before, :suite)
+        # ::RSpec.configuration.run_hook(:before, :suite)
+        ::RSpec.configuration.hooks.run(:before, :suite, ::RSpec::Core::SuiteHookContext.new)
       end
 
       def register_tests_with_printer
@@ -58,7 +60,7 @@ module Specjour
         ::RSpec.configuration.filter_manager.add_location(path, line_number.to_i)
         # ::RSpec.world.filtered_examples.clear
         Specjour.benchmark "running #{test}" do
-        ::RSpec.configuration.reporter.report(0, nil) do |reporter|
+        ::RSpec.configuration.reporter.report(0) do |reporter|
           ::RSpec.world.example_groups.each do |group|
             all_examples = group.descendant_filtered_examples
             ex = find_example(all_examples)
@@ -138,19 +140,21 @@ module Specjour
       def gather_groups(groups)
         groups.map do |g|
           p g.hooks
-          require 'byebug'; byebug
-          before_all_hooks = g.send(:find_hook, :before, :all, nil, nil)
-          if before_all_hooks.any?
-            g
-          else
+          before_all_hooks = g.hooks.send(:find_hook, :before, :all, g, nil)
+          if before_all_hooks
             (g.filtered_examples || []) + gather_groups(g.children)
           end
-        end.flatten
+          # if before_all_hooks.any?
+          #   g
+          # else
+          #   (g.filtered_examples || []) + gather_groups(g.children)
+          # end
+        end.flatten.compact
       end
 
       def filtered_examples
         executables = gather_groups(::RSpec.world.example_groups)
-        # require 'byebug'; byebug
+        require 'byebug'; byebug
         locations = executables.map do |e|
           if e.respond_to?(:examples)
             e.metadata[:example_group][:location]

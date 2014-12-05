@@ -11,7 +11,7 @@ module Specjour
       rsync_options: "-aL --delete --ignore-errors",
       rsync_port: 23456,
       test_paths: nil,
-      worker_size: CPU.cores,
+      worker_size: 1, #CPU.cores,
       worker_number: 0
     }
 
