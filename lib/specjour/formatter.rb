@@ -49,6 +49,7 @@ module Specjour
     def print_rerun
       puts %(
 Failed examples:
+TOTALLY FAKE
 
 rspec ./spec/specjour_spec.rb:29 # Specjour fails as an example
       )

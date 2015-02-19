@@ -2,12 +2,10 @@ module Specjour
   module Logger
 
     def log(msg)
-      return unless Specjour.log?
       Specjour.logger.info(self.class.name) { format(msg) }
     end
 
     def debug(msg)
-      return unless Specjour.log?
       Specjour.logger.debug(self.class.name) { format("#{msg}\n\t#{called_from}") }
     end
 

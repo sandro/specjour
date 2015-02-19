@@ -2,7 +2,7 @@ module Specjour
   class Manager
     require 'dnssd'
 
-    include DRbUndumped
+    # include DRbUndumped
     include SocketHelper
     include Fork
 
@@ -61,7 +61,6 @@ module Specjour
       @loader_pid = fork do
         exec_cmd = "load --printer-uri #{dispatcher_uri} --workers #{worker_size} --task #{worker_task} --project-path #{project_path}"
         exec_cmd << " --test-paths #{test_paths.join(" ")}" if test_paths.any?
-        exec_cmd << " --log" if Specjour.log?
         exec_cmd << " --quiet" if quiet?
         specjour_path = $LOAD_PATH.detect {|l| l =~ %r(specjour[^/]*/lib$)}
         bin_path = File.expand_path(File.join(specjour_path, "../bin"))

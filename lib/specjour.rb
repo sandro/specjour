@@ -87,13 +87,9 @@ module Specjour
     end
   end
 
-  def self.log?
-    logger.level != ::Logger::UNKNOWN
-  end
-
   def self.logger
     @logger ||= new_logger
-  end
+ end
 
   def self.new_logger(level = ::Logger::UNKNOWN, output=nil)
     @logger = ::Logger.new output || $stderr
@@ -122,6 +118,6 @@ module Specjour
     end
   end
 
-  load_custom_hooks
   load_plugins
+  load_custom_hooks
 end

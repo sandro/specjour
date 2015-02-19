@@ -30,8 +30,12 @@ module Specjour
       else
         test_paths = ARGV[0..-1]
         printer = Printer.new test_paths: Array(test_paths)
+        Specjour.benchmark("announce") do
         printer.announce
+        end
+        Specjour.benchmark("rsync") do
         printer.start_rsync
+        end
         printer.start
       end
     end
@@ -40,11 +44,7 @@ module Specjour
       @parser ||= OptionParser.new do |parser|
         parser.banner = "Usage: specjour [options] [files or directories]\n\n"
         parser.on("-l", "--log [FILE]", String, "Log output to stderr") do |option|
-          if Specjour.log?
-            Specjour.new_logger ::Logger::DEBUG, option
-          else
-            Specjour.new_logger ::Logger::INFO, option
-          end
+          Specjour.new_logger ::Logger::DEBUG, option
           log option
           options[:log] = option
         end

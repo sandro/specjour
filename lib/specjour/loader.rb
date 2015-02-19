@@ -25,7 +25,9 @@ module Specjour
     def start
       Process.setsid
       set_up
-      sync
+      Specjour.benchmark("RSYNC") do
+        sync
+      end
       Specjour.load_custom_hooks
       Specjour.plugin_manager.send_task(:load_application)
       Specjour.plugin_manager.send_task(:register_tests_with_printer)
@@ -57,7 +59,6 @@ module Specjour
 
     def load_application
       Specjour.configuration.load_application
-      $stderr.puts ::RSpec::Core
     end
 
     def set_up

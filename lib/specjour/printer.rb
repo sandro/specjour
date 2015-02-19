@@ -32,9 +32,11 @@ module Specjour
     end
 
     def set_paths
-      paths = test_paths.map {|tp| Pathname.new(File.expand_path(tp, Dir.pwd))}
+      # paths = test_paths.map {|tp| Pathname.new(File.expand_path(tp, Dir.pwd))}
+      paths = test_paths.map {|tp| Pathname.new(tp).expand_path}
       if paths.any?
-        @project_path = Pathname.new(find_project_base_dir(paths.first.dirname.to_s))
+        # @project_path = Pathname.new(find_project_base_dir(paths.first.dirname.to_s))
+        @project_path = Pathname.new(find_project_base_dir(paths.first.to_s))
       else
         @project_path = Pathname.new(Dir.pwd)
       end
@@ -152,9 +154,10 @@ module Specjour
     end
 
     def register_tests(tests)
-      if tests_to_run.empty?
+      if example_size == 0
         self.tests_to_run = run_order(tests)
         self.example_size = tests_to_run.size
+        $stderr.puts "EXAMPLES #{tests_to_run.inspect}"
         true
       end
     end

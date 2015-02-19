@@ -54,9 +54,10 @@ module Specjour
     end
 
     def gather
-      DNSSD.browse!('_specjour._tcp') do |reply|
+      @dnssd_service = DNSSD.browse!('_specjour._tcp') do |reply|
         log ['reply', reply.name, reply.service_name, reply.domain,reply.flags]
         if reply.flags.add?
+          Specjour.benchmark("resolve") do
           DNSSD.resolve!(reply.name, reply.type, reply.domain, flags=0, reply.interface) do |resolved|
             log "Bonjour discovered #{resolved.target}"
             if resolved.text_record && resolved.text_record['version'] == Specjour::VERSION
@@ -68,9 +69,10 @@ module Specjour
               $stderr.puts "Found #{resolved.target} but its version doesn't match v#{Specjour::VERSION}. Skipping..."
             end
           end
+        end
           break
         else
-          log "REMOVING #{reply.name}"
+          log "REMOVING #{reply.name} #{reply}"
           remove_printer
         end
       end
@@ -92,15 +94,16 @@ module Specjour
       write_pid
       loop do
         log "listening..."
+        Specjour.benchmark("gather") do
         gather
+        end
         @loader_pid = fork_loader
         select [connection.socket] # wait until server disconnects
         Process.waitall
-        Process.kill("TERM", -@loader_pid)
-        # Process.waitall
+        Process.kill("TERM", -@loader_pid) rescue TypeError
         remove_printer
         remove_connection
-        sleep 1 # let bonjour services stop
+        sleep 3 # let bonjour services stop
       end
     ensure
       shutdown
@@ -111,7 +114,9 @@ module Specjour
     end
 
     def stop
+      @dnssd_service.stop unless @dnssd_service.stopped?
       Process.kill("TERM", pid) rescue TypeError
+    ensure
       remove_pid
     end
 

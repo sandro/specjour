@@ -4,7 +4,7 @@ module Specjour::Plugin
   class Rails < Base
 
     def load_application
-      log "Loading rails plugin #{Specjour.configuration.worker_number}"
+      log "Loading rails plugin"
       if File.exists?("./config/application.rb") && File.exists?("./config/environment.rb")
         bundle_install
         ENV['RAILS_ENV'] = 'test'

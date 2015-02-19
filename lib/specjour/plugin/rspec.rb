@@ -2,6 +2,8 @@ module Specjour
   module Plugin
     class RSpec < Base
 
+      FILE_RE = /_spec\.rb/
+
       def load_application
         log "application loading from rspec plugin, #{File.expand_path("spec/spec_helper", Dir.pwd)}"
         require "rspec/core"
@@ -9,12 +11,14 @@ module Specjour
         @output = StringIO.new
         ::RSpec.configuration.error_stream = $stderr
         ::RSpec.configuration.output_stream = @output
-        ::RSpec.configuration.backtrace_exclusion_patterns << /lib\/specjour\//
+        # ::RSpec.configuration.backtrace_exclusion_patterns << /lib\/specjour\//
+        ::RSpec.configuration.backtrace_clean_patterns << /lib\/specjour\//
         require File.expand_path("spec/spec_helper", Dir.pwd)
         @configuration_options = ::RSpec::Core::ConfigurationOptions.new(['--format=json', spec_files])
-        # @configuration_options.parse_options
+        @configuration_options.parse_options
         @configuration_options.configure ::RSpec.configuration
         ::RSpec.configuration.load_spec_files
+        @all_groups = ::RSpec.world.example_groups
       rescue LoadError => e
         $stderr.puts "\n\nHEY THERE\n\n"
         $stderr.puts "#{e.class}: #{e.message}"
@@ -36,7 +40,7 @@ module Specjour
 
       def run_test(test)
         log "RSpec Plugin: attempting to run test #{test}"
-        if /_spec\.rb/.match(test)
+        if FILE_RE.match(test)
           run(test)
           true
         end
@@ -56,25 +60,44 @@ module Specjour
         ::RSpec.configuration.filter_manager = ::RSpec::Core::FilterManager.new
         path, line_number = test.split(":")
         ::RSpec.configuration.filter_manager.add_location(path, line_number.to_i)
-        # ::RSpec.world.filtered_examples.clear
+        ::RSpec.world.filtered_examples.clear
         Specjour.benchmark "running #{test}" do
-        ::RSpec.configuration.reporter.report(0, nil) do |reporter|
+          log "HI"
+        ::RSpec.configuration.reporter.report(1, nil) do |reporter|
+          log "IN REPORT #{::RSpec.world.example_groups.size}"
           ::RSpec.world.example_groups.each do |group|
-            all_examples = group.descendant_filtered_examples
-            ex = find_example(all_examples)
-            # p example
-            if ex.any?
-              all_examples.each do |example|
-                if ex.include?(example)
-                  def example.run(instance, reporter)
-                    super
-                  end
-                else
-                  def example.run(instance, reporter)
-                    return
-                  end
-                end
-              end
+            log "WITH GROUP"
+
+            group.descendants.each {|g| g.instance_variable_set(:@descendant_filtered_examples, nil)}
+            group.run(reporter)
+
+            # group.descendants.each do |g|
+            #   filtered = group.filtered_examples
+            #   $stderr.puts filtered.inspect
+            #   g.run(reporter)
+            # end
+
+            # all_examples = group.descendant_filtered_examples
+            # ex = find_example(all_examples)
+            # $stderr.puts group.inspect
+            # $stderr.puts ex.first.example_group.inspect
+            # $stderr.puts ex.size.inspect
+            # require 'byebug'; byebug
+            # if ex.any?
+            #   log "HAVE EX"
+            #   all_examples.each do |example|
+            #     if ex.include?(example)
+            #       def example.run(instance, reporter)
+            #         $stderr.puts "INCLUDES"
+            #         super
+            #       end
+            #     else
+            #       def example.run(instance, reporter)
+            #         $stderr.puts "EXCLUDES"
+            #         return
+            #       end
+            #     end
+            #   end
               # def ex.ordered
               #   self
               # end
@@ -83,18 +106,18 @@ module Specjour
               #   ex
               # end
               # p group.filtered_examples.size
-              group.run(reporter)
-            end
+              # group.run(reporter)
+              # if ex.size > 0
+                # ex.first.example_group.run(reporter)
+              # end
           end
         end
         end
         @output.rewind
-        data = @output.read
-        if !data.empty?
+        if @output.size > 0
           begin
-            json = JSON.load(data)
+            json = JSON.load(@output)
           rescue
-            require 'byebug'; byebug
             json = {}
           end
           # p json
@@ -102,9 +125,10 @@ module Specjour
             connection.report_test(e)
           end
         end
-        @output = StringIO.new
-      # ensure
-      #   ::RSpec.reset
+        # @output = StringIO.new
+        @output.reopen("")
+      ensure
+        # ::RSpec.reset
         # ::RSpec.world.example_groups.clear
         # ::RSpec.configuration.filter_manager = ::RSpec::Core::FilterManager.new
         # ::RSpec.world.filtered_examples.clear
@@ -138,7 +162,6 @@ module Specjour
       def gather_groups(groups)
         groups.map do |g|
           p g.hooks
-          require 'byebug'; byebug
           before_all_hooks = g.send(:find_hook, :before, :all, nil, nil)
           if before_all_hooks.any?
             g
@@ -150,7 +173,6 @@ module Specjour
 
       def filtered_examples
         executables = gather_groups(::RSpec.world.example_groups)
-        # require 'byebug'; byebug
         locations = executables.map do |e|
           if e.respond_to?(:examples)
             e.metadata[:example_group][:location]
