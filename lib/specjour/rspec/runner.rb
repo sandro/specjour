@@ -1,5 +1,5 @@
 module Specjour::RSpec::Runner
-  ::RSpec.configuration.backtrace_clean_patterns << %r(lib/specjour/)
+  ::RSpec.configuration.backtrace_exclusion_patterns << %r(lib/specjour/)
 
   def self.run(spec, output)
     args = ['--format=Specjour::RSpec::DistributedFormatter', spec]
