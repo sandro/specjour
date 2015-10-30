@@ -27,6 +27,7 @@ module Specjour
   autoload :Plugin, 'specjour/plugin'
   autoload :Printer, 'specjour/printer'
   autoload :Protocol, 'specjour/protocol'
+  autoload :RspecFormatter, "specjour/rspec_formatter"
   autoload :RsyncDaemon, 'specjour/rsync_daemon'
   autoload :SocketHelper, 'specjour/socket_helper'
   autoload :Tester, 'specjour/tester'
@@ -54,9 +55,9 @@ module Specjour
     return_value
   end
 
-  def self.configuration(configuration=nil)
-    if configuration
-      @configuration = configuration
+  def self.configuration(provided_config=nil)
+    if provided_config
+      @configuration = provided_config
     elsif !instance_variable_defined?(:@configuration)
       @configuration = Configuration.new
     else
@@ -85,6 +86,7 @@ module Specjour
       file = File.expand_path("specjour_plugin.rb", load_path)
       require file if File.exists?(file)
     end
+    return
   end
 
   def self.logger
@@ -117,7 +119,4 @@ module Specjour
       framework.wants_to_quit = true if framework.respond_to?(:wants_to_quit=)
     end
   end
-
-  load_plugins
-  load_custom_hooks
 end

@@ -2,9 +2,10 @@ module Specjour
   class Formatter
     require 'json'
     include Colors
+    BACKTRACE_REGEX = Regexp.new(File.dirname(__FILE__))
     # description, status [pending,failed,passed] file_path, line_number, exception => [class, message, backtrace]
 
-    STATUSES = Hash.new({chars: "?", color: :white}).merge!(
+    STATUSES = Hash.new({char: "?", color: :white}).merge!(
       "passed" => {char: ".", color: :green},
       "failed" => {char: "F", color: :red},
       "error" => {char: "E", color: :magenta},
@@ -41,24 +42,28 @@ module Specjour
         exception = test["exception"]
         puts "#{index+1}) #{test["description"]}"
         puts "   #{exception["class"]}: #{exception["message"]}"
-        puts exception["backtrace"]
+        cleaned_backtrace = exception["backtrace"].reject {|l| BACKTRACE_REGEX.match(l)}
+        puts cleaned_backtrace
         puts
       end
     end
 
     def print_rerun
+      files = failures.map do |f|
+        "#{f["file_path"]}:#{f["line_number"]}"
+      end
+      cmd = colorize("rspec #{files.join(" ")}", :red)
       puts %(
-Failed examples:
-TOTALLY FAKE
+Rerun failures with this command:
 
-rspec ./spec/specjour_spec.rb:29 # Specjour fails as an example
+#{cmd}
       )
     end
 
     def print_summary
       end_time = Time.now
       puts "\n\n"
-      print_failures
+      print_failures if failures.any?
 
       puts colorize("Pending: #{pending_count}", :yellow)
       puts colorize("Failed: #{fail_count}", :red)
@@ -70,7 +75,7 @@ rspec ./spec/specjour_spec.rb:29 # Specjour fails as an example
       puts colorize("\nRan: #{tests.size} tests in #{overall_time.strftime("%Mm:%Ss:%Lms")}", overall_color)
 
       puts "\n\n"
-      print_rerun
+      print_rerun if failures.any?
     end
 
     def report_test(test)

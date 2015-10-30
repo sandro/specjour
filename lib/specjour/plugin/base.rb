@@ -6,6 +6,9 @@ module Specjour
 
       attr_reader :listener, :loader, :worker
 
+      def after_register
+      end
+
       def before_suite
       end
 

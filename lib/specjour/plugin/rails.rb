@@ -9,6 +9,7 @@ module Specjour::Plugin
         bundle_install
         ENV['RAILS_ENV'] = 'test'
         require File.expand_path("config/application", Dir.pwd)
+        Specjour.load_plugins
         # require File.expand_path("config/environment", Dir.pwd)
       end
     end

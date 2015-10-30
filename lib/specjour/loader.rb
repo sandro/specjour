@@ -28,7 +28,7 @@ module Specjour
       Specjour.benchmark("RSYNC") do
         sync
       end
-      Specjour.load_custom_hooks
+      # Specjour.load_custom_hooks
       Specjour.plugin_manager.send_task(:load_application)
       Specjour.plugin_manager.send_task(:register_tests_with_printer)
       fork_workers
@@ -58,6 +58,7 @@ module Specjour
     end
 
     def load_application
+      puts caller
       Specjour.configuration.load_application
     end
 

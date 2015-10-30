@@ -17,6 +17,8 @@ module Specjour
       report_test
     )
 
+    Thread.abort_on_exception = true
+
     def initialize(options={})
       @options = options
       @host = "0.0.0.0"
@@ -26,7 +28,9 @@ module Specjour
       @test_paths = options[:test_paths]
       @example_size = 0
       @machines = []
+      @send_threads = []
       @bonjour_service = nil
+      @mutex = Mutex.new
       self.examples_complete = 0
       set_paths
     end
@@ -40,12 +44,17 @@ module Specjour
       else
         @project_path = Pathname.new(Dir.pwd)
       end
-      @test_paths = paths.map do |p|
-        relative = p.relative_path_from(project_path)
-        if relative != project_path
-          relative
-        end
-      end.compact
+      if paths.size == 1 and paths.first == project_path
+        @test_paths = []
+      else
+        @test_paths = paths
+      end
+      # @test_paths = paths.map do |p|
+      #   relative = p.relative_path_from(project_path)
+      #   if relative != project_path
+      #     relative
+      #   end
+      # end.compact
       abort("#{project_path} doesn't exist") unless project_path.exist?
     end
 
@@ -69,7 +78,7 @@ module Specjour
       # @port = @server_socket.addr[1]
       fds = [@server_socket]
       catch(:stop) do
-        while true
+        while true do
           reads = select(fds).first
           reads.each do |socket_being_read|
             if socket_being_read == @server_socket
@@ -85,6 +94,7 @@ module Specjour
               disconnecting
             else
               debug "serving"
+              # @send_threads << Thread.new { serve(clients[socket_being_read]) }
               serve(clients[socket_being_read])
             end
           end
@@ -115,11 +125,28 @@ module Specjour
 
     def serve(client)
       data = client.recv_data
-      if COMMANDS.include?(data['command'])
-        client.send_data send(data['command'], *data['args'])
+      @mutex.synchronize { @send_threads.reject! {|t| !t.alive?} }
+      # @send_threads << Thread.new do
+      command = data['command']
+      if COMMANDS.include?(command)
+        if command == "report_test"
+          client.send_data true
+          # Thread.new do
+            send(data['command'], *data['args'])
+          # end
+        else
+          # @send_threads << Thread.new do
+          # fork do
+            log "have command #{command}"
+            client.send_data send(command, *data['args'])
+            $stderr.puts "done in fork"
+          # end
+          # end
+        end
       else
         raise Error.new("COMMAND NOT FOUND: #{data['command']}")
       end
+      # end
       # case data
       # when String
       #   $stdout.print data
@@ -130,15 +157,19 @@ module Specjour
     end
 
     def done
-      self.examples_complete += 1
+      @mutex.synchronize do
+        self.examples_complete += 1
+      end
     end
 
     def next_test
       log "Printer: test size: #{tests_to_run.size}"
-      if tests_to_run.size == example_size
-        Specjour.configuration.formatter.start_time = Specjour::Time.now
+      @mutex.synchronize do
+        if tests_to_run.size == example_size
+          Specjour.configuration.formatter.start_time = Specjour::Time.now
+        end
+        tests_to_run.shift
       end
-      tests_to_run.shift
     end
 
     def ready
@@ -154,12 +185,16 @@ module Specjour
     end
 
     def register_tests(tests)
-      if example_size == 0
-        self.tests_to_run = run_order(tests)
-        self.example_size = tests_to_run.size
-        $stderr.puts "EXAMPLES #{tests_to_run.inspect}"
-        true
+      v = @mutex.synchronize do
+        if example_size == 0
+          self.tests_to_run = run_order(tests)
+          self.example_size = tests_to_run.size
+          $stderr.puts "EXAMPLES to run #{tests_to_run.join(" ")}"
+          true
+        end
       end
+      $stderr.puts "register tests is #{v}"
+      true
     end
 
     def report_test(test)
@@ -208,6 +243,7 @@ module Specjour
     def disconnecting
       # if clients.empty?
       if example_size == examples_complete
+        @send_threads.each {|t| t.join}
         throw(:stop)
       end
     end

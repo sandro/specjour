@@ -32,6 +32,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency('rr')
   s.add_development_dependency('cucumber', ['>= 1.2.1'])
   s.add_development_dependency('yard')
-  s.add_development_dependency('byebug')
+  s.add_development_dependency('byebug', ["= 2.6.0"])
   s.add_development_dependency('fakefs')
 end

@@ -114,7 +114,9 @@ module Specjour
     end
 
     def stop
-      @dnssd_service.stop unless @dnssd_service.stopped?
+      if @dnssd_service && !@dnssd_service.stopeed?
+        @dnssd_service.stop
+      end
       Process.kill("TERM", pid) rescue TypeError
     ensure
       remove_pid

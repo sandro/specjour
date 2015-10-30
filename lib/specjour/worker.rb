@@ -27,7 +27,7 @@ module Specjour
       Specjour.plugin_manager.send_task(:before_suite)
 
       while test = connection.next_test
-        print_status(test)
+        # print_status(test)
         time = Benchmark.realtime do
           Specjour.plugin_manager.send_task(:run_test, test)
         end

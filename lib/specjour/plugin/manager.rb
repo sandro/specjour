@@ -8,7 +8,9 @@ module Specjour::Plugin
     end
 
     def register_plugin(plugin, position=-1)
-      plugins.insert(position, plugin)
+      if !plugins.include?(plugin)
+        plugins.insert(position, plugin)
+      end
     end
 
     def clear_plugins
