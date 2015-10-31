@@ -139,7 +139,8 @@ module Specjour
     def scenarios
       Cucumber.runtime.send(:features).map do |feature|
         feature.feature_elements.map do |scenario|
-          "#{feature.file}:#{scenario.instance_variable_get(:@line)}"
+          location = scenario.location
+          "#{location.file}:#{location.line}"
         end
       end.flatten
     end

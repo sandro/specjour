@@ -8,11 +8,11 @@ module Specjour
           end
           require 'cucumber' unless defined?(::Cucumber::Cli)
           args = paths.unshift '--format', 'Specjour::Cucumber::DistributedFormatter'
-          cli = ::Cucumber::Cli::Main.new(args, output)
+          cli = ::Cucumber::Cli::Main.new(args, nil, output)
 
           configuration = cli.configuration
           options = configuration.instance_variable_get(:@options)
-          options.instance_variable_set(:@skip_profile_information, true)
+          options[:skip_profile_information] = true
 
           runtime = ::Cucumber::Runtime.new(configuration)
           runtime.send :load_step_definitions
