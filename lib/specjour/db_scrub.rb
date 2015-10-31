@@ -31,6 +31,13 @@ module Specjour
     def connect_to_database
       ActiveRecord::Base.remove_connection
       ActiveRecord::Base.configurations = Rails.application.config.database_configuration
+
+      # support for rails 4
+      if defined?(ActiveRecord::Tasks::DatabaseTasks)
+        ActiveRecord::Tasks::DatabaseTasks.db_dir = Rails.application.config.paths["db"].first
+        ActiveRecord::Tasks::DatabaseTasks.database_configuration = Rails.application.config.database_configuration
+      end
+
       ActiveRecord::Base.establish_connection
       connection
     rescue # assume the database doesn't exist
