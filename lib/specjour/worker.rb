@@ -10,7 +10,7 @@ module Specjour
     def initialize(options = {})
       ARGV.replace []
       @options = options
-      $stdout = StringIO.new if options[:quiet]
+      # $stdout = StringIO.new if options[:quiet]
       @number = options[:number].to_i
       Specjour.configuration.worker_number = number
       ENV['TEST_ENV_NUMBER'] = Specjour.configuration.worker_number.to_s
@@ -27,10 +27,8 @@ module Specjour
       Specjour.plugin_manager.send_task(:before_suite)
 
       while test = connection.next_test
-        # print_status(test)
-        time = Benchmark.realtime do
-          Specjour.plugin_manager.send_task(:run_test, test)
-        end
+        print_status(test)
+        Specjour.plugin_manager.send_task(:run_test, test)
         # profile(test, time)
         # run_times[test_type(test)] += time
         connection.done

@@ -33,18 +33,20 @@ module Specjour
 
     def print(test)
       status = STATUSES[test['status']]
-      $stdout.print colorize(status[:char], status[:color])
+      @output.print colorize(status[:char], status[:color])
     end
 
     def print_failures
-      puts "Failures:\n\n"
+      @output.puts "Failures:\n\n"
       failures.each_with_index do |test, index|
         exception = test["exception"]
-        puts "#{index+1}) #{test["description"]}"
-        puts "   #{exception["class"]}: #{exception["message"]}"
+        num = index + 1
+        @output.puts colorize("#{num}) #{test["description"]}", :red)
+        message = colorize("#{exception["class"]}: #{exception["message"]}", :red)
+        @output.printf "%#{num.to_s.size + 2 + message.size}s\n" % message
         cleaned_backtrace = exception["backtrace"].reject {|l| BACKTRACE_REGEX.match(l)}
-        puts cleaned_backtrace
-        puts
+        @output.puts cleaned_backtrace
+        @output.puts
       end
     end
 
@@ -53,7 +55,7 @@ module Specjour
         "#{f["file_path"]}:#{f["line_number"]}"
       end
       cmd = colorize("rspec #{files.join(" ")}", :red)
-      puts %(
+      @output.puts %(
 Rerun failures with this command:
 
 #{cmd}
@@ -62,19 +64,19 @@ Rerun failures with this command:
 
     def print_summary
       end_time = Time.now
-      puts "\n\n"
+      @output.puts "\n\n"
       print_failures if failures.any?
 
-      puts colorize("Pending: #{pending_count}", :yellow)
-      puts colorize("Failed: #{fail_count}", :red)
-      puts colorize("Errors: #{error_count}", :magenta)
-      puts colorize("Passed: #{pass_count}", :green)
+      @output.puts colorize("Pending: #{pending_count}", :yellow)
+      @output.puts colorize("Errors: #{error_count}", :magenta)
+      @output.puts colorize("Passed: #{pass_count}", :green)
+      @output.puts colorize("Failed: #{fail_count}", :red)
 
       overall_color = fail_count == 0 ? :green : :red
       overall_time = Time.new(0,1,1) + (end_time - @start_time)
-      puts colorize("\nRan: #{tests.size} tests in #{overall_time.strftime("%Mm:%Ss:%Lms")}", overall_color)
+      @output.puts colorize("\nRan: #{tests.size} tests in #{overall_time.strftime("%Mm:%Ss:%Lms")}", overall_color)
 
-      puts "\n\n"
+      @output.puts "\n\n"
       print_rerun if failures.any?
     end
 

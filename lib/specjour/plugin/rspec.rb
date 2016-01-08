@@ -5,6 +5,7 @@ module Specjour
       FILE_RE = /_spec\.rb/
 
       def load_application
+        $stderr.puts("RSPEC Plugin loading env")
         log "application loading from rspec plugin, #{File.expand_path("spec/spec_helper", Dir.pwd)}"
         require "rspec/core"
         ::RSpec::Core::Runner.disable_autorun!
@@ -39,10 +40,10 @@ module Specjour
 
       def run_test(test)
         # log "RSpec Plugin: attempting to run test #{test}"
-        if FILE_RE.match(test)
+        # if FILE_RE.match(test)
           run(test)
           true
-        end
+        # end
       end
 
       protected
@@ -61,12 +62,15 @@ module Specjour
         ::RSpec.configuration.filter_manager.add_location(path, line_number.to_i)
         ::RSpec.world.filtered_examples.clear
         ::RSpec.configuration.reporter.report(1, nil) do |reporter|
-          example_or_group = @all_specs[test]
-          if example_or_group.respond_to?(:example_group)
-            example_or_group.example_group.run(reporter)
-          else
-            puts "ELSE"
-            example_or_group.run(reporter)
+          examples_or_groups = @all_specs[test]
+          examples_or_groups.each do |example_or_group|
+            if example_or_group.respond_to?(:example_group)
+              instance = example_or_group.example_group.new
+              example_or_group.run instance, reporter
+              # example_or_group.example_group.run(reporter)
+            else
+              example_or_group.run(reporter)
+            end
           end
 
           # ::RSpec.world.example_groups.each do |group|
@@ -82,7 +86,7 @@ module Specjour
 
       def rspec_examples
         if spec_files.any?
-          filtered_examples
+          file_names_with_location
         else
           []
         end
@@ -115,7 +119,7 @@ module Specjour
         end.compact.flatten
       end
 
-      def filtered_examples
+      def file_names_with_location
         executables = gather_groups(::RSpec.world.example_groups)
         locations = executables.map do |e|
           if e.respond_to?(:examples)
@@ -129,7 +133,19 @@ module Specjour
           end
         end
         locations.map.with_index do |location, i|
-          @all_specs[location] = executables[i]
+          @all_specs[location] ||= []
+          executable = executables[i]
+          # if executable.respond_to?(:example_group)
+          #   # if @all_specs[location].empty?
+          #   #   @all_specs[location] << executable
+          #   # else
+          #   group_missing = @all_specs[location].none? do |exec|
+          #     exec.example_group == executable.example_group
+          #   end
+          #   group_missing && @all_specs[location] << executable
+          # else
+            @all_specs[location] << executable
+          # end
         end
         locations
       # ensure
@@ -156,7 +172,6 @@ end
             # $stderr.puts group.inspect
             # $stderr.puts ex.first.example_group.inspect
             # $stderr.puts ex.size.inspect
-            # require 'byebug'; byebug
             # if ex.any?
             #   log "HAVE EX"
             #   all_examples.each do |example|

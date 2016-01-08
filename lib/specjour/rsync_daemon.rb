@@ -41,6 +41,8 @@ module Specjour
       write_config
       Dir.chdir(project_path) do
         Kernel.system *command
+        rsync_pid = $?.pid
+        Kernel.at_exit { Process.kill("KILL", rsync_pid) rescue nil }
         sleep 0.1
       end
     end
@@ -48,7 +50,7 @@ module Specjour
     def stop
       if process_id = pid
         log("#{self.class.name} Shutting down")
-        Process.kill("KILL", process_id)
+        Process.kill("KILL", process_id) rescue nil
         FileUtils.rm(pid_file)
       end
     end

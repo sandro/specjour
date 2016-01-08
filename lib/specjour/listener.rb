@@ -10,6 +10,18 @@ module Specjour
 
     attr_accessor :options, :printer
 
+    def self.ensure_started
+      listener = new
+      unless listener.started?
+        listener_pid = fork do
+          listener.daemonize
+          listener.start
+        end
+        Process.detach(listener_pid)
+      end
+      listener
+    end
+
     def initialize(options={})
       self.options = options
     end
@@ -90,22 +102,22 @@ module Specjour
 
     def start
       return if started?
+      $PROGRAM_NAME = "specjour listen"
       log "Listener starting"
       write_pid
       loop do
         log "listening..."
-        Specjour.benchmark("gather") do
         gather
-        end
         @loader_pid = fork_loader
-        select [connection.socket] # wait until server disconnects
+        # select [connection.socket] # wait until server disconnects
         Process.waitall
-        Process.kill("TERM", -@loader_pid) rescue TypeError
+        Process.kill("KILL", -@loader_pid) rescue TypeError
         remove_printer
-        remove_connection
+        # remove_connection
         sleep 3 # let bonjour services stop
       end
     ensure
+      Process.waitall
       shutdown
     end
 
@@ -117,7 +129,7 @@ module Specjour
       if @dnssd_service && !@dnssd_service.stopeed?
         @dnssd_service.stop
       end
-      Process.kill("TERM", pid) rescue TypeError
+      Process.kill("KILL", pid) rescue TypeError
     ensure
       remove_pid
     end
@@ -127,7 +139,7 @@ module Specjour
     rescue StandardError, ScriptError => e
       $stderr.puts "RESCUED #{e.message}"
       $stderr.puts e.backtrace
-      Process.kill("TERM", @loader_pid) rescue TypeError
+      Process.kill("KILL", @loader_pid) rescue TypeError
     ensure
       remove_pid
     end

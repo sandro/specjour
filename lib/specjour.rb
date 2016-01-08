@@ -46,12 +46,12 @@ module Specjour
   class Error < StandardError; end
 
   def self.benchmark(msg)
-    print "#{msg}... "
+    $stderr.print "#{msg}... "
     return_value = nil
     time = Benchmark.realtime do
       return_value = yield
     end
-    puts "completed in #{time}s"
+    $stderr.puts "completed in #{time}s"
     return_value
   end
 

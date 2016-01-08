@@ -22,9 +22,9 @@ end
 # end
 
 describe Specjour do
-  # it "passes" do
-  #   1.should == 1
-  # end
+  it "passes" do
+    1.should == 1
+  end
 
   # it "pends as an example" do
   #   pending
@@ -57,10 +57,10 @@ describe Specjour do
 
   end
 
-    it "runs before(:all) once maybe" do
-      # expect(@run_times).to eq(1)
-      expect(1).to eq(1)
-    end
+#     it "runs before(:all) once maybe" do
+#       # expect(@run_times).to eq(1)
+#       expect(1).to eq(1)
+#     end
 
   #   describe "testing nested before all" do
   #     before(:all) do

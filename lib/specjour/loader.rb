@@ -23,6 +23,7 @@ module Specjour
     end
 
     def start
+      $PROGRAM_NAME = "specjour loader"
       Process.setsid
       set_up
       Specjour.benchmark("RSYNC") do
@@ -40,13 +41,15 @@ module Specjour
       $stderr.puts "\n\n"
     ensure
       log "Loader killing group #{Process.getpgrp}"
-      Process.kill("TERM", -Process.getpgrp)
+      Process.kill("KILL", -Process.getpgrp)
+      Process.waitall
     end
 
     def fork_workers
       Specjour.plugin_manager.send_task(:before_worker_fork)
       (1..Specjour.configuration.worker_size).each do |index|
         worker_pids << fork do
+          $PROGRAM_NAME = "specjour worker"
           worker = Worker.new(
             :number => index,
             :quiet => quiet
@@ -63,7 +66,7 @@ module Specjour
     end
 
     def set_up
-      data = connection.ready
+      data = connection.ready({hostname: hostname, worker_size: Specjour.configuration.worker_size})
       Specjour.configuration.project_name = data["project_name"]
       Specjour.configuration.project_path = data["project_path"]
       Specjour.configuration.test_paths = data["test_paths"]
@@ -85,8 +88,7 @@ module Specjour
     end
 
     def kill_worker_processes
-      signal = Specjour.interrupted? ? 'INT' : 'TERM'
-      Process.kill(signal, *worker_pids) rescue Errno::ESRCH
+      Process.kill("KILL", *worker_pids) rescue Errno::ESRCH
     end
 
     # def start

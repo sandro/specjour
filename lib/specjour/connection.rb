@@ -7,7 +7,7 @@ module Specjour
     attr_reader :uri, :retries
     attr_writer :socket
 
-    def_delegators :socket, :flush, :close, :closed?, :gets, :each
+    def_delegators :socket, :flush, :close, :closed?, :gets, :each, :eof?
 
     def self.wrap(established_connection)
       host, port = established_connection.peeraddr.values_at(3,1)
@@ -28,7 +28,10 @@ module Specjour
     end
 
     def disconnect
-      socket.close if socket && !socket.closed?
+      if socket && !socket.closed?
+        debug "closing socket"
+        socket.close
+      end
     end
 
     def host
@@ -52,15 +55,15 @@ module Specjour
     end
 
     def greet(msg)
-      send_command("greet", msg)
+      send_recv_command("greet", msg)
     end
 
     def next_test
-      send_command("next_test")
+      send_recv_command("next_test")
     end
 
-    def ready
-      send_command("ready")
+    def ready(info)
+      send_recv_command("ready", info)
     end
 
     def reconnect
@@ -75,6 +78,12 @@ module Specjour
     def send_command(method_name, *args)
       will_reconnect do
         send_data command: method_name, args: args
+      end
+    end
+
+    def send_recv_command(method_name, *args)
+      send_command(method_name, *args)
+      will_reconnect do
         recv_data
       end
     end

@@ -31,6 +31,8 @@ module Specjour
       @send_threads = []
       @bonjour_service = nil
       @mutex = Mutex.new
+      @running = false
+      @output = options[:output] || $stdout
       self.examples_complete = 0
       set_paths
     end
@@ -59,6 +61,7 @@ module Specjour
     end
 
     def announce
+      @output.puts("Searching for listeners...")
       text = DNSSD::TextRecord.new
       text['version'] = Specjour::VERSION
       projects = []
@@ -73,36 +76,57 @@ module Specjour
       @rsync_daemon ||= RsyncDaemon.new(project_path.to_s, project_name, Specjour.configuration.rsync_port)
     end
 
+    def process_io
+
+    end
+
+    def running?
+      @mutex.synchronize do
+        @running
+      end
+    end
+
     def start
+      @running = true
       @server_socket ||= TCPServer.new(@host, Specjour.configuration.printer_port)
       # @port = @server_socket.addr[1]
-      fds = [@server_socket]
-      catch(:stop) do
-        while true do
-          reads = select(fds).first
+      # fds = [@server_socket]
+      # @rp, @wp = IO.pipe
+      # @child_socket, @parent_socket = Socket.pair(:UNIX, :DGRAM, 0)
+      # catch(:stop) do
+      done_reader, @done_writer = IO.pipe
+        while running? do
+          debug "loop going to select #{running?}"
+          result = select([@server_socket, done_reader], [], [])
+          reads = result.first
           reads.each do |socket_being_read|
             if socket_being_read == @server_socket
               debug "adding connection"
               client_socket = @server_socket.accept
-              fds << client_socket
-              clients[client_socket] = Connection.wrap(client_socket)
-            elsif socket_being_read.eof?
-              debug "closing connection"
-              socket_being_read.close
-              fds.delete(socket_being_read)
-              clients.delete(socket_being_read)
-              disconnecting
-            else
-              debug "serving"
-              # @send_threads << Thread.new { serve(clients[socket_being_read]) }
-              serve(clients[socket_being_read])
+              # fds << client_socket
+              # clients[client_socket] = Connection.wrap(client_socket)
+              client_socket = Connection.wrap(client_socket)
+              @send_threads << Thread.new(client_socket) { |sock| serve(sock) }
+            # elsif socket_being_read.eof?
+            #   debug "socket server closing connection"
+            #   socket_being_read.close
+              # fds.delete(socket_being_read)
+              # clients.delete(socket_being_read)
+              # disconnecting
+            # else
+            #   debug "serving"
+              # fork do
+                # serve(clients[socket_being_read])
+              # end
             end
           end
         end
-      end
+      # end
     ensure
+      done_reader.close
+      @done_writer.close
       stopping
-      fds.each {|c| c.close}
+      # fds.each {|c| c.close}
     end
 
     def exit_status
@@ -124,36 +148,36 @@ module Specjour
     protected
 
     def serve(client)
-      data = client.recv_data
-      @mutex.synchronize { @send_threads.reject! {|t| !t.alive?} }
-      # @send_threads << Thread.new do
-      command = data['command']
-      if COMMANDS.include?(command)
-        if command == "report_test"
-          client.send_data true
-          # Thread.new do
-            send(data['command'], *data['args'])
-          # end
-        else
-          # @send_threads << Thread.new do
-          # fork do
-            log "have command #{command}"
-            client.send_data send(command, *data['args'])
-            $stderr.puts "done in fork"
-          # end
-          # end
+      debug "serving #{client.inspect}"
+      loop do
+        if client.eof?
+          debug "client eof"
+          client.close
+          disconnecting
+          break
         end
-      else
-        raise Error.new("COMMAND NOT FOUND: #{data['command']}")
+        data = client.recv_data
+        # @send_threads << Thread.new do
+        command = data['command']
+        case command
+        when "done"
+          done(*data["args"])
+        when "greet"
+          client.send_data greet(*data["args"])
+        when "next_test"
+          client.send_data next_test(*data["args"])
+        when "ready"
+          client.send_data ready(*data["args"])
+        when "register_tests"
+          register_tests(*data["args"])
+        when "report_test"
+          report_test(*data["args"])
+        else
+          raise Error.new("COMMAND NOT FOUND: #{command}")
+        end
+        IO.select([client.socket])
       end
-      # end
-      # case data
-      # when String
-      #   $stdout.print data
-      #   $stdout.flush
-      # when Array
-      #   send data.first, *(data[1..-1].unshift(client))
-      # end
+      debug "thread dying"
     end
 
     def done
@@ -163,7 +187,7 @@ module Specjour
     end
 
     def next_test
-      log "Printer: test size: #{tests_to_run.size}"
+      log "test size: #{tests_to_run.size}"
       @mutex.synchronize do
         if tests_to_run.size == example_size
           Specjour.configuration.formatter.start_time = Specjour::Time.now
@@ -172,7 +196,8 @@ module Specjour
       end
     end
 
-    def ready
+    def ready(info)
+      @output.puts "Received connection from #{info["hostname"]}(#{info["worker_size"]})"
       {
         project_name: project_name,
         project_path: project_path.to_s,
@@ -185,25 +210,22 @@ module Specjour
     end
 
     def register_tests(tests)
-      v = @mutex.synchronize do
+      @mutex.synchronize do
         if example_size == 0
           self.tests_to_run = run_order(tests)
           self.example_size = tests_to_run.size
-          $stderr.puts "EXAMPLES to run #{tests_to_run.join(" ")}"
-          true
+          # $stderr.puts "EXAMPLES to run #{tests_to_run.join(" ")}"
         end
       end
-      $stderr.puts "register tests is #{v}"
-      true
     end
 
     def report_test(test)
-      Specjour.configuration.formatter.report_test(test)
-      true
+      @mutex.synchronize do
+        Specjour.configuration.formatter.report_test(test)
+      end
     end
 
     def find_project_base_dir(directory)
-      p ['find in', directory]
       dirs = Dir["#{directory}/Rakefile"]
       if dirs.any?
         File.dirname dirs.first
@@ -242,9 +264,15 @@ module Specjour
 
     def disconnecting
       # if clients.empty?
-      if example_size == examples_complete
-        @send_threads.each {|t| t.join}
-        throw(:stop)
+      @mutex.synchronize do
+        debug "DISCONNECT #{example_size} #{examples_complete}"
+        if @running && examples_complete == example_size
+          @running = false
+          @done_writer.write("DONE")
+          debug "server socket closed"
+          # @send_threads.each {|t| t.join}
+          # throw(:stop)
+        end
       end
     end
 
@@ -287,11 +315,11 @@ module Specjour
     end
 
     def print_missing_tests
-      puts "*" * 60
-      puts "Oops! The following tests were not run:"
-      puts "*" * 60
-      puts tests_to_run
-      puts "*" * 60
+      @output.puts "*" * 60
+      @output.puts "Oops! The following tests were not run:"
+      @output.puts "*" * 60
+      @output.puts tests_to_run
+      @output.puts "*" * 60
     end
 
   end

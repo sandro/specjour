@@ -1,3 +1,4 @@
+        ENV['RAILS_ENV'] = 'test'
 module Specjour
   require 'optparse'
   class CLI
@@ -12,7 +13,9 @@ module Specjour
     end
 
     def start
+      Specjour.trap_interrupt
       parser.parse!
+      append_to_program_name(ARGV[0])
       case ARGV[0]
       when "listen"
         listener = Listener.new
@@ -24,25 +27,28 @@ module Specjour
         puts "Plugins:"
         puts Specjour.plugin_manager.plugins
       when "stop"
-        Listener.new.stop
+        listener = Listener.new
+        if listener.started?
+          puts "Stopping listener with pid #{listener.pid}"
+          listener.stop
+        else
+          abort("No listener found")
+        end
       when "help"
         abort("Commands are: #{COMMANDS.join(" ")}")
       else
         test_paths = ARGV[0..-1]
+        Listener.ensure_started
         printer = Printer.new test_paths: Array(test_paths)
-        Specjour.benchmark("announce") do
         printer.announce
-        end
-        Specjour.benchmark("rsync") do
         printer.start_rsync
-        end
         printer.start
       end
     end
 
     def parser
       @parser ||= OptionParser.new do |parser|
-        parser.banner = "Usage: specjour [options] [files or directories]\n\n"
+        parser.banner = "Usage: specjour [command] [options] [files or directories]\n\nCommands are #{COMMANDS.join(",")}\n\n"
         parser.on("-l", "--log [FILE]", String, "Log output to stderr") do |option|
           Specjour.new_logger ::Logger::DEBUG, option
           log option
@@ -59,6 +65,13 @@ module Specjour
       end
     end
 
+    private
+
+    def append_to_program_name(command)
+      $PROGRAM_NAME = "#{$PROGRAM_NAME} #{command}"
+    end
+  end
+end
 #     def self.worker_option
 #       method_option :workers, :aliases => "-w", :type => :numeric, :desc => "Number of concurent processes to run. Defaults to your system's available cores."
 #     end
@@ -188,5 +201,3 @@ module Specjour
 #       params[:project_alias] = params.delete(:alias)
 #       raise ArgumentError, "Cannot dispatch line numbers" if paths.any? {|p| p =~ /:\d+/}
 #     end
-  end
-end

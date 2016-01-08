@@ -32,7 +32,7 @@ module Specjour
       end
 
       def interrupted!
-        Process.kill "INT", Process.pid
+        Process.kill "KILL", Process.pid
       end
 
       def register_tests_with_printer

@@ -1,2 +1,2 @@
-# require 'bundler'
-# Bundler.require
+ require 'bundler'
+ Bundler.require
