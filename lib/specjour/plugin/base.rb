@@ -21,6 +21,9 @@ module Specjour
       def load_application
       end
 
+      def load_test_suite
+      end
+
       def after_loader_fork
       end
 
