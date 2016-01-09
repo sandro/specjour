@@ -14,6 +14,7 @@
   printing informational messages
   single specjour command starts daemon
   interrupts
+  handle no careful_test database
 
 
 ## Instructions
