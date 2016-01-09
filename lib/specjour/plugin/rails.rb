@@ -7,7 +7,7 @@ module Specjour::Plugin
       log "Loading rails plugin"
       if File.exists?("./config/application.rb") && File.exists?("./config/environment.rb")
         bundle_install
-        require File.expand_path("config/application", Dir.pwd)
+        require File.expand_path("config/environment", Dir.pwd)
         Specjour.load_plugins
         # require File.expand_path("config/environment", Dir.pwd)
       end
