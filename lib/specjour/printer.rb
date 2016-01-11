@@ -52,11 +52,14 @@ module Specjour
       else
         @test_paths = paths
       end
+      @test_paths = @test_paths.map do |path|
+        path.relative_path_from(project_path)
+        # relative = p.relative_path_from(project_path)
+        # if relative != project_path
+        #   relative
+        # end
+      end
       # @test_paths = paths.map do |p|
-      #   relative = p.relative_path_from(project_path)
-      #   if relative != project_path
-      #     relative
-      #   end
       # end.compact
       abort("#{project_path} doesn't exist") unless project_path.exist?
     end

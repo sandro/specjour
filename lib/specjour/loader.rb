@@ -7,7 +7,6 @@ module Specjour
     attr_reader \
       :options,
       :printer_uri,
-      :project_path,
       :quiet,
       :task,
       :worker_pids,
@@ -68,17 +67,13 @@ module Specjour
     def set_up
       data = connection.ready({hostname: hostname, worker_size: Specjour.configuration.worker_size, loader_pid: Process.pid})
       Specjour.configuration.project_name = data["project_name"]
-      Specjour.configuration.project_path = data["project_path"]
       Specjour.configuration.test_paths = data["test_paths"]
-    end
-
-    def project_path
-      File.expand_path(Specjour.configuration.project_name, '/tmp')
+      Specjour.configuration.project_path = File.expand_path(Specjour.configuration.project_name, Specjour.configuration.tmp_path)
     end
 
     def sync
-      cmd "rsync #{Specjour.configuration.rsync_options} --port=#{Specjour.configuration.rsync_port} #{connection.host}::#{Specjour.configuration.project_name} #{project_path}"
-      Dir.chdir project_path
+      cmd "rsync #{Specjour.configuration.rsync_options} --port=#{Specjour.configuration.rsync_port} #{connection.host}::#{Specjour.configuration.project_name} #{Specjour.configuration.project_path}"
+      Dir.chdir Specjour.configuration.project_path
     end
 
     def cmd(command)
@@ -108,24 +103,24 @@ module Specjour
     #   kill_worker_processes
     # end
 
-    def feature_files
-      if test_paths.empty?
-        Dir["#{project_path}/features/**/*_feature.rb"]
-      else
-        test_paths.map do |test_path|
-          if test_path =~ /_feature\.rb$/
-            Dir["#{project_path}/#{test_path}"]
-          end
-        end.flatten.compact
-      end
-    #   @feature_files ||= file_collector(feature_paths) do |path|
-    #     if path == project_path
-    #       Dir["#{path}/features/**/*.feature"]
-    #     else
-    #       Dir["#{path}/**/*.feature"]
-    #     end
+    # def feature_files
+    #   if test_paths.empty?
+    #     Dir["#{project_path}/features/**/*_feature.rb"]
+    #   else
+    #     test_paths.map do |test_path|
+    #       if test_path =~ /_feature\.rb$/
+    #         Dir["#{project_path}/#{test_path}"]
+    #       end
+    #     end.flatten.compact
     #   end
-    end
+    # #   @feature_files ||= file_collector(feature_paths) do |path|
+    # #     if path == project_path
+    # #       Dir["#{path}/features/**/*.feature"]
+    # #     else
+    # #       Dir["#{path}/**/*.feature"]
+    # #     end
+    # #   end
+    # end
 
     # protected
 
@@ -160,13 +155,13 @@ module Specjour
     #   register_tests_with_printer
     # end
 
-    def cucumber_scenarios
-      if feature_files.any?
-        scenarios
-      else
-        []
-      end
-    end
+    # def cucumber_scenarios
+    #   if feature_files.any?
+    #     scenarios
+    #   else
+    #     []
+    #   end
+    # end
 
     # def scenarios
     #   Cucumber.runtime.send(:features).map do |feature|

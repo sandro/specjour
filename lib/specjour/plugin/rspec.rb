@@ -11,7 +11,7 @@ module Specjour
       end
 
       def load_application
-        $stderr.puts("RSPEC Plugin loading env")
+        $stderr.puts("RSPEC Plugin loading env in #{Dir.pwd}")
         log "application loading from rspec plugin, #{File.expand_path("spec/spec_helper", Dir.pwd)}"
         require "rspec/core"
         ::RSpec::Core::Runner.disable_autorun!

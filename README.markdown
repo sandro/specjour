@@ -16,6 +16,7 @@
   interrupts
   handle no careful_test database
   bonjour announce project names
+  printer#project_name aliases
 
 
 ## Instructions

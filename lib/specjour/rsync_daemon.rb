@@ -98,7 +98,7 @@ remove it, and re-run the dispatcher to generate the new config file.
 # $ #{(command | ['--no-detach']).join(' ')}
 #
 # Rsync with the following command:
-# $ rsync -a --port=#{port} #{hostname}::#{project_name} /tmp/#{project_name}
+# $ rsync -a --port=#{port} #{hostname}::#{project_name} #{Specjour.configuration.tmp_path}/#{project_name}
 #
 use chroot = no
 timeout = 20
