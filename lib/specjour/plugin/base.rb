@@ -35,7 +35,6 @@ module Specjour
       end
 
       def interrupted!
-        Process.kill "KILL", Process.pid
       end
 
       def register_tests_with_printer

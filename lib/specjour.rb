@@ -1,3 +1,5 @@
+ENV["RAILS_ENV"] ||= 'test'
+
 require 'tmpdir'
 
 autoload :URI, 'uri'
@@ -71,10 +73,6 @@ module Specjour
 
   def self.interrupted=(bool)
     @interrupted = bool
-    if bool
-      will_quit(:RSpec)
-      will_quit(:Cucumber)
-    end
   end
 
   def self.load_custom_hooks
@@ -109,14 +107,8 @@ module Specjour
   def self.trap_interrupt
     Signal.trap('INT') do
       self.interrupted = true
+      plugin_manager.send_task(:interrupted!)
       abort("\n")
-    end
-  end
-
-  def self.will_quit(framework)
-    if Object.const_defined?(framework)
-      framework = Object.const_get(framework)
-      framework.wants_to_quit = true if framework.respond_to?(:wants_to_quit=)
     end
   end
 end

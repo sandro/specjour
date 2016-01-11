@@ -66,7 +66,7 @@ module Specjour
     end
 
     def set_up
-      data = connection.ready({hostname: hostname, worker_size: Specjour.configuration.worker_size})
+      data = connection.ready({hostname: hostname, worker_size: Specjour.configuration.worker_size, loader_pid: Process.pid})
       Specjour.configuration.project_name = data["project_name"]
       Specjour.configuration.project_path = data["project_path"]
       Specjour.configuration.test_paths = data["test_paths"]
@@ -87,9 +87,9 @@ module Specjour
       end
     end
 
-    def kill_worker_processes
-      Process.kill("KILL", *worker_pids) rescue Errno::ESRCH
-    end
+    # def kill_worker_processes
+    #   Process.kill("QUIT", *worker_pids) rescue Errno::ESRCH
+    # end
 
     # def start
     #   load_app

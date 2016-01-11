@@ -129,7 +129,7 @@ module Specjour
       if @dnssd_service && !@dnssd_service.stopeed?
         @dnssd_service.stop
       end
-      Process.kill("KILL", pid) rescue TypeError
+      Process.kill("TERM", pid) rescue TypeError
     ensure
       remove_pid
     end
@@ -139,7 +139,7 @@ module Specjour
     rescue StandardError, ScriptError => e
       $stderr.puts "RESCUED #{e.message}"
       $stderr.puts e.backtrace
-      Process.kill("KILL", @loader_pid) rescue TypeError
+      Process.kill("KILL", -@loader_pid) rescue TypeError
     ensure
       remove_pid
     end

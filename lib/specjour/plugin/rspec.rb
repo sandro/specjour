@@ -4,6 +4,12 @@ module Specjour
 
       FILE_RE = /_spec\.rb/
 
+      def interrupted!
+        if defined?(::RSpec)
+          ::RSpec.wants_to_quit = true
+        end
+      end
+
       def load_application
         $stderr.puts("RSPEC Plugin loading env")
         log "application loading from rspec plugin, #{File.expand_path("spec/spec_helper", Dir.pwd)}"

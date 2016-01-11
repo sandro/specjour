@@ -33,6 +33,7 @@ module Specjour
       @mutex = Mutex.new
       @running = false
       @output = options[:output] || $stdout
+      @loader_pids = []
       self.examples_complete = 0
       set_paths
     end
@@ -126,11 +127,19 @@ module Specjour
       done_reader.close
       @done_writer.close
       stopping
+      if Specjour.interrupted?
+        Process.kill("INT", *@loader_pids) rescue TypeError
+      end
+      exit exit_status
       # fds.each {|c| c.close}
     end
 
     def exit_status
-      reporters.all? {|r| r.exit_status == true} && !reporters.empty?
+      if Specjour.interrupted?
+        2
+      else
+        Specjour.configuration.formatter.exit_status
+      end
     end
 
     def uri
@@ -198,6 +207,7 @@ module Specjour
 
     def ready(info)
       @output.puts "Received connection from #{info["hostname"]}(#{info["worker_size"]})"
+      @loader_pids |= [info["loader_pid"]]
       {
         project_name: project_name,
         project_path: project_path.to_s,

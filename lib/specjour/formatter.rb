@@ -96,6 +96,10 @@ Rerun failures with this command:
       end
     end
 
+    def exit_status
+      exit failures.any? ? 1 : 0
+    end
+
   end
 end
 __END__

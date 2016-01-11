@@ -15,6 +15,7 @@
   single specjour command starts daemon
   interrupts
   handle no careful_test database
+  bonjour announce project names
 
 
 ## Instructions

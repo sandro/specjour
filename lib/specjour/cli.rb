@@ -1,4 +1,3 @@
-        ENV['RAILS_ENV'] = 'test'
 module Specjour
   require 'optparse'
   class CLI
