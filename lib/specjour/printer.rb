@@ -65,8 +65,8 @@ module Specjour
       @output.puts("Searching for listeners...")
       text = DNSSD::TextRecord.new
       text['version'] = Specjour::VERSION
-      projects = []
-      @bonjour_service = DNSSD.register "#{projects.join(",")}@#{hostname}".tr(".","-"), "_specjour._tcp", domain=nil, Specjour.configuration.printer_port, text
+      text['project_alias'] = Specjour.configuration.project_aliases.first
+      @bonjour_service = DNSSD.register "#{hostname}".tr(".","-"), "_specjour._tcp", domain=nil, Specjour.configuration.printer_port, text
     end
 
     def start_rsync

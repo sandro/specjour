@@ -27,11 +27,11 @@ module Specjour
     end
 
     def available_for?(project_name)
-      registered_projects ? registered_projects.include?(project_name) : false
-    end
-
-    def registered_projects
-      []
+      if Specjour.configuration.project_aliases.any? || !project_name.empty?
+        Specjour.configuration.project_aliases.include? project_name
+      else
+        true
+      end
     end
 
     def config_directory
@@ -71,12 +71,16 @@ module Specjour
         if reply.flags.add?
           Specjour.benchmark("resolve") do
           DNSSD.resolve!(reply.name, reply.type, reply.domain, flags=0, reply.interface) do |resolved|
-            log "Bonjour discovered #{resolved.target}"
+            log "Bonjour discovered #{resolved.target} #{resolved.text_record.inspect}"
             if resolved.text_record && resolved.text_record['version'] == Specjour::VERSION
-              resolved_ip = ip_from_hostname(resolved.target)
-              uri = URI::Generic.build :host => resolved_ip, :port => resolved.port
-              add_printer(name: resolved.name, uri: uri)
-              break
+              if available_for?(resolved.text_record['project_alias'].to_s)
+                resolved_ip = ip_from_hostname(resolved.target)
+                uri = URI::Generic.build :host => resolved_ip, :port => resolved.port
+                add_printer(name: resolved.name, uri: uri)
+                break
+              else
+                $stderr.puts "Found #{resolved.target} but not listening to project alias: #{resolved.text_record['project_alias']}. Skipping..."
+              end
             else
               $stderr.puts "Found #{resolved.target} but its version doesn't match v#{Specjour::VERSION}. Skipping..."
             end

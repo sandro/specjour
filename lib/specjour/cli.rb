@@ -53,13 +53,20 @@ module Specjour
           log option
           options[:log] = option
         end
+
         parser.on("-f", "--foreground", "Foreground the listener (development purposes)") do |option|
           options[:foreground] = option
         end
+
         parser.on("-w", "--workers NUM", Numeric, "Number of workers") do |option|
           log option
           options[:workers] = option.to_i
           Specjour.configuration.worker_size = options[:workers]
+        end
+
+        parser.on("-a", "--alias NAME", Array, "Project name alias") do |option|
+          log option
+          Specjour.configuration.project_aliases = option
         end
       end
     end
