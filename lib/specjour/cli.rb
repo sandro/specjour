@@ -12,7 +12,7 @@ module Specjour
     end
 
     def start
-      Specjour.trap_interrupt
+      Specjour.trap_interrupt_with_exit
       parser.parse!
       append_to_program_name(ARGV[0])
       case ARGV[0]
@@ -50,7 +50,6 @@ module Specjour
         parser.banner = "Usage: specjour [command] [options] [files or directories]\n\nCommands are #{COMMANDS.join(",")}\n\n"
         parser.on("-l", "--log [FILE]", String, "Log output to stderr") do |option|
           Specjour.new_logger ::Logger::DEBUG, option
-          log option
           options[:log] = option
         end
 
@@ -59,13 +58,11 @@ module Specjour
         end
 
         parser.on("-w", "--workers NUM", Numeric, "Number of workers") do |option|
-          log option
           options[:workers] = option.to_i
           Specjour.configuration.worker_size = options[:workers]
         end
 
         parser.on("-a", "--alias NAME", Array, "Project name alias") do |option|
-          log option
           Specjour.configuration.project_aliases = option
         end
       end

@@ -1,5 +1,3 @@
-ENV["RAILS_ENV"] ||= 'test'
-
 require 'tmpdir'
 
 autoload :URI, 'uri'
@@ -108,7 +106,14 @@ module Specjour
     Signal.trap('INT') do
       self.interrupted = true
       plugin_manager.send_task(:interrupted!)
-      abort("\n")
+    end
+  end
+
+  def self.trap_interrupt_with_exit
+    trap_interrupt
+    old_int = Signal.trap("INT") do
+      old_int.call()
+      abort("ABORTING\n")
     end
   end
 end

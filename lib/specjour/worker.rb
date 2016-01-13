@@ -41,8 +41,27 @@ module Specjour
       $stderr.puts "RESCUED #{e.message}"
       $stderr.puts e.backtrace
     ensure
-      log "Worker disconnecting"
-      connection.disconnect
+      $stderr.puts("worker ensure")
+      remove_connection
+      log "Worker disconnecting #{Process.pid}"
+      r = IO.popen("ps -eo pid,ppid,command | grep #{Process.pid}")
+      $stderr.puts("#{ENV["TEST_ENV_NUMBER"]} PS CMD")
+      r.each_line do |line|
+        $stderr.puts line
+        pid, ppid = line.split(" ")
+        pid = pid.to_i
+        ppid = ppid.to_i
+        $stderr.puts("is equal? #{pid} #{Process.pid} #{r.pid}")
+        if ppid == Process.pid && pid != r.pid
+          $stderr.puts "KILLING #{pid}"
+          Process.kill("TERM", pid)
+        end
+      end
+      # sleep 10
+      # at_exit do
+      #   $stderr.puts("Worker at exit")
+      #   Process.kill("KILL", -Process.pid)
+      # end
     end
 
     protected

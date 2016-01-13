@@ -7,6 +7,7 @@ module Specjour::Plugin
       log "Loading rails plugin"
       if File.exists?("./config/application.rb") && File.exists?("./config/environment.rb")
         bundle_install
+        ENV["RAILS_ENV"] ||= "test"
         require File.expand_path("config/application", Dir.pwd)
         load "active_record/railties/databases.rake"
         Rake::Task.define_task(:environment) unless Rake::Task.task_defined?(:environment)
@@ -21,7 +22,7 @@ module Specjour::Plugin
     end
 
     def after_worker_fork
-      return unless (defined?(Rails) && defined?(ActiveRecord::Base))
+      return unless (defined?(::Rails) && defined?(::ActiveRecord::Base))
       # DbScrubber.scrub
       # ::Rails.application.load_tasks
       force_task('db:drop')

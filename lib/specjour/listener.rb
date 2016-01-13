@@ -69,7 +69,6 @@ module Specjour
       @dnssd_service = DNSSD.browse!('_specjour._tcp') do |reply|
         log ['reply', reply.name, reply.service_name, reply.domain,reply.flags]
         if reply.flags.add?
-          Specjour.benchmark("resolve") do
           DNSSD.resolve!(reply.name, reply.type, reply.domain, flags=0, reply.interface) do |resolved|
             log "Bonjour discovered #{resolved.target} #{resolved.text_record.inspect}"
             if resolved.text_record && resolved.text_record['version'] == Specjour::VERSION
@@ -85,7 +84,6 @@ module Specjour
               $stderr.puts "Found #{resolved.target} but its version doesn't match v#{Specjour::VERSION}. Skipping..."
             end
           end
-        end
           break
         else
           log "REMOVING #{reply.name} #{reply}"
@@ -113,16 +111,20 @@ module Specjour
         log "listening..."
         gather
         @loader_pid = fork_loader
-        # select [connection.socket] # wait until server disconnects
         Process.waitall
-        Process.kill("KILL", -@loader_pid) rescue TypeError
-        remove_printer
+        # select [connection.socket] # wait until server disconnects
+        $stderr.puts("listener waitall done")
+        # Process.kill("KILL", -@loader_pid) rescue TypeError
         # remove_connection
+        remove_printer
         sleep 3 # let bonjour services stop
       end
+    rescue StandardError, ScriptError => e
+      $stderr.puts "RESCUED #{e.message}"
+      $stderr.puts e.backtrace
     ensure
-      Process.waitall
-      shutdown
+      remove_pid
+      log "Shutting down listener"
     end
 
     def started?
@@ -130,20 +132,7 @@ module Specjour
     end
 
     def stop
-      if @dnssd_service && !@dnssd_service.stopeed?
-        @dnssd_service.stop
-      end
       Process.kill("TERM", pid) rescue TypeError
-    ensure
-      remove_pid
-    end
-
-    def shutdown
-      log "Shutting down listener"
-    rescue StandardError, ScriptError => e
-      $stderr.puts "RESCUED #{e.message}"
-      $stderr.puts e.backtrace
-      Process.kill("KILL", -@loader_pid) rescue TypeError
     ensure
       remove_pid
     end

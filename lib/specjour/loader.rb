@@ -22,26 +22,29 @@ module Specjour
     end
 
     def start
-      $PROGRAM_NAME = "specjour loader"
       Process.setsid
+      $PROGRAM_NAME = "specjour loader"
+      # Specjour.trap_interrupt
+      # Process.setsid
       set_up
-      Specjour.benchmark("RSYNC") do
-        sync
-      end
+      sync
       # Specjour.load_custom_hooks
       Specjour.plugin_manager.send_task(:load_application)
       Specjour.plugin_manager.send_task(:register_tests_with_printer)
       fork_workers
+      wait_srv
       # select [connection.socket] # wait for server to disconnect
-      Process.waitall
+      # Process.waitall
     rescue StandardError, ScriptError => e
       $stderr.puts "RESCUED #{e.class} '#{e.message}'"
       $stderr.puts e.backtrace
       $stderr.puts "\n\n"
     ensure
-      log "Loader killing group #{Process.getpgrp}"
-      Process.kill("KILL", -Process.getpgrp)
       Process.waitall
+      remove_connection
+      $stderr.puts("loader ENSURE")
+      log "Loader killing group #{Process.getsid}"
+      # Process.kill("KILL", -Process.getsid)
     end
 
     def fork_workers
@@ -59,9 +62,15 @@ module Specjour
       end
     end
 
-    def load_application
-      puts caller
-      Specjour.configuration.load_application
+    def wait_srv
+      select [connection.socket]
+      if connection.socket.eof?
+        $stderr.puts("server eof")
+      else
+        val = connection.socket.gets
+        $stderr.puts("LOADER GOT #{val}")
+        Process.kill("INT", -Process.getsid)
+      end
     end
 
     def set_up
@@ -69,6 +78,8 @@ module Specjour
       Specjour.configuration.project_name = data["project_name"]
       Specjour.configuration.test_paths = data["test_paths"]
       Specjour.configuration.project_path = File.expand_path(Specjour.configuration.project_name, Specjour.configuration.tmp_path)
+      # Thread.new(connection) do |conn|
+      # end
     end
 
     def sync
@@ -81,102 +92,5 @@ module Specjour
         system *command.split
       end
     end
-
-    # def kill_worker_processes
-    #   Process.kill("QUIT", *worker_pids) rescue Errno::ESRCH
-    # end
-
-    # def start
-    #   load_app
-    #   Configuration.after_load.call
-    #   (1..worker_size).each do |index|
-    #     worker_pids << fork do
-    #       Worker.new(
-    #         :number => index,
-    #         :printer_uri => printer_uri,
-    #         :quiet => quiet
-    #       ).send(task)
-    #     end
-    #   end
-    #   Process.waitall
-    # ensure
-    #   kill_worker_processes
-    # end
-
-    # def feature_files
-    #   if test_paths.empty?
-    #     Dir["#{project_path}/features/**/*_feature.rb"]
-    #   else
-    #     test_paths.map do |test_path|
-    #       if test_path =~ /_feature\.rb$/
-    #         Dir["#{project_path}/#{test_path}"]
-    #       end
-    #     end.flatten.compact
-    #   end
-    # #   @feature_files ||= file_collector(feature_paths) do |path|
-    # #     if path == project_path
-    # #       Dir["#{path}/features/**/*.feature"]
-    # #     else
-    # #       Dir["#{path}/**/*.feature"]
-    # #     end
-    # #   end
-    # end
-
-    # protected
-
-    # def spec_paths
-    #   @spec_paths ||= test_paths.select {|p| p =~ /spec.*$/}
-    # end
-
-    # def feature_paths
-    #   @feature_paths ||= test_paths.select {|p| p =~ /features.*$/}
-    # end
-
-    # def file_collector(paths, &globber)
-    #   if spec_paths.empty? && feature_paths.empty?
-    #     globber[project_path]
-    #   else
-    #     paths.map do |path|
-    #       path = File.expand_path(path, project_path)
-    #       if File.directory?(path)
-    #         globber[path]
-    #       else
-    #         path
-    #       end
-    #     end.flatten.uniq
-    #   end
-    # end
-
-    # def load_app
-    #   RSpec::Preloader.load spec_files if spec_files.any?
-
-    #   $stderr.puts ['feature files', feature_files].inspect
-    #   Cucumber::Preloader.load(feature_files, connection) if feature_files.any?
-    #   register_tests_with_printer
-    # end
-
-    # def cucumber_scenarios
-    #   if feature_files.any?
-    #     scenarios
-    #   else
-    #     []
-    #   end
-    # end
-
-    # def scenarios
-    #   Cucumber.runtime.send(:features).map do |feature|
-    #     feature.feature_elements.map do |scenario|
-    #       "#{feature.file}:#{scenario.instance_variable_get(:@line)}"
-    #     end
-    #   end.flatten
-    # end
-
-    # def connection
-    #   @connection ||= begin
-    #     at_exit { connection.disconnect }
-    #     Connection.new URI.parse(printer_uri)
-    #   end
-    # end
-
   end
 end

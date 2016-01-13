@@ -33,7 +33,7 @@ module Specjour
       @mutex = Mutex.new
       @running = false
       @output = options[:output] || $stdout
-      @loader_pids = []
+      @loader_clients = []
       self.examples_complete = 0
       set_paths
     end
@@ -54,13 +54,7 @@ module Specjour
       end
       @test_paths = @test_paths.map do |path|
         path.relative_path_from(project_path)
-        # relative = p.relative_path_from(project_path)
-        # if relative != project_path
-        #   relative
-        # end
       end
-      # @test_paths = paths.map do |p|
-      # end.compact
       abort("#{project_path} doesn't exist") unless project_path.exist?
     end
 
@@ -93,48 +87,32 @@ module Specjour
     def start
       @running = true
       @server_socket ||= TCPServer.new(@host, Specjour.configuration.printer_port)
-      # @port = @server_socket.addr[1]
-      # fds = [@server_socket]
-      # @rp, @wp = IO.pipe
-      # @child_socket, @parent_socket = Socket.pair(:UNIX, :DGRAM, 0)
-      # catch(:stop) do
       done_reader, @done_writer = IO.pipe
-        while running? do
-          debug "loop going to select #{running?}"
-          result = select([@server_socket, done_reader], [], [])
-          reads = result.first
-          reads.each do |socket_being_read|
-            if socket_being_read == @server_socket
-              debug "adding connection"
-              client_socket = @server_socket.accept
-              # fds << client_socket
-              # clients[client_socket] = Connection.wrap(client_socket)
-              client_socket = Connection.wrap(client_socket)
-              @send_threads << Thread.new(client_socket) { |sock| serve(sock) }
-            # elsif socket_being_read.eof?
-            #   debug "socket server closing connection"
-            #   socket_being_read.close
-              # fds.delete(socket_being_read)
-              # clients.delete(socket_being_read)
-              # disconnecting
-            # else
-            #   debug "serving"
-              # fork do
-                # serve(clients[socket_being_read])
-              # end
-            end
+      while running? do
+        debug "loop going to select #{running?}"
+        result = select([@server_socket, done_reader], [], [])
+        reads = result.first
+        reads.each do |socket_being_read|
+          if socket_being_read == @server_socket
+            debug "adding connection"
+            client_socket = @server_socket.accept
+            client_socket = Connection.wrap(client_socket)
+            @send_threads << Thread.new(client_socket) { |sock| serve(sock) }
           end
         end
-      # end
+      end
     ensure
       done_reader.close
       @done_writer.close
-      stopping
       if Specjour.interrupted?
-        Process.kill("INT", *@loader_pids) rescue TypeError
+        @loader_clients.each do |client|
+          client.socket.puts("INT")
+        end
+        # Process.kill("INT", *@loader_pids) rescue TypeError
       end
+      @server_socket.close
+      stopping
       exit exit_status
-      # fds.each {|c| c.close}
     end
 
     def exit_status
@@ -164,12 +142,11 @@ module Specjour
       loop do
         if client.eof?
           debug "client eof"
-          client.close
+          client.disconnect
           disconnecting
           break
         end
         data = client.recv_data
-        # @send_threads << Thread.new do
         command = data['command']
         case command
         when "done"
@@ -179,6 +156,7 @@ module Specjour
         when "next_test"
           client.send_data next_test(*data["args"])
         when "ready"
+          @loader_clients |= [client]
           client.send_data ready(*data["args"])
         when "register_tests"
           register_tests(*data["args"])
@@ -189,7 +167,8 @@ module Specjour
         end
         IO.select([client.socket])
       end
-      debug "thread dying"
+    # ensure
+    #   client.disconnect
     end
 
     def done
@@ -210,7 +189,6 @@ module Specjour
 
     def ready(info)
       @output.puts "Received connection from #{info["hostname"]}(#{info["worker_size"]})"
-      @loader_pids |= [info["loader_pid"]]
       {
         project_name: project_name,
         project_path: project_path.to_s,
@@ -227,7 +205,6 @@ module Specjour
         if example_size == 0
           self.tests_to_run = run_order(tests)
           self.example_size = tests_to_run.size
-          # $stderr.puts "EXAMPLES to run #{tests_to_run.join(" ")}"
         end
       end
     end
@@ -255,13 +232,6 @@ module Specjour
       @machines = machines
     end
 
-    # def tests=(client, tests)
-    #   if tests_to_run.empty?
-    #     self.tests_to_run = run_order(tests)
-    #     self.example_size = tests_to_run.size
-    #   end
-    # end
-
     def rspec_summary=(client, summary)
       rspec_report.add(summary)
     end
@@ -276,15 +246,11 @@ module Specjour
     end
 
     def disconnecting
-      # if clients.empty?
       @mutex.synchronize do
         debug "DISCONNECT #{example_size} #{examples_complete}"
         if @running && examples_complete == example_size
           @running = false
           @done_writer.write("DONE")
-          debug "server socket closed"
-          # @send_threads.each {|t| t.join}
-          # throw(:stop)
         end
       end
     end

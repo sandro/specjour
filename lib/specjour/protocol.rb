@@ -6,7 +6,7 @@ module Specjour
       bytes = socket.gets.to_i
       string = socket.read(bytes)
       debug "recv_string #{bytes} #{string.inspect}"
-      if string
+      if !string.empty?
         json = JSON.load(string)
         # log "recv_data: #{bytes} #{json.inspect}"
         json
