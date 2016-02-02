@@ -36,7 +36,7 @@ module Specjour
   autoload :Cucumber, 'specjour/cucumber'
   autoload :RSpec, 'specjour/rspec'
 
-  VERSION ||= "0.7.0"
+  VERSION ||= "1.0.0.pre"
   HOOKS_PATH ||= "./.specjour/hooks.rb"
   PROGRAM_NAME ||= $PROGRAM_NAME # keep a reference of the original program name
   Time = Time.dup
@@ -82,12 +82,11 @@ module Specjour
       file = File.expand_path("specjour_plugin.rb", load_path)
       require file if File.exists?(file)
     end
-    return
   end
 
   def self.logger
     @logger ||= new_logger
- end
+  end
 
   def self.new_logger(level = ::Logger::UNKNOWN, output=nil)
     @logger = ::Logger.new output || $stderr

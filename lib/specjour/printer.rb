@@ -59,7 +59,7 @@ module Specjour
     end
 
     def announce
-      @output.puts("Searching for listeners...")
+      @output.puts("Looking for listeners...")
       text = DNSSD::TextRecord.new
       text['version'] = Specjour::VERSION
       text['project_alias'] = Specjour.configuration.project_aliases.first
@@ -167,8 +167,6 @@ module Specjour
         end
         IO.select([client.socket])
       end
-    # ensure
-    #   client.disconnect
     end
 
     def done

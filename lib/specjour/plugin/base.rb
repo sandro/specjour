@@ -35,7 +35,6 @@ module Specjour
       end
 
       def interrupted!
-        $stderr.puts("#{ENV["TEST_ENV_NUMBER"]} INTERRUPTED! called")
       end
 
       def register_tests_with_printer

@@ -8,6 +8,7 @@ module Specjour
     attr_reader :number, :options
 
     def initialize(options = {})
+      Specjour.trap_interrupt
       ARGV.replace []
       @options = options
       # $stdout = StringIO.new if options[:quiet]
@@ -45,15 +46,15 @@ module Specjour
       remove_connection
       log "Worker disconnecting #{Process.pid}"
       r = IO.popen("ps -eo pid,ppid,command | grep #{Process.pid}")
-      $stderr.puts("#{ENV["TEST_ENV_NUMBER"]} PS CMD")
+      # $stderr.puts("#{ENV["TEST_ENV_NUMBER"]} PS CMD")
       r.each_line do |line|
         $stderr.puts line
         pid, ppid = line.split(" ")
         pid = pid.to_i
         ppid = ppid.to_i
-        $stderr.puts("is equal? #{pid} #{Process.pid} #{r.pid}")
+        # $stderr.puts("is equal? #{pid} #{Process.pid} #{r.pid}")
         if ppid == Process.pid && pid != r.pid
-          $stderr.puts "KILLING #{pid}"
+          # $stderr.puts "KILLING #{pid}"
           Process.kill("TERM", pid)
         end
       end
