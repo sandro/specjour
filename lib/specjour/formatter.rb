@@ -53,7 +53,7 @@ module Specjour
     def print_rerun
       files = failures.map do |f|
         "#{f["file_path"]}:#{f["line_number"]}"
-      end
+      end.uniq
       cmd = colorize("rspec #{files.join(" ")}", :red)
       @output.puts %(
 Rerun failures with this command:
