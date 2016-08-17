@@ -7,7 +7,7 @@ module Specjour
     attr_reader :uri, :retries
     attr_writer :socket
 
-    def_delegators :socket, :flush, :close, :closed?, :gets, :each, :eof?
+    def_delegators :socket, :flush, :close, :closed?, :gets, :puts, :each, :eof?
 
     def self.wrap(established_connection)
       host, port = established_connection.peeraddr.values_at(3,1)

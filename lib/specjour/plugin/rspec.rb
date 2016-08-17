@@ -4,15 +4,24 @@ module Specjour
 
       FILE_RE = /_spec\.rb/
 
+      Specjour::Configuration.make_option(:rspec_rerun)
+      Specjour.configuration.rspec_rerun = true
+
+      attr_reader :rerunner
+
+      def initialize
+        @all_specs = {}
+      end
+
       def interrupted!
         if defined?(::RSpec)
-          ::RSpec.wants_to_quit = true
+          ::RSpec.world.wants_to_quit = true
         end
       end
 
       def load_application
         $stderr.puts("RSPEC Plugin loading env in #{Dir.pwd}")
-        log "application loading from rspec plugin, #{File.expand_path("spec/spec_helper", Dir.pwd)}"
+        log "application loading from rspec plugin"
         require "rspec/core"
         ::RSpec::Core::Runner.disable_autorun!
         @output = connection
@@ -23,10 +32,9 @@ module Specjour
         @configuration_options.parse_options
         @configuration_options.configure ::RSpec.configuration
         ::RSpec.configuration.load_spec_files
-        @all_specs = {}
-      rescue LoadError => e
-        $stderr.puts "\n\nCAUGHT ERROR\n\n"
-        $stderr.puts "#{e.class}: #{e.message}"
+      # rescue LoadError => e
+      #   $stderr.puts "\n\nCAUGHT ERROR\n\n"
+      #   $stderr.puts "#{e.class}: #{e.message}"
       end
 
       def after_suite
@@ -42,8 +50,22 @@ module Specjour
       end
 
       def run_test(test)
-        run(test)
+        run(test) if FILE_RE === test
         true
+      end
+
+
+      def after_print_summary(formatter)
+        if formatter.failures.any?
+          @rerunner = ReRunner.new(formatter)
+          rerunner.start
+        end
+      end
+
+      def exit_status(formatter)
+        if formatter.failures.any?
+          rerunner.exit_status
+        end
       end
 
       protected
@@ -128,6 +150,46 @@ module Specjour
           @all_specs[location] << executable
         end
         locations
+      end
+
+      class ReRunner
+
+        include Colors
+
+        attr_reader :formatter
+
+        def initialize(formatter)
+          @formatter = formatter
+          @exit_status = false
+        end
+
+        def start
+          if Specjour.configuration.rspec_rerun
+            rerun
+          else
+            print_rerun
+          end
+        end
+
+        def rerun
+          command = "rake db:test:prepare && #{rerun_command}"
+          output.puts("Rerunning failing tests with following command:\n#{command}")
+          @exit_status = system(command)
+        end
+
+        def print_rerun
+          cmd = colorize(rerun_command, :red)
+          output.puts "Rerun failures with this command:\n\n#{cmd}"
+        end
+
+        def rerun_command
+          "rspec #{formatter.failing_test_paths.select {|t| RSpec::FILE_RE === t}.join(" ")}"
+        end
+
+        def output
+          formatter.output
+        end
+
       end
 
     end

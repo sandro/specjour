@@ -9,7 +9,7 @@ module Specjour
       "spec/spec_helper.rb",
       "spec/rails_helper.rb",
       "bin/"
-    ])
+    ]).freeze
 
     DEFAULT_OPTIONS = {
       backtrace_exclusion_pattern: DEFAULT_BACKTRACE_EXCLUSION,
@@ -26,20 +26,33 @@ module Specjour
       tmp_path: "/tmp",
       worker_size: CPU.cores,
       worker_number: 0
-    }
+    }.freeze
+
+    def self.make_option(name)
+      define_method(name) do
+        option = @options[name]
+        if option.respond_to?(:call)
+          option.call()
+        else
+          option
+        end
+      end
+
+      define_method("#{name}=") do |value|
+        @options[name] = value
+      end
+    end
 
     DEFAULT_OPTIONS.each do |k,v|
-      define_method(k) do
-        @options[k]
-      end
-
-      define_method("#{k}=") do |value|
-        @options[k] = value
-      end
+      make_option(k)
     end
 
     def initialize(options={})
       @original_options = options
+      set_options
+    end
+
+    def set_options
       @options = DEFAULT_OPTIONS.merge @original_options
     end
 

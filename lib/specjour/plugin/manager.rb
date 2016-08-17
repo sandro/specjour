@@ -18,7 +18,7 @@ module Specjour::Plugin
     end
 
     def send_task(task, *args)
-      plugins.each do |plugin|
+      plugins.map do |plugin|
         log "sending task to plugin: #{task}, #{plugin}"
         plugin.__send__(task, *args)
         # break if plugin.__send__(task, *args) == false

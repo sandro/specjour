@@ -44,9 +44,13 @@ module Specjour
         @test_paths = paths
       end
       @test_paths = @test_paths.map do |path|
-        path.relative_path_from(project_path)
+        test_path = path.relative_path_from(project_path)
+        abort("Test path #{test_path} doesn't exist") unless test_path.exist?
+        test_path
       end
-      abort("#{project_path} doesn't exist") unless project_path.exist?
+      if !project_path.exist?
+        abort("Project path #{project_path} doesn't exist")
+      end
     end
 
     def announce
@@ -110,8 +114,9 @@ module Specjour
       if Specjour.interrupted?
         2
       else
-        Specjour.plugin_manager.send_task(:exit_status, Specjour.configuration.formatter) ||
-          Specjour.configuration.formatter.exit_status
+        statuses = Specjour.plugin_manager.send_task(:exit_status, Specjour.configuration.formatter)
+        plugin_status = statuses.detect {|s| !s.nil?}
+        plugin_status.nil? ? Specjour.configuration.formatter.exit_status : plugin_status
       end
     end
 
@@ -273,6 +278,7 @@ module Specjour
     end
 
     def stopping
+      Specjour.configuration.formatter.set_end_time!
       @bonjour_service.stop# unless @bonjour_service.stopped?
 
       Specjour.plugin_manager.send_task(:before_print_summary, Specjour.configuration.formatter)

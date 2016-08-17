@@ -43,6 +43,7 @@ module Specjour
         else
           Listener.ensure_started
         end
+        printer = nil
         printer = Printer.new test_paths: Array(test_paths)
         printer.announce
         printer.start_rsync

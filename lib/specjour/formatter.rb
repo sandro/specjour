@@ -20,6 +20,7 @@ module Specjour
       :pass_count,
       :pending_count,
       :start_time,
+      :end_time,
       :tests
 
     def initialize(output=$stdout)
@@ -74,31 +75,29 @@ module Specjour
       end.uniq
     end
 
-    def print_rerun
-      cmd = colorize("rspec #{failing_test_paths.join(" ")}", :red)
-      @output.puts %(
-Rerun failures with this command:
 
-#{cmd}
-      )
-    end
-
-    def print_summary
-      end_time = Time.now
-      @output.puts "\n\n"
-      print_failures if failures.any?
-
+    def print_counts
       @output.puts colorize("Pending: #{pending_count}", :yellow)
       @output.puts colorize("Errors: #{error_count}", :magenta)
       @output.puts colorize("Passed: #{pass_count}", :green)
       @output.puts colorize("Failed: #{fail_count}", :red)
+    end
 
+    def execution_time
+      Time.new(2000,1,1,0,0,0,0) + (end_time - start_time)
+    end
+
+    def print_overview
       overall_color = fail_count == 0 ? :green : :red
-      overall_time = Time.new(0,1,1) + (end_time - @start_time)
-      @output.puts colorize("\nRan: #{tests.size} tests in #{overall_time.strftime("%Mm:%Ss:%Lms")}", overall_color)
+      @output.puts colorize("\nRan: #{tests.size} tests in #{execution_time.strftime("%Mm:%Ss:%Lms")}", overall_color)
+    end
 
+    def print_summary
+      @output.puts "\n\n"
+      print_failures if failures.any?
+      print_counts
+      print_overview
       @output.puts "\n"
-      print_rerun if failures.any?
     end
 
     def report_test(test)
@@ -117,8 +116,12 @@ Rerun failures with this command:
       end
     end
 
+    def set_end_time!
+      @end_time = Time.now
+    end
+
     def exit_status
-      exit failures.any? ? 1 : 0
+      failures.any? ? 1 : 0
     end
 
   end

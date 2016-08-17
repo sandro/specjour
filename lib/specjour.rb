@@ -48,11 +48,10 @@ module Specjour
   def self.benchmark(msg)
     $stderr.print "#{msg}... "
     return_value = nil
-    time = Benchmark.realtime do
-      return_value = yield
-    end
-    $stderr.puts "completed in #{time}s"
-    return_value
+    start_time = Time.now
+    yield
+  ensure
+    $stderr.puts "completed in #{Time.now - start_time}s"
   end
 
   def self.configuration(provided_config=nil)
