@@ -74,34 +74,52 @@ describe Specjour do
   #   end
   # end
 
-  # describe "testing before each" do
-  #   before(:each) do
-  #     @run_times = @run_times.to_i + 1
-  #   end
+  describe "testing before each" do
+    before(:each) do
+      puts "1"
+      @zee = 1
+      @run_times = @run_times.to_i + 1
+    end
 
-  #   it "runs before(:each) once" do
-  #     expect(@run_times).to eq(1)
-  #   end
+    it "runs before(:each) once" do
+          puts "zee is #{@zee}"
+      expect(@run_times).to eq(1)
+    end
 
-  #   it "runs before(:each) once" do
-  #     expect(@run_times).to eq(1)
-  #   end
+    it "runs before(:each) once" do
+          puts "zee is #{@zee}"
+      expect(@run_times).to eq(1)
+    end
 
-  #   describe "testing before all" do
-  #     before(:all) do
-  #       @run_times = @run_times.to_i + 1
-  #     end
+    describe "testing before all" do
+      before(:each) do
+        puts "2"
+        @zaa = 2
+        @zee = 2
+      end
+      # before(:all) do
+      #   @run_times = @run_times.to_i + 1
+      # end
 
-  #     it "runs before(:all) once" do
-  #       expect(@run_times).to eq(2)
-  #     end
+      it "runs before(:all) once" do
+          puts "zee is #{@zee}"
+        expect(@run_times).to eq(2)
+      end
 
-  #     describe "deeply nested" do
-  #       it "works" do
-  #         expect(@run_times).to eq(2)
-  #       end
-  #     end
-  #   end
+      describe "deeply nested" do
+        before(:each) do
+          puts "3"
+          @zee = 3
+        end
+
+        it "works" do
+          puts "zee is #{@zee}"
+          puts "zaa is #{@zaa}"
+          expect(@run_times).to eq(2)
+        end
+      end
+    end
+  end
 
   #   describe "testing nested before each" do
   #     before(:each) do

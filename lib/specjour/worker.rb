@@ -8,7 +8,7 @@ module Specjour
     attr_reader :number, :options
 
     def initialize(options = {})
-      Specjour.trap_interrupt
+      Specjour.trap_interrupt_with_exit
       ARGV.replace []
       @options = options
       # $stdout = StringIO.new if options[:quiet]
@@ -29,8 +29,10 @@ module Specjour
 
       while test = connection.next_test
         print_status(test)
-        Specjour.plugin_manager.send_task(:run_test, test)
-        # profile(test, time)
+        time = Benchmark.realtime do
+          Specjour.plugin_manager.send_task(:run_test, test)
+        end
+        profile(test, time)
         # run_times[test_type(test)] += time
         connection.done
       end
@@ -82,13 +84,13 @@ module Specjour
     end
 
     def print_time_for(test, time)
-      printf "[#{number}] Finished #{test} in %.2fs\n", time
+      log sprintf("[#{number}] Finished #{test} in %.2fs\n", time)
     end
 
-    # def profile(test, time)
-    #   connection.send_message(:add_to_profiler, [test, time])
-    #   print_time_for(test, time)
-    # end
+    def profile(test, time)
+      connection.add_to_profiler(test, time, "#{hostname}[#{ENV["TEST_ENV_NUMBER"]}]")
+      print_time_for(test, time)
+    end
 
     # def run_test(test)
     #   if test_type(test) == :cucumber

@@ -15,7 +15,6 @@ module Specjour
         log "application loading from rspec plugin, #{File.expand_path("spec/spec_helper", Dir.pwd)}"
         require "rspec/core"
         ::RSpec::Core::Runner.disable_autorun!
-        # @output = StringIO.new
         @output = connection
         ::RSpec.configuration.error_stream = $stderr
         ::RSpec.configuration.output_stream = @output
@@ -40,16 +39,11 @@ module Specjour
 
       def register_tests_with_printer
         connection.register_tests rspec_examples
-        # rspec_examples
-        # connection.register_tests ["spec/specjour_spec.rb"]
       end
 
       def run_test(test)
-        # log "RSpec Plugin: attempting to run test #{test}"
-        # if FILE_RE.match(test)
-          run(test)
-          true
-        # end
+        run(test)
+        true
       end
 
       protected
@@ -63,30 +57,20 @@ module Specjour
         line_number=nil
         ::RSpec.configuration.reset
         ::RSpec.configuration.add_formatter(Specjour::RspecFormatter)
-        ::RSpec.configuration.filter_manager = ::RSpec::Core::FilterManager.new
+        # ::RSpec.configuration.filter_manager = ::RSpec::Core::FilterManager.new
         path, line_number = test.split(":")
-        ::RSpec.configuration.filter_manager.add_location(path, line_number.to_i)
-        ::RSpec.world.filtered_examples.clear
+        # ::RSpec.configuration.filter_manager.add_location(path, line_number.to_i)
+        # ::RSpec.world.filtered_examples.clear
         ::RSpec.configuration.reporter.report(1, nil) do |reporter|
           examples_or_groups = @all_specs[test]
           examples_or_groups.each do |example_or_group|
             if example_or_group.respond_to?(:example_group)
               instance = example_or_group.example_group.new
               example_or_group.run instance, reporter
-              # example_or_group.example_group.run(reporter)
             else
               example_or_group.run(reporter)
             end
           end
-
-          # ::RSpec.world.example_groups.each do |group|
-            # p "GROUP MAYBE #{group.display_name}"
-            # if group.descendant_filtered_examples.any?
-              # p "GROUP YES"
-              # group.run(reporter)
-            # end
-            # p "GROUP DONE"
-          # end
         end
       end
 
@@ -141,87 +125,11 @@ module Specjour
         locations.map.with_index do |location, i|
           @all_specs[location] ||= []
           executable = executables[i]
-          # if executable.respond_to?(:example_group)
-          #   # if @all_specs[location].empty?
-          #   #   @all_specs[location] << executable
-          #   # else
-          #   group_missing = @all_specs[location].none? do |exec|
-          #     exec.example_group == executable.example_group
-          #   end
-          #   group_missing && @all_specs[location] << executable
-          # else
-            @all_specs[location] << executable
-          # end
+          @all_specs[location] << executable
         end
         locations
-      # ensure
-        # shared_groups = ::RSpec.world.shared_example_groups.dup
-        # ::RSpec.reset
-        # shared_groups.each do |k,v|
-        #   ::RSpec.world.shared_example_groups[k] = v
-        # end
       end
 
     end
   end
 end
-            # group.descendants.each {|g| g.instance_variable_set(:@descendant_filtered_examples, nil)}
-
-            # group.descendants.each do |g|
-            #   filtered = group.filtered_examples
-            #   $stderr.puts filtered.inspect
-            #   g.run(reporter)
-            # end
-
-            # all_examples = group.descendant_filtered_examples
-            # ex = find_example(all_examples)
-            # $stderr.puts group.inspect
-            # $stderr.puts ex.first.example_group.inspect
-            # $stderr.puts ex.size.inspect
-            # if ex.any?
-            #   log "HAVE EX"
-            #   all_examples.each do |example|
-            #     if ex.include?(example)
-            #       def example.run(instance, reporter)
-            #         $stderr.puts "INCLUDES"
-            #         super
-            #       end
-            #     else
-            #       def example.run(instance, reporter)
-            #         $stderr.puts "EXCLUDES"
-            #         return
-            #       end
-            #     end
-            #   end
-              # def ex.ordered
-              #   self
-              # end
-              # meta = class << group; self; end
-              # meta.send :define_method, :filtered_examples do
-              #   ex
-              # end
-              # p group.filtered_examples.size
-              # group.run(reporter)
-              # if ex.size > 0
-                # ex.first.example_group.run(reporter)
-              # end
-        # @output.rewind
-        # if @output.size > 0
-        #   begin
-        #     json = JSON.load(@output)
-        #   rescue
-        #     json = {}
-        #   end
-        #   # p json
-        #   json["examples"].each do |e|
-        #     connection.report_test(e)
-        #   end
-        # end
-        # @output.reopen("")
-      # ensure
-        # ::RSpec.reset
-        # ::RSpec.world.example_groups.clear
-        # ::RSpec.configuration.filter_manager = ::RSpec::Core::FilterManager.new
-        # ::RSpec.world.filtered_examples.clear
-        # ::RSpec.world.inclusion_filter.clear
-        # ::RSpec.world.exclusion_filter.clear

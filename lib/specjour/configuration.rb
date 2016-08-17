@@ -2,8 +2,19 @@ module Specjour
   class Configuration
     attr_accessor :options
 
+    DEFAULT_BACKTRACE_EXCLUSION = Regexp.union([
+      "/lib/specjour/",
+      /lib\/rspec\/(core|expectations|matchers|mocks)/,
+      "/gems/",
+      "spec/spec_helper.rb",
+      "spec/rails_helper.rb",
+      "bin/"
+    ])
+
     DEFAULT_OPTIONS = {
+      backtrace_exclusion_pattern: DEFAULT_BACKTRACE_EXCLUSION,
       formatter: Formatter.new,
+      full_backtrace: false,
       printer_port: 34276,
       printer_uri: nil,
       project_aliases: [],

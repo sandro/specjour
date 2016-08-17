@@ -8,15 +8,6 @@ module Specjour
     attr_reader :host, :port, :clients
     attr_accessor :tests_to_run, :test_paths, :example_size, :examples_complete, :profiler, :machines
 
-    COMMANDS = %w(
-      done
-      greet
-      next_test
-      ready
-      register_tests
-      report_test
-    )
-
     Thread.abort_on_exception = true
 
     def initialize(options={})
@@ -119,7 +110,8 @@ module Specjour
       if Specjour.interrupted?
         2
       else
-        Specjour.configuration.formatter.exit_status
+        Specjour.plugin_manager.send_task(:exit_status, Specjour.configuration.formatter) ||
+          Specjour.configuration.formatter.exit_status
       end
     end
 
@@ -149,6 +141,8 @@ module Specjour
         data = client.recv_data
         command = data['command']
         case command
+        when "add_to_profiler"
+          add_to_profiler(*data["args"])
         when "done"
           done(*data["args"])
         when "greet"
@@ -186,7 +180,7 @@ module Specjour
     end
 
     def ready(info)
-      @output.puts "Received connection from #{info["hostname"]}(#{info["worker_size"]})"
+      @output.puts "Found #{info["hostname"]}(#{info["worker_size"]})"
       {
         project_name: project_name,
         project_path: project_path.to_s,
@@ -238,9 +232,8 @@ module Specjour
       cucumber_report.add(summary)
     end
 
-    def add_to_profiler(client, args)
-      test, time = *args
-      self.profiler[test] = time
+    def add_to_profiler(test, time, host)
+      self.profiler[test] = [time, host]
     end
 
     def disconnecting
@@ -255,10 +248,10 @@ module Specjour
 
     def run_order(tests)
       if File.exist?('.specjour/performance')
-        ordered_tests = File.readlines('.specjour/performance').map {|l| l.chop.split(':', 2)[1]}
+        ordered_tests = File.readlines('.specjour/performance').map {|l| l.chop.split(':')[1]}
         ordered_tests & tests | tests
       else
-        tests
+        tests.sort
       end
     end
 
@@ -270,17 +263,22 @@ module Specjour
       @cucumber_report ||= Cucumber::FinalReport.new
     end
 
+    # "test.rb" => [1.12, "host.local[2]"]
     def record_performance
       File.open('.specjour/performance', 'w') do |file|
-        ordered_specs = profiler.to_a.sort_by {|a| -a[1].to_f}.map do |test, time|
-          file.puts "%6f:%s" % [time, test]
+        ordered_specs = profiler.to_a.sort_by {|test, data| -data[0].to_f}.map do |test, data|
+          file.puts "%6f:%s:%s" % [data[0], test, data[1]]
         end
       end
     end
 
     def stopping
-      Specjour.configuration.formatter.print_summary
       @bonjour_service.stop# unless @bonjour_service.stopped?
+
+      Specjour.plugin_manager.send_task(:before_print_summary, Specjour.configuration.formatter)
+      Specjour.configuration.formatter.print_summary
+      Specjour.plugin_manager.send_task(:after_print_summary, Specjour.configuration.formatter)
+
       unless Specjour.interrupted?
         record_performance
         print_missing_tests if missing_tests?

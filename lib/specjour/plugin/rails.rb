@@ -6,6 +6,7 @@ module Specjour::Plugin
     def load_application
       log "Loading rails plugin"
       if File.exists?("./config/application.rb") && File.exists?("./config/environment.rb")
+        @rails_loaded = true
         bundle_install
         ENV["RAILS_ENV"] ||= "test"
         require File.expand_path("config/application", Dir.pwd)
@@ -17,6 +18,7 @@ module Specjour::Plugin
     end
 
     def before_worker_fork
+      return unless @rails_loaded
       # DbScrubber.disconnect_database
       ActiveRecord::Base.remove_connection
     end

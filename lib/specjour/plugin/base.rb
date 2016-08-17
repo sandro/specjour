@@ -47,6 +47,16 @@ module Specjour
       def tests_to_register
         []
       end
+
+      def before_print_summary(formatter)
+      end
+
+      def after_print_summary(formatter)
+      end
+
+      def exit_status(formatter)
+      end
+
     end
   end
 end

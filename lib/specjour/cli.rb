@@ -37,7 +37,12 @@ module Specjour
         abort("Commands are: #{COMMANDS.join(" ")}")
       else
         test_paths = ARGV[0..-1]
-        Listener.ensure_started
+        if no_workers?
+          listener = Listener.new
+          listener.stop if listener.started?
+        else
+          Listener.ensure_started
+        end
         printer = Printer.new test_paths: Array(test_paths)
         printer.announce
         printer.start_rsync
@@ -45,9 +50,19 @@ module Specjour
       end
     end
 
+    def no_workers?
+      options[:workers] && options[:workers] <= 0
+    end
+
     def parser
       @parser ||= OptionParser.new do |parser|
         parser.banner = "Usage: specjour [command] [options] [files or directories]\n\nCommands are #{COMMANDS.join(",")}\n\n"
+
+        parser.on('-b', '--backtrace', 'Enable full backtrace.') do |o|
+          options[:full_backtrace] = true
+          Specjour.configuration.full_backtrace = true
+        end
+
         parser.on("-l", "--log [FILE]", String, "Print logging information") do |option|
           Specjour.new_logger ::Logger::INFO, option
         end

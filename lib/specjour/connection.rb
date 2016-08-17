@@ -46,6 +46,10 @@ module Specjour
       @socket ||= connect
     end
 
+    def add_to_profiler(test, time, host)
+      send_command("add_to_profiler", test, time, host)
+    end
+
     def done
       send_command("done")
     end

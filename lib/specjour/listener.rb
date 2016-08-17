@@ -76,15 +76,15 @@ module Specjour
                 resolved_ip = ip_from_hostname(resolved.target)
                 uri = URI::Generic.build :host => resolved_ip, :port => resolved.port
                 add_printer(name: resolved.name, uri: uri)
-                break
               else
                 $stderr.puts "Found #{resolved.target} but not listening to project alias: #{resolved.text_record['project_alias']}. Skipping..."
               end
             else
               $stderr.puts "Found #{resolved.target} but its version doesn't match v#{Specjour::VERSION}. Skipping..."
             end
+            break
           end
-          break
+          break if printer
         else
           log "REMOVING #{reply.name} #{reply}"
           remove_printer
@@ -102,9 +102,17 @@ module Specjour
       File.join(config_directory, PID_FILE_NAME)
     end
 
+    def program_name
+      name = "specjour listen"
+      if Specjour.configuration.project_aliases.any?
+        name += " -a #{Specjour.configuration.project_aliases.join(",")}"
+      end
+      name
+    end
+
     def start
       return if started?
-      $PROGRAM_NAME = "specjour listen"
+      $PROGRAM_NAME = program_name
       log "Listener starting"
       write_pid
       loop do
