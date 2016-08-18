@@ -20,11 +20,12 @@ module Specjour
       project_aliases: [],
       project_name: nil,
       project_path: nil,
+      remote_job: nil,
       rsync_options: "-aL --delete --ignore-errors",
       rsync_port: 23456,
       test_paths: nil,
       tmp_path: "/tmp",
-      worker_size: CPU.cores,
+      worker_size: lambda { Specjour.configuration.remote_job ? CPU.half_cores : CPU.cores },
       worker_number: 0
     }.freeze
 

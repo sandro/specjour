@@ -49,11 +49,13 @@ module Specjour
       log "Listener adding printer #{params}"
       self.printer = params
       Specjour.configuration.printer_uri = params[:uri]
+      Specjour.configuration.remote_job = params[:ip] != local_ip
     end
 
     def remove_printer
       self.printer = nil
       Specjour.configuration.printer_uri = nil
+      Specjour.configuration.remote_job = nil
     end
 
     def fork_loader
@@ -75,7 +77,7 @@ module Specjour
               if available_for?(resolved.text_record['project_alias'].to_s)
                 resolved_ip = ip_from_hostname(resolved.target)
                 uri = URI::Generic.build :host => resolved_ip, :port => resolved.port
-                add_printer(name: resolved.name, uri: uri)
+                add_printer(name: resolved.name, uri: uri, ip: resolved_ip)
               else
                 $stderr.puts "Found #{resolved.target} but not listening to project alias: #{resolved.text_record['project_alias']}. Skipping..."
               end
