@@ -175,8 +175,8 @@ module Specjour
     end
 
     def next_test
-      log "test size: #{tests_to_run.size}"
       @mutex.synchronize do
+        log "test size: #{tests_to_run.size}"
         if tests_to_run.size == example_size
           Specjour.configuration.formatter.start_time = Specjour::Time.now
         end

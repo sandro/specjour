@@ -6,7 +6,7 @@ module Specjour
       @hostname ||= Socket.gethostname
     end
 
-    def close
+    def close(_notification=nil)
       @output_hash[:examples].each do |e|
         e["hostname"] = hostname
         e["worker_number"] = ENV["TEST_ENV_NUMBER"]

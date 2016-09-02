@@ -50,7 +50,7 @@ module Specjour
       r = IO.popen("ps -eo pid,ppid,command | grep #{Process.pid}")
       # $stderr.puts("#{ENV["TEST_ENV_NUMBER"]} PS CMD")
       r.each_line do |line|
-        $stderr.puts line
+        # $stderr.puts line
         pid, ppid = line.split(" ")
         pid = pid.to_i
         ppid = ppid.to_i

@@ -61,7 +61,7 @@ module Specjour
     def fork_loader
       Specjour.plugin_manager.send_task(:before_loader_fork)
       fork do
-        loader = Loader.new(task: "run_tests")
+        loader = Loader.new({task: "run_tests"})
         Specjour.plugin_manager.send_task(:after_loader_fork)
         loader.start
       end
@@ -113,7 +113,6 @@ module Specjour
     end
 
     def start
-      return if started?
       $PROGRAM_NAME = program_name
       log "Listener starting"
       write_pid
@@ -123,7 +122,6 @@ module Specjour
         @loader_pid = fork_loader
         Process.waitall
         # select [connection.socket] # wait until server disconnects
-        $stderr.puts("listener waitall done")
         # Process.kill("KILL", -@loader_pid) rescue TypeError
         # remove_connection
         remove_printer
@@ -154,7 +152,7 @@ module Specjour
     end
 
     def remove_pid
-      File.unlink(pid_file) if File.exists?(pid_file)
+      File.unlink(pid_file) if File.exists?(pid_file) && pid == Process.pid
     end
   end
 end

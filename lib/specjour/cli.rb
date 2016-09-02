@@ -18,6 +18,9 @@ module Specjour
       case ARGV[0]
       when "listen"
         listener = Listener.new
+        if listener.started?
+          listener.stop
+        end
         listener.daemonize unless options[:foreground]
         listener.start
       when "tester"

@@ -9,13 +9,11 @@ module Specjour
       :printer_uri,
       :quiet,
       :task,
-      :worker_pids,
-      :worker_size
+      :worker_pids
 
     def initialize(options = {})
       @options = options
       @printer_uri = options[:printer_uri]
-      @worker_size = options[:worker_size]
       @task = options[:task]
       @quiet = options[:quiet]
       @worker_pids = []
