@@ -3,7 +3,7 @@ module Specjour
     require 'dnssd'
     Thread.abort_on_exception = true
 
-    PID_FILE_NAME = "listener.pid"
+    LOCK_FILE = "listener.lock"
 
     include Logger
     include SocketHelper
@@ -95,13 +95,33 @@ module Specjour
     end
 
     def pid
-      if File.exists?(pid_file)
+      if File.exist?(pid_file) && !File.directory?(pid_file)
         File.read(pid_file).strip.to_i
       end
     end
 
     def pid_file
-      File.join(config_directory, PID_FILE_NAME)
+      @pid_file ||= File.join(config_directory, Specjour.configuration.project_aliases.join("-"))
+    end
+
+    def lock_file
+      @lock_file ||= File.join(config_directory, LOCK_FILE)
+    end
+
+    # only allow one listener to execute at a time
+    def listener_lock(&block)
+      exception = nil
+      File.open(lock_file, "w") do |file|
+        begin
+          debug "Acquiring listener lock"
+          file.flock File::LOCK_EX
+          debug "Listener lock acquired"
+          block.call
+        rescue => exception
+          file.flock File::LOCK_UN
+        end
+      end
+      raise exception if exception
     end
 
     def program_name
@@ -119,13 +139,12 @@ module Specjour
       loop do
         log "listening..."
         gather
-        @loader_pid = fork_loader
-        Process.waitall
-        # select [connection.socket] # wait until server disconnects
-        # Process.kill("KILL", -@loader_pid) rescue TypeError
-        # remove_connection
-        remove_printer
-        sleep 3 # let bonjour services stop
+        listener_lock do
+          @loader_pid = fork_loader
+          Process.waitall
+          remove_printer
+          sleep 3 # let bonjour services stop
+        end
       end
     rescue StandardError, ScriptError => e
       $stderr.puts "RESCUED #{e.message}"
@@ -153,7 +172,7 @@ module Specjour
     end
 
     def remove_pid
-      File.unlink(pid_file) if File.exists?(pid_file) && pid == Process.pid
+      File.unlink(pid_file) if File.exist?(pid_file) && pid == Process.pid
     end
   end
 end

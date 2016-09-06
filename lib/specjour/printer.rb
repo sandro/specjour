@@ -27,6 +27,7 @@ module Specjour
       @loader_clients = []
       self.examples_complete = 0
       set_paths
+      Specjour.configuration.printer_port ||= SocketHelper.new_uri.port
     end
 
     def set_paths
@@ -96,9 +97,9 @@ module Specjour
           end
         end
       end
-    ensure
       done_reader.close
       @done_writer.close
+    ensure
       if Specjour.interrupted?
         @loader_clients.each do |client|
           client.socket.puts("INT")

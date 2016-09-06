@@ -17,6 +17,7 @@ module Specjour
       append_to_program_name(ARGV[0])
       case ARGV[0]
       when "listen"
+        ensure_alias
         listener = Listener.new
         if listener.started?
           listener.stop
@@ -40,17 +41,23 @@ module Specjour
         abort("Commands are: #{COMMANDS.join(" ")}")
       else
         test_paths = ARGV[0..-1]
+        ensure_alias
         if no_workers?
           listener = Listener.new
           listener.stop if listener.started?
         else
           Listener.ensure_started
         end
-        printer = nil
         printer = Printer.new test_paths: Array(test_paths)
         printer.announce
         printer.start_rsync
         printer.start
+      end
+    end
+
+    def ensure_alias
+      if Specjour.configuration.project_aliases.empty?
+        Specjour.configuration.project_aliases = [File.basename(Dir.pwd)]
       end
     end
 
