@@ -8,7 +8,6 @@ module Specjour
       debug "recv_string #{bytes} #{string.inspect}"
       if !string.empty?
         json = JSON.load(string)
-        # log "recv_data: #{bytes} #{json.inspect}"
         json
       end
     end

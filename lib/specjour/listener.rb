@@ -152,6 +152,7 @@ module Specjour
       connection.error(e)
     ensure
       remove_pid
+      remove_connection
       log "Shutting down listener"
     end
 

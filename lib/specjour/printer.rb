@@ -31,10 +31,8 @@ module Specjour
     end
 
     def set_paths
-      # paths = test_paths.map {|tp| Pathname.new(File.expand_path(tp, Dir.pwd))}
       paths = test_paths.map {|tp| Pathname.new(tp).expand_path}
       if paths.any?
-        # @project_path = Pathname.new(find_project_base_dir(paths.first.dirname.to_s))
         @project_path = Pathname.new(find_project_base_dir(paths.first.to_s))
       else
         @project_path = Pathname.new(Dir.pwd)
@@ -104,7 +102,6 @@ module Specjour
         @loader_clients.each do |client|
           client.socket.puts("INT")
         end
-        # Process.kill("INT", *@loader_pids) rescue TypeError
       end
       @server_socket.close
       stopping

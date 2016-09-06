@@ -42,7 +42,6 @@ module Specjour
       Dir.chdir(project_path) do
         Kernel.system *command
         rsync_pid = $?.pid
-        # Kernel.at_exit { Process.kill("INT", rsync_pid) rescue nil }
         sleep 0.1
       end
     end

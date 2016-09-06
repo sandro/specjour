@@ -22,17 +22,12 @@ module Specjour
     def start
       Process.setsid
       $PROGRAM_NAME = "specjour loader"
-      # Specjour.trap_interrupt
-      # Process.setsid
       set_up
       sync
-      # Specjour.load_custom_hooks
       Specjour.plugin_manager.send_task(:load_application)
       Specjour.plugin_manager.send_task(:register_tests_with_printer)
       fork_workers
       wait_srv
-      # select [connection.socket] # wait for server to disconnect
-      # Process.waitall
     rescue StandardError, ScriptError => e
       $stderr.puts "RESCUED #{e.class} '#{e.message}'"
       $stderr.puts e.backtrace
@@ -43,7 +38,6 @@ module Specjour
       remove_connection
       $stderr.puts("loader ENSURE")
       log "Loader killing group #{Process.getsid}"
-      # Process.kill("KILL", -Process.getsid)
     end
 
     def fork_workers
@@ -63,11 +57,8 @@ module Specjour
 
     def wait_srv
       select [connection.socket]
-      if connection.socket.eof?
-        $stderr.puts("server eof")
-      else
-        val = connection.socket.gets
-        $stderr.puts("LOADER GOT #{val}")
+      if !connection.socket.eof?
+        connection.socket.gets
         Process.kill("INT", -Process.getsid)
       end
     end
@@ -77,8 +68,6 @@ module Specjour
       Specjour.configuration.project_name = data["project_name"]
       Specjour.configuration.test_paths = data["test_paths"]
       Specjour.configuration.project_path = File.expand_path(Specjour.configuration.project_name, Specjour.configuration.tmp_path)
-      # Thread.new(connection) do |conn|
-      # end
     end
 
     def sync

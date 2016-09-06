@@ -21,9 +21,8 @@ module Specjour
       end
 
       def load_application
-        log "application loading from RSpec plugin"
+        log "application loading from RSpec plugin #{Dir.pwd}"
         require "rspec/core"
-        require File.expand_path("spec/spec_helper", Dir.pwd)
 
         ::RSpec::Core::Runner.disable_autorun!
         @output = connection
