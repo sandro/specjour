@@ -161,6 +161,8 @@ module Specjour
           register_tests(*data["args"])
         when "report_test"
           report_test(*data["args"])
+        when "error"
+          unexpected_error(*data["args"])
         else
           raise Error.new("COMMAND NOT FOUND: #{command}")
         end
@@ -210,6 +212,10 @@ module Specjour
       @mutex.synchronize do
         Specjour.configuration.formatter.report_test(test)
       end
+    end
+
+    def unexpected_error(message)
+      @output.puts message
     end
 
     def find_project_base_dir(directory)

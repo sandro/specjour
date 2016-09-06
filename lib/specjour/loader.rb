@@ -37,6 +37,7 @@ module Specjour
       $stderr.puts "RESCUED #{e.class} '#{e.message}'"
       $stderr.puts e.backtrace
       $stderr.puts "\n\n"
+      connection.error(e)
     ensure
       Process.waitall
       remove_connection

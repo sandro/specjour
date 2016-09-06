@@ -54,6 +54,15 @@ module Specjour
       send_command("done")
     end
 
+    def error(exception)
+      prefix = if n = ENV["TEST_ENV_NUMBER"]
+                 "[#{n}]"
+               else
+                 ""
+               end
+      send_command("error", "#{prefix}#{exception.inspect}\n#{exception.backtrace.join("\n")}")
+    end
+
     def report_test(test)
       send_command("report_test", test)
     end

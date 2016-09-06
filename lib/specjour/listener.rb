@@ -130,6 +130,7 @@ module Specjour
     rescue StandardError, ScriptError => e
       $stderr.puts "RESCUED #{e.message}"
       $stderr.puts e.backtrace
+      connection.error(e)
     ensure
       remove_pid
       log "Shutting down listener"
