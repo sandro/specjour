@@ -74,12 +74,12 @@ module Specjour
           Specjour.configuration.full_backtrace = true
         end
 
-        parser.on("-l", "--log [FILE]", String, "Print logging information") do |option|
-          Specjour.new_logger ::Logger::INFO, option
+        parser.on("-l", "--log", "Print logging information") do
+          Specjour.new_logger ::Logger::INFO
         end
 
-        parser.on("-d", "--debug [FILE]", String, "Print debugging information") do |option|
-          Specjour.new_logger ::Logger::DEBUG, option
+        parser.on("-d", "--debug", "Print debugging information") do
+          Specjour.new_logger ::Logger::DEBUG
         end
 
         parser.on("-f", "--foreground", "Foreground the listener (development purposes)") do |option|
