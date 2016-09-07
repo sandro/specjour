@@ -1,3 +1,2 @@
 export RUBYLIB=`pwd`/lib
-export RUBYOPT="-r ./dev_setup"
 export PATH=`pwd`/bin:$PATH
