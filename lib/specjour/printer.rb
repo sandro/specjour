@@ -148,8 +148,6 @@ module Specjour
           add_to_profiler(*data["args"])
         when "done"
           done(*data["args"])
-        when "greet"
-          client.send_data greet(*data["args"])
         when "next_test"
           client.send_data next_test(*data["args"])
         when "ready"
@@ -191,10 +189,6 @@ module Specjour
         project_path: project_path.to_s,
         test_paths: test_paths
       }
-    end
-
-    def greet(message)
-      { received: message }
     end
 
     def register_tests(tests)

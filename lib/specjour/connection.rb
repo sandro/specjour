@@ -67,10 +67,6 @@ module Specjour
       send_command("report_test", test)
     end
 
-    def greet(msg)
-      send_recv_command("greet", msg)
-    end
-
     def next_test
       send_recv_command("next_test")
     end

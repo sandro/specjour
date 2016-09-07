@@ -15,7 +15,7 @@ module Specjour
       backtrace_exclusion_pattern: DEFAULT_BACKTRACE_EXCLUSION,
       formatter: Formatter.new,
       full_backtrace: false,
-      printer_port: nil,
+      printer_port: 334422,
       printer_uri: nil,
       project_aliases: [],
       project_name: nil,

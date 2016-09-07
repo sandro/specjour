@@ -3,7 +3,7 @@ module Specjour
   class CLI
     include Logger
 
-    COMMANDS = %w(listen tester ls stop)
+    COMMANDS = %w(listen ls stop)
 
     attr_accessor :options
 
@@ -24,8 +24,6 @@ module Specjour
         end
         listener.daemonize unless options[:foreground]
         listener.start
-      when "tester"
-        Tester.new("FOUR").start
       when "ls"
         puts "Plugins:"
         puts Specjour.plugin_manager.plugins

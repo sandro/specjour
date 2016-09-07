@@ -30,7 +30,6 @@ module Specjour
   autoload :RspecFormatter, "specjour/rspec_formatter"
   autoload :RsyncDaemon, 'specjour/rsync_daemon'
   autoload :SocketHelper, 'specjour/socket_helper'
-  autoload :Tester, 'specjour/tester'
   autoload :Worker, 'specjour/worker'
 
   autoload :Cucumber, 'specjour/cucumber'
