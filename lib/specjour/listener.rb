@@ -69,7 +69,7 @@ module Specjour
 
     def gather
       @dnssd_service = DNSSD.browse!('_specjour._tcp') do |reply|
-        log ['reply', reply.name, reply.service_name, reply.domain,reply.flags]
+        log ['reply', reply.name, reply.service_name, reply.domain,reply.flags, reply.interface]
         if reply.flags.add?
           DNSSD.resolve!(reply.name, reply.type, reply.domain, flags=0, reply.interface) do |resolved|
             log "Bonjour discovered #{resolved.target} #{resolved.text_record.inspect}"
@@ -101,7 +101,7 @@ module Specjour
     end
 
     def pid_file
-      @pid_file ||= File.join(config_directory, Specjour.configuration.project_aliases.join("-"))
+      @pid_file ||= File.join(config_directory, "#{Specjour.configuration.project_aliases.join("-")}.pid")
     end
 
     def lock_file

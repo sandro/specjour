@@ -50,7 +50,7 @@ module Specjour
       end
 
       def after_print_summary(formatter)
-        if formatter.failures.any?
+        if formatter.failures.any? && !Specjour.interrupted?
           @rerunner = ReRunner.new(formatter)
           rerunner.start
         end
