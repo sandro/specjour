@@ -62,6 +62,7 @@ module Specjour
     end
 
     def format_backtrace(backtrace)
+      backtrace = Array(backtrace)
       if Specjour.configuration.full_backtrace
         backtrace
       else
