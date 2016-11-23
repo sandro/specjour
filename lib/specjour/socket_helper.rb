@@ -43,6 +43,10 @@ module Specjour
       UDPSocket.open {|s| s.connect('74.125.224.103', 1); s.addr.last }
     end
 
+    def remote_ip?(ip)
+      Socket.ip_address_list.detect {|a| a.ip_address == ip}.nil?
+    end
+
     def faux_server
       server = TCPServer.new('0.0.0.0', nil)
       server.addr

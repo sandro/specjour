@@ -49,7 +49,7 @@ module Specjour
       log "Listener adding printer #{params}"
       self.printer = params
       Specjour.configuration.printer_uri = params[:uri]
-      Specjour.configuration.remote_job = params[:ip] != local_ip
+      Specjour.configuration.remote_job = remote_ip?(params[:ip])
     end
 
     def remove_printer
