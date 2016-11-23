@@ -49,7 +49,7 @@ module Specjour
         pid = pid.to_i
         ppid = ppid.to_i
         if ppid == Process.pid && pid != r.pid
-          Process.kill("TERM", pid)
+          Process.kill("KILL", pid)
         end
       end
     end
