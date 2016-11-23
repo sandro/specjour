@@ -15,9 +15,9 @@ module Specjour
       Specjour.trap_interrupt_with_exit
       parser.parse!
       append_to_program_name(ARGV[0])
+      ensure_alias
       case ARGV[0]
       when "listen"
-        ensure_alias
         listener = Listener.new
         if listener.started?
           listener.stop
@@ -39,7 +39,6 @@ module Specjour
         abort("Commands are: #{COMMANDS.join(" ")}")
       else
         test_paths = ARGV[0..-1]
-        ensure_alias
         if no_workers?
           listener = Listener.new
           listener.stop if listener.started?
