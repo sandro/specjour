@@ -8,8 +8,8 @@ module Specjour
 
     def close(_notification=nil)
       @output_hash[:examples].each do |e|
-        e["hostname"] = hostname
-        e["worker_number"] = ENV["TEST_ENV_NUMBER"]
+        e[:hostname] = hostname
+        e[:worker_number] = ENV["TEST_ENV_NUMBER"]
         @output.report_test(e)
       end
     end

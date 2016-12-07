@@ -7,7 +7,7 @@ module Specjour
     attr_reader :uri, :retries
     attr_writer :socket
 
-    def_delegators :socket, :flush, :close, :closed?, :gets, :puts, :each, :eof?
+    def_delegators :socket, :flush, :close, :closed?, :gets, :puts, :each, :eof?, :tty?
 
     def self.wrap(established_connection)
       host, port = established_connection.peeraddr.values_at(3,1)
@@ -63,8 +63,7 @@ module Specjour
                end
       send_command("error", "#{prefix}#{exception.inspect}\n#{exception.backtrace.join("\n")}")
     rescue => error
-      $stderr.puts "GOT AN ERROR ON AN ERROR"
-      $stderr.puts error.inspect
+      $stderr.puts "Error sending error to server: #{error.inspect}"
       $stderr.puts error.backtrace
     end
 
@@ -95,7 +94,10 @@ module Specjour
 
     def get_server_done
       will_reconnect do
-        recv_data["command"]
+        data = recv_data
+        if data[:command] == "server_done"
+          data[:args].first
+        end
       end
     end
 

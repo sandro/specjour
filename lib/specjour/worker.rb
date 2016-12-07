@@ -56,13 +56,13 @@ module Specjour
     protected
 
     def print_status(test)
-      status = "[#{number}] Running #{test}"
+      status = "Running #{test}"
       log status
       $PROGRAM_NAME = "specjour#{status}"
     end
 
     def print_time_for(test, time)
-      log sprintf("[#{number}] Finished #{test} in %.2fs\n", time)
+      log sprintf("Finished #{test} in %.2fs\n", time)
     end
 
     def profile(test, time)

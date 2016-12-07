@@ -4,7 +4,6 @@ module Specjour
 
     def connection
       return @connection if connection?
-      debug "CONNECTING #{self.class.name}"
       @connection = Connection.new Specjour.configuration.printer_uri
       @connection.connect
       @connection
@@ -12,10 +11,6 @@ module Specjour
 
     def connection?
       !@connection.nil?
-    end
-
-    def current_uri
-      @current_uri ||= new_uri
     end
 
     def remove_connection

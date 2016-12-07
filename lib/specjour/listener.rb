@@ -14,6 +14,7 @@ module Specjour
       listener = new
       unless listener.started?
         listener_pid = fork do
+          Specjour.plugin_manager.send_task(:remove_connection)
           listener.daemonize
           listener.start
         end
@@ -61,6 +62,7 @@ module Specjour
     def fork_loader
       Specjour.plugin_manager.send_task(:before_loader_fork)
       fork do
+        Specjour.plugin_manager.send_task(:remove_connection)
         loader = Loader.new({task: "run_tests"})
         Specjour.plugin_manager.send_task(:after_loader_fork)
         loader.start

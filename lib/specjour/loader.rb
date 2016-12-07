@@ -33,7 +33,6 @@ module Specjour
       connection.error(e)
     ensure
       remove_connection
-      $stderr.puts("loader ENSURE")
       log "Loader killing group #{Process.getsid}"
     end
 
@@ -60,6 +59,7 @@ module Specjour
         signal = connection.get_server_done
         case signal
         when "INT"
+          debug "Sending INT to -#{Process.getsid}"
           Process.kill("INT", -Process.getsid)
         end
       end
@@ -67,8 +67,8 @@ module Specjour
 
     def set_up
       data = connection.ready({hostname: hostname, worker_size: Specjour.configuration.worker_size})
-      Specjour.configuration.project_name = data["project_name"]
-      Specjour.configuration.test_paths = data["test_paths"]
+      Specjour.configuration.project_name = data[:project_name]
+      Specjour.configuration.test_paths = data[:test_paths]
       Specjour.configuration.project_path = File.expand_path(Specjour.configuration.project_name, Specjour.configuration.tmp_path)
     end
 

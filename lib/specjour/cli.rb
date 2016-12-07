@@ -11,6 +11,14 @@ module Specjour
       self.options = {}
     end
 
+    def stop_running_listener
+      listener = Listener.new
+      if listener.started?
+        listener.stop
+      end
+      listener
+    end
+
     def start
       Specjour.trap_interrupt_with_exit
       parser.parse!
@@ -18,10 +26,7 @@ module Specjour
       ensure_alias
       case ARGV[0]
       when "listen"
-        listener = Listener.new
-        if listener.started?
-          listener.stop
-        end
+        listener = stop_running_listener
         listener.daemonize unless options[:foreground]
         listener.start
       when "ls"
@@ -39,11 +44,11 @@ module Specjour
         abort("Commands are: #{COMMANDS.join(" ")}")
       else
         test_paths = ARGV[0..-1]
-        if no_workers?
-          listener = Listener.new
-          listener.stop if listener.started?
-        else
-          Listener.ensure_started
+        if options[:workers]
+          stop_running_listener
+          if options[:workers] > 0
+            Listener.ensure_started
+          end
         end
         printer = Printer.new test_paths: Array(test_paths)
         printer.announce
@@ -58,28 +63,24 @@ module Specjour
       end
     end
 
-    def no_workers?
-      options[:workers] && options[:workers] <= 0
-    end
-
     def parser
       @parser ||= OptionParser.new do |parser|
         parser.banner = "Usage: specjour [command] [options] [files or directories]\n\nCommands are #{COMMANDS.join(",")}\n\n"
 
-        parser.on('-b', '--backtrace', 'Enable full backtrace.') do |o|
+        parser.on('-b', '--backtrace', 'Include specjour in the backtrace (do not scrub backtrace)') do |o|
           options[:full_backtrace] = true
           Specjour.configuration.full_backtrace = true
         end
 
-        parser.on("-l", "--log", "Print logging information") do
+        parser.on("-l", "--log", "Enable informational logging") do
           Specjour.new_logger ::Logger::INFO
         end
 
-        parser.on("-d", "--debug", "Print debugging information") do
+        parser.on("-d", "--debug", "Enable debug logging") do
           Specjour.new_logger ::Logger::DEBUG
         end
 
-        parser.on("-f", "--foreground", "Foreground the listener (development purposes)") do |option|
+        parser.on("-f", "--foreground", "Foreground the listener") do |option|
           options[:foreground] = option
         end
 

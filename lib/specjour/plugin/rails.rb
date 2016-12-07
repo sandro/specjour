@@ -1,5 +1,4 @@
 module Specjour::Plugin
-  require 'rake'
 
   class Rails < Base
 

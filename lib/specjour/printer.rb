@@ -33,6 +33,10 @@ module Specjour
     def set_paths
       paths = test_paths.map {|tp| Pathname.new(tp).expand_path}
       if paths.any?
+        paths.each do |p|
+          pn = Pathname.new(p)
+          abort("Request test path: #{p} does not exist") unless pn.exist?
+        end
         @project_path = Pathname.new(find_project_base_dir(paths.first.to_s))
       else
         @project_path = Pathname.new(Dir.pwd)
@@ -45,7 +49,7 @@ module Specjour
       @test_paths = @test_paths.map do |path|
         test_path = path.relative_path_from(project_path)
         abort("Test path #{test_path} doesn't exist") unless test_path.exist?
-        test_path
+        test_path.to_s
       end
       if !project_path.exist?
         abort("Project path #{project_path} doesn't exist")
@@ -147,25 +151,25 @@ module Specjour
         end
         debug "socket about to read data #{client.inspect}"
         data = client.recv_data
-        command = data['command']
+        command = data[:command]
         case command
         when "add_to_profiler"
-          add_to_profiler(*data["args"])
+          add_to_profiler(*data[:args])
         when "done"
-          done(*data["args"])
+          done(*data[:args])
         when "next_test"
-          client.send_data next_test(*data["args"])
+          client.send_data next_test(*data[:args])
         when "ready"
           @mutex.synchronize do
             @loader_clients |= [client]
           end
-          client.send_data ready(*data["args"])
+          client.send_data ready(*data[:args])
         when "register_tests"
-          register_tests(*data["args"])
+          register_tests(*data[:args])
         when "report_test"
-          report_test(*data["args"])
+          report_test(*data[:args])
         when "error"
-          unexpected_error(*data["args"])
+          unexpected_error(*data[:args])
         else
           raise Error.new("COMMAND NOT FOUND: #{command}")
         end
@@ -190,7 +194,7 @@ module Specjour
     end
 
     def ready(info)
-      @output.puts "Found #{info["hostname"]}(#{info["worker_size"]})"
+      @output.puts "Found #{info[:hostname]}(#{info[:worker_size]})"
       {
         project_name: project_name,
         project_path: project_path.to_s,
@@ -243,15 +247,19 @@ module Specjour
     end
 
     def add_to_profiler(test, time, host)
-      self.profiler[test] = [time, host]
+      @mutex.synchronize do
+        self.profiler[test] = [time, host]
+      end
     end
 
     def disconnecting
       @mutex.synchronize do
-        debug "DISCONNECT #{example_size} #{examples_complete}"
+        debug "DISCONNECT #{@running} #{example_size} #{examples_complete}"
         if @running && examples_complete == example_size
           @running = false
+          debug "writing done"
           @done_writer.write("DONE")
+          debug "done with writer"
         end
       end
     end
@@ -284,16 +292,17 @@ module Specjour
 
     def stopping
       Specjour.configuration.formatter.set_end_time!
-      @bonjour_service.stop# unless @bonjour_service.stopped?
+      @bonjour_service.stop
 
       Specjour.plugin_manager.send_task(:before_print_summary, Specjour.configuration.formatter)
       Specjour.configuration.formatter.print_summary
-      Specjour.plugin_manager.send_task(:after_print_summary, Specjour.configuration.formatter)
 
       unless Specjour.interrupted?
         record_performance
         print_missing_tests if missing_tests?
       end
+
+      Specjour.plugin_manager.send_task(:after_print_summary, Specjour.configuration.formatter)
     end
 
     def missing_tests?

@@ -32,11 +32,11 @@ module Specjour
     end
 
     def print(test)
-      if test["status"] == "failed"
+      if test[:status] == "failed"
         @output.puts
         print_failure(test, fail_count)
       else
-        status_format = STATUSES[test['status']]
+        status_format = STATUSES[test[:status]]
         @output.print colorize(status_format[:char], status_format[:color])
       end
     end
@@ -49,15 +49,15 @@ module Specjour
     end
 
     def print_failure(test, index)
-      exception = test["exception"]
+      exception = test[:exception]
       num = index + 1
-      worker = "#{test["hostname"]}[#{test["worker_number"]}]"
+      worker = "#{test[:hostname]}[#{test[:worker_number]}]"
       @output.puts colorize("#{num}. #{worker}", :red)
-      description = colorize("#{test["description"]}", :red)
+      description = colorize("#{test[:description]}", :red)
       @output.printf "%#{num.to_s.size + 2 + description.size}s\n" % description
-      message = colorize("#{exception["class"]}: #{exception["message"]}", :red)
+      message = colorize("#{exception[:class]}: #{exception[:message]}", :red)
       @output.printf "%#{num.to_s.size + 2 + message.size}s\n" % message
-      @output.puts format_backtrace(exception["backtrace"])
+      @output.puts format_backtrace(exception[:backtrace])
       @output.puts
     end
 
@@ -72,7 +72,7 @@ module Specjour
 
     def failing_test_paths
       failures.map do |f|
-        "#{f["file_path"]}:#{f["line_number"]}"
+        "#{f[:file_path]}:#{f[:line_number]}"
       end.uniq
     end
 
@@ -104,7 +104,7 @@ module Specjour
     def report_test(test)
       print(test)
       tests << test
-      case test['status']
+      case test[:status]
       when "passed"
         @pass_count += 1
       when "failed"
