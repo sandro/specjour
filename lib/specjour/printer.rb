@@ -68,10 +68,6 @@ module Specjour
       @rsync_daemon ||= RsyncDaemon.new(project_path.to_s, project_name, Specjour.configuration.rsync_port)
     end
 
-    def process_io
-
-    end
-
     def running?
       @mutex.synchronize do
         @running
@@ -81,6 +77,7 @@ module Specjour
     def start
       @running = true
       @server_socket ||= TCPServer.new(@host, Specjour.configuration.printer_port)
+      debug "server socket #{@host}:#{Specjour.configuration.printer_port}"
       done_reader, @done_writer = IO.pipe
       while running? do
         debug "loop going to select #{running?}"
@@ -92,15 +89,22 @@ module Specjour
             client_socket = @server_socket.accept
             client_socket = Connection.wrap(client_socket)
             @send_threads << Thread.new(client_socket) { |sock| serve(sock) }
+          elsif socket_being_read == @done_writer
+            debug "breaking on done socket"
+            break
           end
         end
       end
       done_reader.close
       @done_writer.close
+    rescue => error
+      $stderr.puts "Server got an error #{error.inspect} #{error.backtrace.join("\n")}"
     ensure
-      if Specjour.interrupted?
-        @loader_clients.each do |client|
-          client.socket.puts("INT")
+      @loader_clients.each do |client|
+        if Specjour.interrupted?
+          client.send_server_done("INT")
+        else
+          client.send_server_done("TERM")
         end
       end
       @server_socket.close
@@ -141,6 +145,7 @@ module Specjour
           disconnecting
           break
         end
+        debug "socket about to read data #{client.inspect}"
         data = client.recv_data
         command = data['command']
         case command
@@ -151,7 +156,9 @@ module Specjour
         when "next_test"
           client.send_data next_test(*data["args"])
         when "ready"
-          @loader_clients |= [client]
+          @mutex.synchronize do
+            @loader_clients |= [client]
+          end
           client.send_data ready(*data["args"])
         when "register_tests"
           register_tests(*data["args"])

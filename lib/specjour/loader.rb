@@ -6,14 +6,12 @@ module Specjour
 
     attr_reader \
       :options,
-      :printer_uri,
       :quiet,
       :task,
       :worker_pids
 
     def initialize(options = {})
       @options = options
-      @printer_uri = options[:printer_uri]
       @task = options[:task]
       @quiet = options[:quiet]
       @worker_pids = []
@@ -34,7 +32,6 @@ module Specjour
       $stderr.puts "\n\n"
       connection.error(e)
     ensure
-      Process.waitall
       remove_connection
       $stderr.puts("loader ENSURE")
       log "Loader killing group #{Process.getsid}"
@@ -44,6 +41,8 @@ module Specjour
       Specjour.plugin_manager.send_task(:before_worker_fork)
       (1..Specjour.configuration.worker_size).each do |index|
         worker_pids << fork do
+          remove_connection
+          Specjour.plugin_manager.send_task(:remove_connection)
           $PROGRAM_NAME = "specjour worker"
           worker = Worker.new(
             :number => index,
@@ -58,13 +57,16 @@ module Specjour
     def wait_srv
       select [connection.socket]
       if !connection.socket.eof?
-        connection.socket.gets
-        Process.kill("INT", -Process.getsid)
+        signal = connection.get_server_done
+        case signal
+        when "INT"
+          Process.kill("INT", -Process.getsid)
+        end
       end
     end
 
     def set_up
-      data = connection.ready({hostname: hostname, worker_size: Specjour.configuration.worker_size, loader_pid: Process.pid})
+      data = connection.ready({hostname: hostname, worker_size: Specjour.configuration.worker_size})
       Specjour.configuration.project_name = data["project_name"]
       Specjour.configuration.test_paths = data["test_paths"]
       Specjour.configuration.project_path = File.expand_path(Specjour.configuration.project_name, Specjour.configuration.tmp_path)

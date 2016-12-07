@@ -31,7 +31,6 @@ module Specjour
       end
 
       def after_worker_fork
-        remove_connection
       end
 
       def interrupted!

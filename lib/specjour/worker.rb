@@ -4,7 +4,6 @@ module Specjour
     include Logger
     include Protocol
     include SocketHelper
-    attr_accessor :printer_uri
     attr_reader :number, :options
 
     def initialize(options = {})

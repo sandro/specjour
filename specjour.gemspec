@@ -26,8 +26,7 @@ Gem::Specification.new do |s|
 
   s.files = Dir.glob('lib/**/*') + %w(MIT_LICENSE README.markdown History.markdown Rakefile bin/specjour)
 
-  s.add_runtime_dependency('dnssd', ['= 2.0.0'])
-  s.add_runtime_dependency('thor', ['>= 0.14.0'])
+  s.add_runtime_dependency('dnssd', ['= 2.0.1'])
   s.add_development_dependency('rspec', ['= 2.13'])
   s.add_development_dependency('rr')
   s.add_development_dependency('yard')

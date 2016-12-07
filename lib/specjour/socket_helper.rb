@@ -3,7 +3,7 @@ module Specjour
     Socket.do_not_reverse_lookup = true
 
     def connection
-      return @connection if @connection
+      return @connection if connection?
       debug "CONNECTING #{self.class.name}"
       @connection = Connection.new Specjour.configuration.printer_uri
       @connection.connect
@@ -11,7 +11,7 @@ module Specjour
     end
 
     def connection?
-      instance_variable_defined? :@connection
+      !@connection.nil?
     end
 
     def current_uri

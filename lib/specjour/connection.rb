@@ -24,6 +24,7 @@ module Specjour
     alias to_str to_s
 
     def connect
+      debug "connecting to socket #{host}:#{port}"
       timeout { connect_socket }
     end
 
@@ -61,6 +62,10 @@ module Specjour
                  ""
                end
       send_command("error", "#{prefix}#{exception.inspect}\n#{exception.backtrace.join("\n")}")
+    rescue => error
+      $stderr.puts "GOT AN ERROR ON AN ERROR"
+      $stderr.puts error.inspect
+      $stderr.puts error.backtrace
     end
 
     def report_test(test)
@@ -82,6 +87,16 @@ module Specjour
 
     def register_tests(tests)
       send_command("register_tests", tests)
+    end
+
+    def send_server_done(signal)
+      send_command("server_done", signal)
+    end
+
+    def get_server_done
+      will_reconnect do
+        recv_data["command"]
+      end
     end
 
     def send_command(method_name, *args)
