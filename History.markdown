@@ -1,6 +1,23 @@
 History
 =======
 
+2.0.0 (v2)
+----------
+* Specjour always starts a listener daemon unless one is already running. This means you're always sharing your cores by default.
+* `specjour stop` stops the daemon running for the current project
+* Your machine will share half available cores when running tests for a remote machine. This enables you to continue working while sharing your cpu.
+* The listener can be run in the foreground with `specjour -f listen`.
+* A constant number of workers can be set by the `-w` flag. Use this to set up a daemon on a machine devoted to specjour: `nohup specjour listen -w 4`
+* Failing tests will be rerun after the suite completes. Disable with: `Specjour.configuration.rspec_rerun = false`
+* The bonjour register/browse design has been flipped. Now, the listeners synchronously browse while the printer asynchronously advertises. This allows a listener to join the workers midway through a test run.
+* You can run specjour on a single file, wherein all examples in the file will be distributed.
+* Rspec and Rails are now treated as plugins. The plugins system is still a little rough, but should allow for adapting specjour to other testin frameworks like minitest and cucumber.
+* Specjour uses its own formatter, instead of reusing an rspec formatter. The formatter is configurable which allows plugin authors to create the fomatter which best suits them.
+* Specjour now launches a separate listener per project. This supports running specjour on two or more projects that have different Ruby versions.
+* Removed the dependency on DRB.
+* Removed the dependency on thor.
+
+
 0.7.1 / (master)
 ---------------------------
 * [fixed] printer exit\_status returns false if there are no reporters
