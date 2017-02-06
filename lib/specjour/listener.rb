@@ -69,25 +69,32 @@ module Specjour
       end
     end
 
+    def resolve(reply)
+      Timeout.timeout(2) do
+        DNSSD.resolve!(reply.name, reply.type, reply.domain, flags=0, reply.interface) do |resolved|
+          log "Bonjour discovered #{resolved.target} #{resolved.text_record.inspect}"
+          if resolved.text_record && resolved.text_record['version'] == Specjour::VERSION
+            if available_for?(resolved.text_record['project_alias'].to_s)
+              resolved_ip = ip_from_hostname(resolved.target)
+              uri = URI::Generic.build :host => resolved_ip, :port => resolved.port
+              add_printer(name: resolved.name, uri: uri, ip: resolved_ip)
+            else
+              $stderr.puts "Found #{resolved.target} but not listening to project alias: #{resolved.text_record['project_alias']}. Skipping..."
+            end
+          else
+            $stderr.puts "Found #{resolved.target} but its version doesn't match v#{Specjour::VERSION}. Skipping..."
+          end
+          break
+        end
+      end
+      rescue TimeoutError
+    end
+
     def gather
       @dnssd_service = DNSSD.browse!('_specjour._tcp') do |reply|
         log ['reply', reply.name, reply.service_name, reply.domain,reply.flags, reply.interface]
         if reply.flags.add?
-          DNSSD.resolve!(reply.name, reply.type, reply.domain, flags=0, reply.interface) do |resolved|
-            log "Bonjour discovered #{resolved.target} #{resolved.text_record.inspect}"
-            if resolved.text_record && resolved.text_record['version'] == Specjour::VERSION
-              if available_for?(resolved.text_record['project_alias'].to_s)
-                resolved_ip = ip_from_hostname(resolved.target)
-                uri = URI::Generic.build :host => resolved_ip, :port => resolved.port
-                add_printer(name: resolved.name, uri: uri, ip: resolved_ip)
-              else
-                $stderr.puts "Found #{resolved.target} but not listening to project alias: #{resolved.text_record['project_alias']}. Skipping..."
-              end
-            else
-              $stderr.puts "Found #{resolved.target} but its version doesn't match v#{Specjour::VERSION}. Skipping..."
-            end
-            break
-          end
+          resolve(reply)
           break if printer
         else
           log "REMOVING #{reply.name} #{reply}"
