@@ -1,6 +1,5 @@
 module Specjour
   module Protocol
-    require 'json'
 
     def recv_data
       bytes = socket.gets.to_i

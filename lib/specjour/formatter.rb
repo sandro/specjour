@@ -1,6 +1,5 @@
 module Specjour
   class Formatter
-    require 'json'
     include Colors
     # description, status [pending,failed,passed] file_path, line_number, exception => [class, message, backtrace]
 
