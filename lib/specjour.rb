@@ -1,5 +1,3 @@
-require 'tmpdir'
-
 autoload :URI, 'uri'
 autoload :Forwardable, 'forwardable'
 autoload :Timeout, 'timeout'

@@ -15,6 +15,7 @@ module Specjour
       backtrace_exclusion_pattern: DEFAULT_BACKTRACE_EXCLUSION,
       formatter: Formatter.new,
       full_backtrace: false,
+      global_path: File.join("#{ENV['HOME']}", ".specjour"),
       printer_port: nil,
       printer_uri: nil,
       project_aliases: [],

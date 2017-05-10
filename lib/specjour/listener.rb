@@ -1,6 +1,7 @@
 module Specjour
   class Listener
     require 'dnssd'
+    require 'fileutils'
     Thread.abort_on_exception = true
 
     LOCK_FILE = "listener.lock"
@@ -37,7 +38,7 @@ module Specjour
 
     def config_directory
       return @config_directory if @config_directory
-      @config_directory = File.join(Dir.tmpdir, "specjour")
+      @config_directory = Specjour.configuration.global_path
       FileUtils.mkdir_p @config_directory
       @config_directory
     end
