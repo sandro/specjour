@@ -16,6 +16,7 @@ History
 * Specjour now launches a separate listener per project. This supports running specjour on two or more projects that have different Ruby versions.
 * Removed the dependency on DRB.
 * Removed the dependency on thor.
+* Introduce a global specjour directory ($HOME/.specjour) to hold the lock file and daemon pids
 
 
 0.7.1 / (master)
