@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.summary = 'Distribute your spec suite amongst your LAN via Bonjour.'
   s.description = <<-EOD
     Specjour splits your RSpec suite across multiple machines, and multiple
-    cores per machine, to run super-parallel-fast!  Also works with Cucumber.
+    cores per machine, to run super-parallel-fast!
   EOD
 
   s.default_executable = 'specjour'

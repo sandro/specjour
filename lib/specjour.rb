@@ -30,7 +30,6 @@ module Specjour
   autoload :SocketHelper, 'specjour/socket_helper'
   autoload :Worker, 'specjour/worker'
 
-  autoload :Cucumber, 'specjour/cucumber'
   autoload :RSpec, 'specjour/rspec'
 
   VERSION ||= "2.0.0.rc2"

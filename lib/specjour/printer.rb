@@ -242,10 +242,6 @@ module Specjour
       rspec_report.add(summary)
     end
 
-    def cucumber_summary=(client, summary)
-      cucumber_report.add(summary)
-    end
-
     def add_to_profiler(test, time, host)
       @mutex.synchronize do
         self.profiler[test] = [time, host]
@@ -275,10 +271,6 @@ module Specjour
 
     def rspec_report
       @rspec_report ||= RSpec::FinalReport.new
-    end
-
-    def cucumber_report
-      @cucumber_report ||= Cucumber::FinalReport.new
     end
 
     # "test.rb" => [1.12, "host.local[2]"]
