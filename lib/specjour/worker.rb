@@ -58,7 +58,7 @@ module Specjour
     def print_status(test)
       status = "Running #{test}"
       log status
-      $PROGRAM_NAME = "specjour #{status}"
+      $PROGRAM_NAME = "specjour[#{ENV["TEST_ENV_NUMBER"]}] #{status}"
     end
 
     def print_time_for(test, time)
