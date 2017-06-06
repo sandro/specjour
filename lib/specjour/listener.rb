@@ -167,7 +167,16 @@ module Specjour
     end
 
     def started?
-      !pid.nil?
+      process_id = pid
+      if process_id
+        begin
+          Process.getsid(process_id) && true
+        rescue Errno::ESRCH
+          false
+        end
+      else
+        false
+      end
     end
 
     def stop
