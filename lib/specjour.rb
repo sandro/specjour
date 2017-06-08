@@ -32,7 +32,7 @@ module Specjour
 
   autoload :RSpec, 'specjour/rspec'
 
-  VERSION ||= "2.0.0.rc2"
+  VERSION ||= "2.0.0.rc3"
   HOOKS_PATH ||= "./.specjour/hooks.rb"
   PROGRAM_NAME ||= $PROGRAM_NAME # keep a reference of the original program name
   Time = Time.dup
