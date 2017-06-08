@@ -144,7 +144,7 @@ module Specjour
 
     def start
       $PROGRAM_NAME = program_name
-      log "Listener starting"
+      log "Listener starting pid: #{Process.pid} grp: #{Process.getpgrp} ppid: #{Process.ppid}"
       write_pid
       loop do
         log "listening..."

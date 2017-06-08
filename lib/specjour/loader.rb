@@ -20,6 +20,7 @@ module Specjour
     def start
       Process.setsid
       $PROGRAM_NAME = "specjour loader"
+      debug "Loader pid: #{Process.pid} ppid: #{Process.ppid}"
       set_up
       sync
       Specjour.plugin_manager.send_task(:load_application)
@@ -31,9 +32,10 @@ module Specjour
       $stderr.puts e.backtrace
       $stderr.puts "\n\n"
       connection.error(e)
+      remove_connection
+      kill_parent
     ensure
       remove_connection
-      log "Loader killing group #{Process.getsid}"
     end
 
     def fork_workers
@@ -59,10 +61,20 @@ module Specjour
         signal = connection.get_server_done
         case signal
         when "INT"
-          debug "Sending INT to -#{Process.getsid}"
-          Process.kill("INT", -Process.getsid)
+          kill_session
         end
       end
+    end
+
+    def kill_session
+      debug "Sending INT to session -#{Process.getsid}"
+      Process.kill("INT", -Process.getsid) rescue nil
+    end
+
+    # shut down the parent before it restarts this loader in a loop
+    def kill_parent
+      debug "Sending INT to parent -#{Process.ppid}"
+      Process.kill("INT", Process.ppid) rescue nil
     end
 
     def set_up
