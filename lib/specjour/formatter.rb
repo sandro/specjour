@@ -3,7 +3,7 @@ module Specjour
     include Colors
     # description, status [pending,failed,passed] file_path, line_number, exception => [class, message, backtrace]
 
-    STATUSES = Hash.new({char: "?", color: :white}).merge!(
+    STATUSES = Hash.new({char: "?", color: :cyan}).merge!(
       "passed" => {char: ".", color: :green},
       "failed" => {char: "F", color: :red},
       "error" => {char: "E", color: :magenta},
