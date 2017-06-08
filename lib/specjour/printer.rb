@@ -175,6 +175,9 @@ module Specjour
         end
         IO.select([client.socket])
       end
+    rescue => e
+      $stderr.puts("Serve got an Error #{e.inspect}")
+      raise e
     end
 
     def done
