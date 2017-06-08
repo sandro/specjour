@@ -17,7 +17,7 @@ module Specjour
       @clients = {}
       @tests_to_run = []
       @test_paths = options[:test_paths]
-      @example_size = 0
+      @example_size = nil
       @machines = []
       @send_threads = []
       @bonjour_service = nil
@@ -89,7 +89,7 @@ module Specjour
         reads = result.first
         reads.each do |socket_being_read|
           if socket_being_read == @server_socket
-            debug "adding connection"
+            debug "adding connection #{@send_threads.size}"
             client_socket = @server_socket.accept
             client_socket = Connection.wrap(client_socket)
             @send_threads << Thread.new(client_socket) { |sock| serve(sock) }
@@ -204,7 +204,7 @@ module Specjour
 
     def register_tests(tests)
       @mutex.synchronize do
-        if example_size == 0
+        if example_size == nil
           self.tests_to_run = run_order(tests)
           self.example_size = tests_to_run.size
         end
@@ -250,7 +250,7 @@ module Specjour
 
     def disconnecting
       @mutex.synchronize do
-        debug "DISCONNECT #{@running} #{example_size} #{examples_complete}"
+        debug "DISCONNECT #{@running} #{example_size.inspect} #{examples_complete.inspect}"
         if @running && examples_complete == example_size
           @running = false
           debug "writing done"
