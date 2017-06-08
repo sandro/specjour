@@ -218,7 +218,7 @@ module Specjour
     end
 
     def unexpected_error(message)
-      @output.puts message
+      Specjour.configuration.formatter.report_error(message)
     end
 
     def find_project_base_dir(directory)

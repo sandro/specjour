@@ -119,6 +119,13 @@ module Specjour
       end
     end
 
+    def report_error(message)
+      @error_count += 1
+      status_format = STATUSES["error"]
+      @output.print colorize(status_format[:char], status_format[:color])
+      @output.puts "\n#{message}\n"
+    end
+
     def set_end_time!
       @end_time = Time.now
     end
