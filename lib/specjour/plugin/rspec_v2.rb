@@ -2,6 +2,23 @@ module Specjour
   module Plugin
     module RSpecV2
 
+      # stub out the summary stream because the specjour socket raises an error
+      # when trying to handled unstructured messages
+      def self.extended(klass)
+        if defined?(::RSpec::Core::Formatters::DeprecationFormatter::ImmediatePrinter)
+          ::RSpec::Core::Formatters::DeprecationFormatter::ImmediatePrinter.class_eval do
+            def summary_stream
+              $stderr
+            end
+          end
+          ::RSpec::Core::Formatters::DeprecationFormatter::DelayedPrinter.class_eval do
+            def summary_stream
+              $stderr
+            end
+          end
+        end
+      end
+
       def versioned_load_application
         @configuration_options = ::RSpec::Core::ConfigurationOptions.new([spec_files])
         @configuration_options.parse_options
