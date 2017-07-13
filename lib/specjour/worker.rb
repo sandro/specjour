@@ -36,7 +36,7 @@ module Specjour
       Specjour.plugin_manager.send_task(:after_suite)
 
     rescue StandardError, ScriptError => e
-      $stderr.puts "RESCUED #{e.message}"
+      $stderr.puts "Worker RESCUED #{e.class} '#{e.message}'"
       $stderr.puts e.backtrace
       connection.error(e)
     ensure

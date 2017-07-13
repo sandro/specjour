@@ -157,7 +157,7 @@ module Specjour
         end
       end
     rescue StandardError, ScriptError => e
-      $stderr.puts "RESCUED #{e.message}"
+      $stderr.puts "Listener RESCUED #{e.class} '#{e.message}'"
       $stderr.puts e.backtrace
       connection.error(e)
     ensure

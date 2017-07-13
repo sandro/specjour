@@ -28,9 +28,8 @@ module Specjour
       fork_workers
       wait_srv
     rescue StandardError, ScriptError => e
-      $stderr.puts "RESCUED #{e.class} '#{e.message}'"
+      $stderr.puts "Loader RESCUED #{e.class} '#{e.message}'"
       $stderr.puts e.backtrace
-      $stderr.puts "\n\n"
       connection.error(e)
       remove_connection
       kill_parent
