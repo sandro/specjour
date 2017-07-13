@@ -135,7 +135,7 @@ module Specjour
     end
 
     def program_name
-      name = "specjour listen"
+      name = "specjour listen -w #{Specjour.configuration.worker_size}"
       if Specjour.configuration.project_aliases.any?
         name += " -a #{Specjour.configuration.project_aliases.join(",")}"
       end
