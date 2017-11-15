@@ -70,6 +70,22 @@ module Specjour
       end
     end
 
+    def fork_remote_workers
+      log "forking remote workers"
+      return if Specjour.configuration.remote_workers.size < 1
+      Specjour.plugin_manager.send_task(:before_remote_worker_fork)
+      Specjour.configuration.remote_workers.each_with_index do |ssh_options, i|
+        fork do
+          log "forking a worker #{ssh_options}, #{i}"
+          remove_connection
+          Specjour.plugin_manager.send_task(:remove_connection)
+          remote_worker = RemoteWorker.new(ssh_options: ssh_options, number: i)
+          Specjour.plugin_manager.send_task(:after_remote_worker_fork)
+          remote_worker.start
+        end
+      end
+    end
+
     def resolve(reply)
       Timeout.timeout(2) do
         DNSSD.resolve!(reply.name, reply.type, reply.domain, flags=0, reply.interface) do |resolved|
@@ -150,7 +166,9 @@ module Specjour
         log "listening..."
         gather
         listener_lock do
+          log "in lock"
           @loader_pid = fork_loader
+          fork_remote_workers
           Process.waitall
           remove_printer
           sleep 3 # let bonjour services stop

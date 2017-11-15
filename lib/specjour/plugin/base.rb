@@ -33,6 +33,12 @@ module Specjour
       def after_worker_fork
       end
 
+      def before_remote_worker_fork
+      end
+
+      def after_remote_worker_fork
+
+      end
       def interrupted!
       end
 

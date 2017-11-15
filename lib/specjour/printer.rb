@@ -22,6 +22,9 @@ module Specjour
       @send_threads = []
       @bonjour_service = nil
       @mutex = Mutex.new
+      @tests_registered_mutex = Mutex.new
+      @tests_registered_condition = ConditionVariable.new
+      @tests_registered = false
       @running = false
       @output = options[:output] || $stdout
       @loader_clients = []
@@ -176,7 +179,7 @@ module Specjour
         IO.select([client.socket])
       end
     rescue => e
-      $stderr.puts("Serve got an Error #{e.inspect}")
+      $stderr.puts("#serve got an Error #{e.inspect}")
       raise e
     end
 
@@ -187,6 +190,10 @@ module Specjour
     end
 
     def next_test
+      @tests_registered_mutex.synchronize do
+        break if @tests_registered
+        @tests_registered_condition.wait(@tests_registered_mutex)
+      end
       @mutex.synchronize do
         log "test size: #{tests_to_run.size}"
         if tests_to_run.size == example_size
@@ -208,8 +215,12 @@ module Specjour
     def register_tests(tests)
       @mutex.synchronize do
         if example_size == nil
-          self.tests_to_run = run_order(tests)
-          self.example_size = tests_to_run.size
+          @tests_registered_mutex.synchronize do
+            self.tests_to_run = run_order(tests)
+            self.example_size = tests_to_run.size
+            @tests_registered_condition.broadcast
+            @tests_registered = true
+          end
         end
       end
     end

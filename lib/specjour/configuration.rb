@@ -21,12 +21,18 @@ module Specjour
       project_aliases: [],
       project_name: nil,
       project_path: nil,
+      # remote_workers: [],
+      remote_workers: [
+        ["localhost", "deploy", port: 2222]
+      ],
       remote_job: nil,
       rsync_options: "-aL --delete --ignore-errors",
       rsync_port: 23456,
       test_paths: nil,
       tmp_path: "/tmp",
-      worker_size: lambda { Specjour.configuration.remote_job ? CPU.half_cores : CPU.cores },
+      worker_size: lambda do
+        Specjour.configuration.remote_job ? CPU.half_cores : CPU.cores
+      end,
       worker_number: 0
     }.freeze
 

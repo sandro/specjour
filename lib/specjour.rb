@@ -25,6 +25,7 @@ module Specjour
   autoload :Plugin, 'specjour/plugin'
   autoload :Printer, 'specjour/printer'
   autoload :Protocol, 'specjour/protocol'
+  autoload :RemoteWorker, "specjour/remote_worker"
   autoload :RspecFormatter, "specjour/rspec_formatter"
   autoload :RsyncDaemon, 'specjour/rsync_daemon'
   autoload :SocketHelper, 'specjour/socket_helper'
