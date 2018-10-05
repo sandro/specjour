@@ -7,7 +7,7 @@ module Specjour
     attr_reader :uri, :retries
     attr_writer :socket
 
-    def_delegators :socket, :flush, :close, :closed?, :gets, :puts, :each, :eof?, :tty?
+    def_delegators :socket, :flush, :close, :closed?, :each, :eof?, :tty?
 
     def self.wrap(established_connection)
       host, port = established_connection.peeraddr.values_at(3,1)
@@ -22,6 +22,14 @@ module Specjour
     end
 
     alias to_str to_s
+
+    def gets(*args)
+      debug "#{__method__.inspect} called with #{args.inspect}"
+    end
+
+    def puts(*args)
+      debug "#{__method__.inspect} called with #{args.inspect}"
+    end
 
     def connect
       debug "connecting to socket #{host}:#{port}"
