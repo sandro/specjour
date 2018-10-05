@@ -13,13 +13,13 @@ module Specjour
 
       def before_suite
         ::RSpec.configuration.instance_eval do
-          run_hooks_with(@before_suite_hooks, ::RSpec::Core::SuiteHookContext.new)
+          run_suite_hooks("a `before(:suite)` hook", @before_suite_hooks)
         end
       end
 
       def after_suite
         ::RSpec.configuration.instance_eval do
-          run_hooks_with(@after_suite_hooks, ::RSpec::Core::SuiteHookContext.new)
+          run_suite_hooks("an `after(:suite)` hook", @after_suite_hooks)
         end
       end
 
